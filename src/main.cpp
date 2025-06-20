@@ -160,8 +160,6 @@ void Input() {
 }
 
 
-
-
 void MainLoop() {
     while (!gQuit) 
     {
