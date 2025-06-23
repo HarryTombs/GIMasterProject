@@ -3,6 +3,8 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <glm/glm.hpp>
+
 
 std::string readFile(const std::string& path) {
     std::ifstream file(path);
@@ -47,4 +49,11 @@ GLuint loadShaderProgram(const std::string& vertPath, const std::string& fragPat
     glAttachShader(program, frag);
     glLinkProgram(program);
     return program;
+}
+
+void setMat4(GLuint program, const std::string& name, const glm::mat4 &value) 
+{
+    GLint location = glGetUniformLocation(program, name.c_str());
+    glUniformMatrix4fv(location, 1, GL_FALSE, &value[0][0]);
+
 }

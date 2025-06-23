@@ -1,9 +1,13 @@
 #include <iostream>
+
 #include <SDL2/SDL.h>
 #include <GL/glew.h>
 #include <GL/glut.h>
+
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include <vector>
+
 #include "SDLWindow.h"
 #include "ShaderUtils.h"
 
@@ -15,6 +19,10 @@ SDL_GLContext OpenGlConext = nullptr;
 bool gQuit = false;
 
 GLuint renderShader, quadVAO;
+
+Uint64 NOW = SDL_GetPerformanceCounter();
+Uint64 LAST = 0;
+double deltaTime = 0;
 
 
 float screenQuadVerticies[] = 
@@ -211,10 +219,33 @@ void MainLoop() {
     {
         Input();
 
+        // Get Delta time
+
+        LAST = NOW;
+        NOW = SDL_GetPerformanceCounter();
+
+        deltaTime = (double)((NOW - LAST) * 1000) / SDL_GetPerformanceFrequency();
+        deltaTime /= 1000.0;
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glUseProgram(renderShader);
+
         glClearColor(0.8, 0.4, 0.15, 1);
         glClear(GL_COLOR_BUFFER_BIT);
+
+        glUseProgram(renderShader);
+
+        glm::mat4 model = glm::mat4(1.0f);
+        glm::mat4 view = glm::mat4(1.0f);
+        glm::mat4 projection = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(0.0f, -1.0f, 0.0f));
+        model = glm::rotate(model, glm::radians(20.0f), glm::vec3(1.0f, 0.3f, 0.5f));
+        projection = glm::perspective(glm::radians(45.0f), (float)ScreenWidth / (float)ScreenHeight, 0.1f, 100.0f);
+        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -5.0f));
+
+        setMat4(renderShader, "model", model);  
+        setMat4(renderShader, "view", view);
+        setMat4(renderShader, "projection", projection);
+        CheckGLError("Set Matrices");
 
         glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
