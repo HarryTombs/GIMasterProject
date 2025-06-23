@@ -175,7 +175,7 @@ void InitialiseProgram()
     CheckGLError("glGenVertexArrays");
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(screenQuadVerticies), screenQuadVerticies, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
     CheckGLError("Buffer setup");
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
@@ -217,7 +217,7 @@ void MainLoop() {
         glClear(GL_COLOR_BUFFER_BIT);
 
         glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 6);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
         CheckGLError("RenderQuad");
         SDL_GL_SwapWindow(GraphicsApplicationWindow);
         
