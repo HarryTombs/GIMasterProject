@@ -4,6 +4,7 @@
 #include <GL/glew.h>
 #include <GL/glut.h>
 
+#include <assimp/Importer.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <vector>
@@ -237,8 +238,9 @@ void MainLoop() {
         glm::mat4 model = glm::mat4(1.0f);
         glm::mat4 view = glm::mat4(1.0f);
         glm::mat4 projection = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0f, -1.0f, 0.0f));
-        model = glm::rotate(model, glm::radians(20.0f), glm::vec3(1.0f, 0.3f, 0.5f));
+        model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
+        float angle = static_cast<float>(SDL_GetTicks()) / 1000.0f * 50.0f; // Rotate at 50 degrees per second
+        model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.5f, 0.1f));
         projection = glm::perspective(glm::radians(45.0f), (float)ScreenWidth / (float)ScreenHeight, 0.1f, 100.0f);
         view = glm::translate(view, glm::vec3(0.0f, 0.0f, -5.0f));
 
