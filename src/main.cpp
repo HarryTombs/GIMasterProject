@@ -11,6 +11,7 @@
 
 #include "SDLWindow.h"
 #include "ShaderUtils.h"
+#include "Mesh.h"
 
 
 int ScreenHeight = 512;
@@ -18,6 +19,8 @@ int ScreenWidth = 512;
 SDL_Window* GraphicsApplicationWindow = nullptr;
 SDL_GLContext OpenGlConext = nullptr;
 bool gQuit = false;
+
+Model* cubeModel;
 
 GLuint renderShader, quadVAO;
 
@@ -35,53 +38,6 @@ float screenQuadVerticies[] =
    -1.0f, -1.0f, 0.0f,   0.0f, 0.0f,
    -1.0f,  1.0f, 0.0f,   0.0f, 1.0f
 };
-
-float vertices[] = {
-    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-    0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-    0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-    0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-    0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-    0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-    0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-    -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-
-    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-    -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-    0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-    0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-    0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-    0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-    0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-    0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-
-    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-    0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-    0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-    0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-    -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
-};
-
-unsigned int VBO;
-unsigned int VAO;
 
 
 void CheckSDLError(const std::string& message) 
@@ -178,23 +134,7 @@ void InitialiseProgram()
     std::cout << "OpenGL initialized successfully!" << std::endl;
 
 
-    glGenBuffers(1, &VBO);
-    CheckGLError("glGenBuffers");
-    glGenVertexArrays(1, &VAO);
-    CheckGLError("glGenVertexArrays");
-    glBindVertexArray(VAO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    CheckGLError("Buffer setup");
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-    CheckGLError("VertexAttribPointer (position)");
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
-    CheckGLError("VertexAttribPointer (texture)");
-
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    cubeModel = new Model("../models/test2.obj");
 
     renderShader = loadShaderProgram("../shaders/vertex.glsl", "../shaders/fragment.glsl");
 
@@ -239,7 +179,7 @@ void MainLoop() {
         glm::mat4 view = glm::mat4(1.0f);
         glm::mat4 projection = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
-        float angle = static_cast<float>(SDL_GetTicks()) / 1000.0f * 50.0f; // Rotate at 50 degrees per second
+        float angle = static_cast<float>(SDL_GetTicks()) / 1000.0f * 50.0f; 
         model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.5f, 0.1f));
         projection = glm::perspective(glm::radians(45.0f), (float)ScreenWidth / (float)ScreenHeight, 0.1f, 100.0f);
         view = glm::translate(view, glm::vec3(0.0f, 0.0f, -5.0f));
@@ -249,9 +189,8 @@ void MainLoop() {
         setMat4(renderShader, "projection", projection);
         CheckGLError("Set Matrices");
 
-        glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-        CheckGLError("RenderQuad");
+        cubeModel->Draw(renderShader);
+
         SDL_GL_SwapWindow(GraphicsApplicationWindow);
         
 
@@ -261,8 +200,6 @@ void MainLoop() {
 
 void CleanUp() 
 {
-    glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VBO);
     glDeleteProgram(renderShader);
     SDL_GL_DeleteContext(OpenGlConext);
     SDL_DestroyWindow(GraphicsApplicationWindow);
