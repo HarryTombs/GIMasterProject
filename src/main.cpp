@@ -1,13 +1,14 @@
 #include <iostream>
+#include <vector>
 
 #include <SDL2/SDL.h>
 #include <GL/glew.h>
 #include <GL/glut.h>
 
-#include <assimp/Importer.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <vector>
+#include <stb_image.h>
+#include <filesystem>
 
 #include "SDLWindow.h"
 #include "ShaderUtils.h"
@@ -27,6 +28,8 @@ GLuint renderShader, quadVAO;
 Uint64 NOW = SDL_GetPerformanceCounter();
 Uint64 LAST = 0;
 double deltaTime = 0;
+
+unsigned int texture;
 
 
 float screenQuadVerticies[] = 
@@ -137,8 +140,25 @@ void InitialiseProgram()
     cubeModel = new Model("../models/test2.obj");
 
     renderShader = loadShaderProgram("../shaders/vertex.glsl", "../shaders/fragment.glsl");
-
     
+
+    glGenTextures(1, &texture);
+
+    glBindTexture(GL_TEXTURE_2D, texture);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    int width, height, channels;
+    unsigned char *data = stbi_load("../textures/wallss.jpg", &width, &height, &channels, 4);
+
+    if (data)
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, ScreenWidth, ScreenHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    stbi_image_free(data);
 
 }
 
@@ -172,6 +192,8 @@ void MainLoop() {
 
         glClearColor(0.8, 0.4, 0.15, 1);
         glClear(GL_COLOR_BUFFER_BIT);
+
+        glBindTexture(GL_TEXTURE_2D, texture);
 
         glUseProgram(renderShader);
 
