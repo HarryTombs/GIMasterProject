@@ -19,6 +19,10 @@ GLuint loadComputeShader(const std::string& path) {
     const char* cstr = src.c_str();
     glShaderSource(shader, 1, &cstr, NULL);
     glCompileShader(shader);
+    if (glGetError() != GL_NO_ERROR) {
+        std::cerr << "Error compiling compute shader: " << path << std::endl;
+        return 0;
+    }
     GLuint program = glCreateProgram();
     glAttachShader(program, shader);
     glLinkProgram(program);
@@ -42,12 +46,24 @@ GLuint loadShaderProgram(const std::string& vertPath, const std::string& fragPat
         glCompileShader(shader);
         return shader;
     };
+    if (!std::filesystem::exists(vertPath) || !std::filesystem::exists(fragPath)) {
+        std::cerr << "Shader file not found: " << vertPath << " or " << fragPath << std::endl;
+        return 0;
+    }
     GLuint vert = load(vertPath, GL_VERTEX_SHADER);
     GLuint frag = load(fragPath, GL_FRAGMENT_SHADER);
     GLuint program = glCreateProgram();
     glAttachShader(program, vert);
     glAttachShader(program, frag);
     glLinkProgram(program);
+    GLint success;
+    glGetProgramiv(program, GL_LINK_STATUS, &success);
+    if (!success) {
+        char infoLog[512];
+        glGetProgramInfoLog(program, 512, NULL, infoLog);
+        std::cerr << "Shader Program Linking Failed:\n" << infoLog << std::endl;
+        return 0;
+    }
     return program;
 }
 

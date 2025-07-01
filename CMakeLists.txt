@@ -36,6 +36,9 @@ target_link_libraries(${TargetName}  ${OPENGL_LIBRARIES})
 find_package(assimp REQUIRED)
 target_link_libraries(${TargetName}  ${ASSIMP_LIBRARIES})
 
+add_compile_definitions(ASSET_DIR="${CMAKE_CURRENT_SOURCE_DIR}/")
+
+
 
 add_custom_command(TARGET ${TargetName} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory

@@ -7,6 +7,7 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+
 #include <stb_image.h>
 #include <filesystem>
 
@@ -105,6 +106,8 @@ void InitialiseProgram()
     }
     CheckSDLError("SDL_Init");
 
+    std::cout << std::filesystem::current_path() << std::endl;
+
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 4);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
@@ -136,11 +139,18 @@ void InitialiseProgram()
     GetOpenGLVersionInfo();
     std::cout << "OpenGL initialized successfully!" << std::endl;
 
+    std::string modelPath = std::string(ASSET_DIR) + "/models/test2.obj";
 
-    cubeModel = new Model("../models/test2.obj");
+    cubeModel = new Model(modelPath);
 
-    renderShader = loadShaderProgram("../shaders/vertex.glsl", "../shaders/fragment.glsl");
-    
+    std::string vertexShaderPath = std::string(ASSET_DIR) + "shaders/vertex.glsl";
+    std::string fragmentShaderPath = std::string(ASSET_DIR) + "shaders/fragment.glsl";
+
+    renderShader = loadShaderProgram(vertexShaderPath, fragmentShaderPath);
+    if (renderShader == 0) {
+        std::cerr << "Failed to load shaders." << std::endl;
+        exit(1);
+    }
 
     glGenTextures(1, &texture);
 
@@ -151,14 +161,22 @@ void InitialiseProgram()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     int width, height, channels;
-    unsigned char *data = stbi_load("../textures/wallss.jpg", &width, &height, &channels, 4);
+    constexpr const char* stbi_path = (ASSET_DIR "textures/7051776139_0a12399c9c_o.png");
+    unsigned char *data = stbi_load(stbi_path, &width, &height, &channels, 4);
 
     if (data)
     {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, ScreenWidth, ScreenHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
     }
+    else 
+    {
+        std::cerr << "Failed to load texture: " << stbi_path << std::endl;
+        std::cerr << "stbi error: " << stbi_failure_reason() << std::endl;
+
+    }
     stbi_image_free(data);
+    CheckGLError("Texture Loading");
 
 }
 
@@ -193,9 +211,15 @@ void MainLoop() {
         glClearColor(0.8, 0.4, 0.15, 1);
         glClear(GL_COLOR_BUFFER_BIT);
 
+        CheckGLError("Clear Color");
+
         glBindTexture(GL_TEXTURE_2D, texture);
 
+        CheckGLError("Bind Texture");
+
         glUseProgram(renderShader);
+
+        CheckGLError("Use Shader");
 
         glm::mat4 model = glm::mat4(1.0f);
         glm::mat4 view = glm::mat4(1.0f);
