@@ -71,7 +71,7 @@ private:
         glEnableVertexAttribArray(1);
         
         // Texture coordinate attribute
-        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, TexCoords));
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, TexCoords));
         glEnableVertexAttribArray(2);
 
         glBindVertexArray(0);
