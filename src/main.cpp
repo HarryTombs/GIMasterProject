@@ -24,7 +24,9 @@ bool gQuit = false;
 
 Model* cubeModel;
 
-GLuint renderShader, gbufferShader, lightShader, quadVAO;
+GLuint renderShader, gbufferShader, lightShader; 
+GLuint quadVAO,quadVBO;
+
 unsigned int gPosition, gNormal, gAlbedoSpec;
 unsigned int gBuffer;
 
@@ -181,6 +183,18 @@ void InitialiseProgram()
     stbi_image_free(data);
     CheckGLError("Texture Loading");
 
+    // Create Screen Quad
+
+    glGenVertexArrays(1, &quadVAO);
+    glGenBuffers(1, &quadVBO);
+    glBindVertexArray(quadVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+    glBufferData(GL_ARRAY_BUFFER,sizeof(screenQuadVerticies),&screenQuadVerticies,GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3,GL_FLOAT, GL_FALSE, 5 * sizeof(float),(void*)0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2,GL_FLOAT, GL_FALSE, 5 * sizeof(float),(void*)(3*sizeof(float)));
+
     /// GBuffer Creation
 
     glGenFramebuffers(1, &gBuffer);
@@ -285,13 +299,20 @@ void MainLoop() {
         glUniform1i(glGetUniformLocation(lightShader, "gNormal"), 1);
         glUniform1i(glGetUniformLocation(lightShader, "gAlbedoSpec"), 2);
 
-        glBindTexture(GL_TEXTURE_2D, texture);
+        // Render screen quad
 
-        CheckGLError("Bind Texture");
+        glBindVertexArray(quadVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+        glBindVertexArray(0);
 
-        LoadMatricies(renderShader);
 
-        cubeModel->Draw(renderShader);
+        // glBindTexture(GL_TEXTURE_2D, texture);
+
+        // CheckGLError("Bind Texture");
+
+        // LoadMatricies(renderShader);
+
+        // cubeModel->Draw(renderShader);
 
         SDL_GL_SwapWindow(GraphicsApplicationWindow);
         

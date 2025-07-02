@@ -63,6 +63,7 @@ GLuint loadShaderProgram(const std::string& inVertPath, const std::string& inFra
         std::cerr << "Shader Program Linking Failed:\n" << infoLog << std::endl;
         return 0;
     }
+    std::cout << "Shader Program Linked Successfully: " << inVertPath << " and " << inFragPath << std::endl;
     return program;
 }
 
