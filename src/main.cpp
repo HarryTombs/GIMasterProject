@@ -24,7 +24,8 @@ bool gQuit = false;
 
 Model* cubeModel;
 
-GLuint renderShader, quadVAO;
+GLuint renderShader, computeShader, quadVAO;
+unsigned int gBuffer;
 
 Uint64 NOW = SDL_GetPerformanceCounter();
 Uint64 LAST = 0;
@@ -77,12 +78,10 @@ void createTexture(GLuint& tex)
 {
     glGenTextures(1, &tex);
     glBindTexture(GL_TEXTURE_2D, tex);
-    glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA32F, ScreenWidth, ScreenHeight);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glBindTexture(GL_TEXTURE_2D, 0);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, ScreenWidth, ScreenHeight, 0, GL_RGBA, GL_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex, 0);
     CheckGLError("createTexture");
 }
 
@@ -150,6 +149,8 @@ void InitialiseProgram()
     std::string fragmentShaderPath = std::string(ASSET_DIR) + "shaders/fragment.glsl";
 
     renderShader = loadShaderProgram(vertexShaderPath, fragmentShaderPath);
+    computeShader = loadComputeShader(std::string(ASSET_DIR) + "shaders/compute.glsl");
+
     if (renderShader == 0) {
         std::cerr << "Failed to load shaders." << std::endl;
         exit(1);
@@ -164,7 +165,7 @@ void InitialiseProgram()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     int width, height, channels;
-    constexpr const char* stbi_path = (ASSET_DIR "textures/Cicero-face.png");
+    constexpr const char* stbi_path = (ASSET_DIR "textures/7051776139_0a12399c9c_o.png");
     unsigned char *data = stbi_load(stbi_path, &width, &height, &channels, 4);
 
     if (data)
@@ -180,6 +181,21 @@ void InitialiseProgram()
     }
     stbi_image_free(data);
     CheckGLError("Texture Loading");
+
+    /// GBuffer Creation
+
+    glGenFramebuffers(1, &gBuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
+    unsigned int gPosition, gNormal, gAlbedoSpec;
+
+    createTexture(gPosition);
+    createTexture(gNormal);
+    createTexture(gAlbedoSpec);
+
+    unsigned int attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
+    glDrawBuffers(3, attachments);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    CheckGLError("GBuffer Creation");
 
 }
 
@@ -230,7 +246,7 @@ void MainLoop() {
         model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
         float angle = static_cast<float>(SDL_GetTicks()) / 1000.0f * 50.0f; 
         model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.5f, 0.1f));
-        projection = glm::perspective(glm::radians(45.0f), (float)ScreenWidth / (float)ScreenHeight, 0.1f, 100.0f);
+        projection = glm::perspective(glm::radians(45.0f), (float)ScreenWidth / (float)ScreenHeight, 0.1f, 10000.0f);
         view = glm::translate(view, glm::vec3(0.0f, 0.0f, -5.0f));
 
         setMat4(renderShader, "model", model);  
