@@ -165,7 +165,7 @@ void InitialiseProgram()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     int width, height, channels;
-    constexpr const char* stbi_path = (ASSET_DIR "textures/7051776139_0a12399c9c_o.png");
+    constexpr const char* stbi_path = (ASSET_DIR "textures/white-brick-wall-seamless-texture-free.png");
     unsigned char *data = stbi_load(stbi_path, &width, &height, &channels, 4);
 
     if (data)
