@@ -24,7 +24,8 @@ bool gQuit = false;
 
 Model* cubeModel;
 
-GLuint renderShader, computeShader, quadVAO;
+GLuint renderShader, gbufferShader, lightShader, quadVAO;
+unsigned int gPosition, gNormal, gAlbedoSpec;
 unsigned int gBuffer;
 
 Uint64 NOW = SDL_GetPerformanceCounter();
@@ -141,15 +142,13 @@ void InitialiseProgram()
     glEnable(GL_DEPTH_TEST);
 
 
-    std::string modelPath = std::string(ASSET_DIR) + "models/test2.obj";
+    std::string modelPath = "models/test2.obj";
 
     cubeModel = new Model(modelPath);
 
-    std::string vertexShaderPath = std::string(ASSET_DIR) + "shaders/vertex.glsl";
-    std::string fragmentShaderPath = std::string(ASSET_DIR) + "shaders/fragment.glsl";
-
-    renderShader = loadShaderProgram(vertexShaderPath, fragmentShaderPath);
-    computeShader = loadComputeShader(std::string(ASSET_DIR) + "shaders/compute.glsl");
+    renderShader = loadShaderProgram("shaders/vertex.glsl", "shaders/fragment.glsl");
+    gbufferShader = loadShaderProgram("shaders/DSVertex.glsl", "shaders/DSFragment.glsl");
+    lightShader = loadShaderProgram("shaders/LightVertex.glsl", "shaders/LightFragment.glsl");
 
     if (renderShader == 0) {
         std::cerr << "Failed to load shaders." << std::endl;
@@ -186,7 +185,7 @@ void InitialiseProgram()
 
     glGenFramebuffers(1, &gBuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
-    unsigned int gPosition, gNormal, gAlbedoSpec;
+
 
     createTexture(gPosition);
     createTexture(gNormal);
@@ -194,9 +193,40 @@ void InitialiseProgram()
 
     unsigned int attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
     glDrawBuffers(3, attachments);
+
+    unsigned int rboDepth;
+    glGenRenderbuffers(1, &rboDepth);
+    glBindRenderbuffer(GL_RENDERBUFFER, rboDepth);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, ScreenWidth , ScreenHeight);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rboDepth);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     CheckGLError("GBuffer Creation");
 
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE)
+    {
+        std::cout << "Gbuffer Complete" << std::endl;
+    }
+
+}
+
+void LoadMatricies (GLuint shaderProgram) 
+{
+    glUseProgram(shaderProgram);
+    glm::mat4 model = glm::mat4(1.0f);
+    glm::mat4 view = glm::mat4(1.0f);
+    glm::mat4 projection = glm::mat4(1.0f);
+
+    model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
+    float angle = static_cast<float>(SDL_GetTicks()) / 1000.0f * 50.0f; 
+    model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.5f, 0.1f));
+    projection = glm::perspective(glm::radians(45.0f), (float)ScreenWidth / (float)ScreenHeight, 0.1f, 10000.0f);
+    view = glm::translate(view, glm::vec3(0.0f, 0.0f, -5.0f));
+
+    //FIXME make these global variables later
+
+    setMat4(shaderProgram, "model", model);  
+    setMat4(shaderProgram, "view", view);
+    setMat4(shaderProgram, "projection", projection);
 }
 
 void Input() {
@@ -226,33 +256,40 @@ void MainLoop() {
         deltaTime /= 1000.0;
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
         glClearColor(0.8, 0.4, 0.15, 1);
-        glClear(GL_COLOR_BUFFER_BIT);
-
         CheckGLError("Clear Color");
+
+        // GBuffer Pass
+
+        glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        LoadMatricies(gbufferShader);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture);
+        cubeModel->Draw(renderShader);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        CheckGLError("GBuffer Pass");
+
+        // Light Pass
+
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glUseProgram(lightShader);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, gPosition);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, gNormal);
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, gAlbedoSpec);
+
+        glUniform1i(glGetUniformLocation(lightShader, "gPosition"), 0);
+        glUniform1i(glGetUniformLocation(lightShader, "gNormal"), 1);
+        glUniform1i(glGetUniformLocation(lightShader, "gAlbedoSpec"), 2);
 
         glBindTexture(GL_TEXTURE_2D, texture);
 
         CheckGLError("Bind Texture");
 
-        glUseProgram(renderShader);
-
-        CheckGLError("Use Shader");
-
-        glm::mat4 model = glm::mat4(1.0f);
-        glm::mat4 view = glm::mat4(1.0f);
-        glm::mat4 projection = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
-        float angle = static_cast<float>(SDL_GetTicks()) / 1000.0f * 50.0f; 
-        model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.5f, 0.1f));
-        projection = glm::perspective(glm::radians(45.0f), (float)ScreenWidth / (float)ScreenHeight, 0.1f, 10000.0f);
-        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -5.0f));
-
-        setMat4(renderShader, "model", model);  
-        setMat4(renderShader, "view", view);
-        setMat4(renderShader, "projection", projection);
-        CheckGLError("Set Matrices");
+        LoadMatricies(renderShader);
 
         cubeModel->Draw(renderShader);
 

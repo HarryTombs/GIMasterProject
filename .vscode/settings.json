@@ -82,6 +82,7 @@
         "valarray": "cpp",
         "variant": "cpp",
         "__nullptr": "cpp",
-        "__config": "cpp"
+        "__config": "cpp",
+        "filesystem": "cpp"
     }
 }

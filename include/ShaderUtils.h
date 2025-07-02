@@ -37,7 +37,7 @@ GLuint loadComputeShader(const std::string& path) {
     return program;
 }
 
-GLuint loadShaderProgram(const std::string& vertPath, const std::string& fragPath) {
+GLuint loadShaderProgram(const std::string& inVertPath, const std::string& inFragPath) {
     auto load = [](const std::string& path, GLenum type) {
         GLuint shader = glCreateShader(type);
         std::string src = readFile(path);
@@ -46,10 +46,9 @@ GLuint loadShaderProgram(const std::string& vertPath, const std::string& fragPat
         glCompileShader(shader);
         return shader;
     };
-    if (!std::filesystem::exists(vertPath) || !std::filesystem::exists(fragPath)) {
-        std::cerr << "Shader file not found: " << vertPath << " or " << fragPath << std::endl;
-        return 0;
-    }
+    std::string vertPath = (std::string(ASSET_DIR) + inVertPath);
+    std::string fragPath = (std::string(ASSET_DIR) + inFragPath);
+
     GLuint vert = load(vertPath, GL_VERTEX_SHADER);
     GLuint frag = load(fragPath, GL_FRAGMENT_SHADER);
     GLuint program = glCreateProgram();

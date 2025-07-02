@@ -84,7 +84,7 @@ class Model
 public:
     Model(std::string const path)
     {
-        loadModel(path);
+        loadModel(std::string(ASSET_DIR) + path);
     }
 
     void Draw(unsigned int &shader)
@@ -147,7 +147,6 @@ private:
 
             if (mesh->HasNormals()) 
             {
-
             vector.x = mesh->mNormals[i].x;
             vector.y = mesh->mNormals[i].y;
             vector.z = mesh->mNormals[i].z;
