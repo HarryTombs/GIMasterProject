@@ -8,5 +8,5 @@ uniform sampler2D useTexture;
 void main() 
     {
         vec4 loadtexture = texture(useTexture,uv);
-        color = loadtexture;
+        color = vec4(1,1,1,1);
     }
