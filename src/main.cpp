@@ -5,16 +5,19 @@
 #include <GL/glew.h>
 #include <GL/glut.h>
 
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/string_cast.hpp>
 
-#define STB_IMAGE_IMPLEMENTATION
+// #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 #include <filesystem>
 
 #include "SDLWindow.h"
 #include "ShaderUtils.h"
 #include "Mesh.h"
+#include "Camera.h"
 
 
 int ScreenHeight = 512;
@@ -24,6 +27,7 @@ SDL_GLContext OpenGlConext = nullptr;
 bool gQuit = false;
 
 Model* cubeModel;
+Camera* fpsCamera;
 
 GLuint renderShader, gbufferShader, lightShader; 
 GLuint quadVAO,quadVBO;
@@ -222,22 +226,22 @@ void InitialiseProgram()
         std::cout << "Gbuffer Complete" << std::endl;
     }
 
+    fpsCamera = new Camera(glm::vec3(0.0f,0.0f,-5.0f),glm::vec3(0.0f,0.0f,0.0f),glm::vec3(0.0f,1.0f,0.0f));
+
+    fpsCamera->setProjection(45.0f, static_cast<float>(ScreenWidth) / static_cast<float>(ScreenHeight), 0.1f, 100.0f);
+
 }
 
 void LoadMatricies (GLuint shaderProgram) 
 {
     glUseProgram(shaderProgram);
     glm::mat4 model = glm::mat4(1.0f);
-    glm::mat4 view = glm::mat4(1.0f);
-    glm::mat4 projection = glm::mat4(1.0f);
+    glm::mat4 view = fpsCamera->getView();
+    glm::mat4 projection = fpsCamera->getProjection();
 
     model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
     float angle = static_cast<float>(SDL_GetTicks()) / 1000.0f * 50.0f; 
     model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.5f, 0.1f));
-    projection = glm::perspective(glm::radians(45.0f), (float)ScreenWidth / (float)ScreenHeight, 0.1f, 10000.0f);
-    view = glm::translate(view, glm::vec3(0.0f, 0.0f, -5.0f));
-
-    //FIXME make these global variables later
 
     setMat4(shaderProgram, "model", model);  
     setMat4(shaderProgram, "view", view);
@@ -302,18 +306,18 @@ void MainLoop() {
 
         // Render screen quad
 
-        glBindVertexArray(quadVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 6);
-        glBindVertexArray(0);
+        // glBindVertexArray(quadVAO);
+        // glDrawArrays(GL_TRIANGLES, 0, 6);
+        // glBindVertexArray(0);
 
 
-        // glBindTexture(GL_TEXTURE_2D, texture);
+        glBindTexture(GL_TEXTURE_2D, texture);
 
-        // CheckGLError("Bind Texture");
+        CheckGLError("Bind Texture");
 
-        // LoadMatricies(renderShader);
+        LoadMatricies(renderShader);
 
-        // cubeModel->Draw(renderShader);
+        cubeModel->Draw(renderShader);
 
         SDL_GL_SwapWindow(GraphicsApplicationWindow);
         
