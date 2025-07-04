@@ -1,11 +1,15 @@
 #include "Camera.h"
 #include <glm/glm.hpp>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/string_cast.hpp>
+#include <iostream>
 
 Camera::Camera(glm::vec3 from,glm::vec3 to,glm::vec3 up)
 {
     CamPos = from;
     CamTo = to;
     CamUp = up;
+
     setVectors();
 }
 
@@ -28,18 +32,31 @@ void Camera::setProjection(float FOV,float aspect,float nearPlane,float farPlane
 
 void Camera::setVectors()
 {
-    CamFront.x = cosf(glm::radians(m_yaw) * cosf(glm::radians(m_pitch)));
-    CamFront.y = sinf(glm::radians(m_pitch));
-    CamFront.z = sinf(glm::radians(m_yaw)) * cosf(glm::radians(m_pitch));
-    glm::normalize(CamFront);
+    // CamFront.x = cosf(glm::radians(m_yaw) * cosf(glm::radians(m_pitch)));
+    // CamFront.y = sinf(glm::radians(m_pitch));
+    // CamFront.z = sinf(glm::radians(m_yaw)) * cosf(glm::radians(m_pitch));
+    // CamFront = glm::normalize(CamFront);
+    
 
-    CamRight = glm::cross(CamFront,WorldUp);
-    CamUp = glm::cross(CamRight,CamFront);
+    // CamRight = glm::cross(CamFront,WorldUp);
+    // CamUp = glm::cross(CamRight,CamFront);
 
-    glm::normalize(CamRight);
-    glm::normalize(CamFront);
+    // CamRight = glm::normalize(CamRight);
+    // CamFront = glm::normalize(CamFront);
 
-    ViewMat = glm::lookAt(CamPos,CamPos + CamFront, CamUp);
+    //FIX ROTATION STUFF LATER
+
+    glm::vec3 lookat = CamTo + CamFront;
+
+
+    std::cout << "looking at: " << glm::to_string(lookat) << std::endl;
+    std::cout << "CamPos: " << glm::to_string(CamPos) << std::endl;
+    std::cout << "CamUp: " << glm::to_string(CamUp) << std::endl;
+    std::cout << "CamFront: " << glm::to_string(CamFront) << std::endl;
+
+    ViewMat = glm::lookAt(CamPos,lookat, CamUp);
+
+    std::cout <<  "ViewMat " << glm::to_string(ViewMat) << std::endl;
 }
 
 void Camera::Move(float x, float y, float deltaTime)

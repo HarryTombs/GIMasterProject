@@ -6,22 +6,22 @@
 class Camera 
 {
 public:
-    glm::vec3 CamPos;
-    glm::vec3 CamTo;
-    glm::vec3 CamUp;
+    glm::vec3 CamPos = glm::vec3(0.0f,0.0f,-5.0f);
+    glm::vec3 CamTo = glm::vec3(0.0f,0.0f,0.0f);
+    glm::vec3 CamUp = glm::vec3(0.0f,1.0f,0.0f);
     glm::vec3 WorldUp;
     glm::vec3 CamFront;
     glm::vec3 CamRight;
-    glm::mat4 ViewMat;
-    glm::mat4 ProjecMat;
-    float m_FOV;
-    float m_aspect;
-    float m_near;
-    float m_far; 
-    float m_yaw;
-    float m_pitch;
-    float m_speed;
-    float m_sensitivity;
+    glm::mat4 ViewMat = glm::mat4(1.0f);
+    glm::mat4 ProjecMat = glm::mat4(1.0f);
+    float m_FOV = 45.0f;
+    float m_aspect = 1.2f;
+    float m_near = 0.01f;
+    float m_far = 1000.0f; 
+    float m_yaw = 0.0f;
+    float m_pitch = 0.0f;
+    float m_speed = 0.75f;
+    float m_sensitivity = 0.1f;
     int width;
     int height;
 
