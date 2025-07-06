@@ -285,7 +285,7 @@ void MainLoop() {
         LoadMatricies(gbufferShader);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture);
-        cubeModel->Draw(renderShader);
+        cubeModel->Draw(gbufferShader);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         CheckGLError("GBuffer Pass");
 
@@ -300,24 +300,20 @@ void MainLoop() {
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, gAlbedoSpec);
 
-        glUniform1i(glGetUniformLocation(lightShader, "gPosition"), 0);
-        glUniform1i(glGetUniformLocation(lightShader, "gNormal"), 1);
-        glUniform1i(glGetUniformLocation(lightShader, "gAlbedoSpec"), 2);
-
         // Render screen quad
 
-        // glBindVertexArray(quadVAO);
-        // glDrawArrays(GL_TRIANGLES, 0, 6);
-        // glBindVertexArray(0);
+        glBindVertexArray(quadVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+        glBindVertexArray(0);
 
 
-        glBindTexture(GL_TEXTURE_2D, texture);
+        // glBindTexture(GL_TEXTURE_2D, texture);
 
-        CheckGLError("Bind Texture");
+        // CheckGLError("Bind Texture");
 
-        LoadMatricies(renderShader);
+        // LoadMatricies(renderShader);
 
-        cubeModel->Draw(renderShader);
+        // cubeModel->Draw(renderShader);
 
         SDL_GL_SwapWindow(GraphicsApplicationWindow);
         

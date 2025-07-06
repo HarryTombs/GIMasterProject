@@ -12,7 +12,7 @@ layout (location=2)out vec4 gColorSpec;
 
 void main()
 {
-    gPos = vec4(FragPos,1.0);
+    gPos = vec4(1.0,0.0,0.0,1.0);
     gNorm = vec4(Normal,1.0);
     gColorSpec = texture(tex,TexCoord);
 }
