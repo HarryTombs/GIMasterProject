@@ -3,42 +3,55 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+const float YAW = -90.f; 
+const float PITCH = 0.0f;
+const float SPEED = 2.5f;
+const float SENSITIVITY = 0.1f;
+const float ZOOM = 45.0f;
+
 class Camera 
 {
 public:
-    glm::vec3 CamPos = glm::vec3(0.0f,0.0f,-5.0f);
-    glm::vec3 CamTo = glm::vec3(0.0f,0.0f,0.0f);
-    glm::vec3 CamUp = glm::vec3(0.0f,1.0f,0.0f);
+    glm::vec3 CamPos;
+    glm::vec3 CamUp;
     glm::vec3 WorldUp;
     glm::vec3 CamFront;
     glm::vec3 CamRight;
-    glm::mat4 ViewMat = glm::mat4(1.0f);
-    glm::mat4 ProjecMat = glm::mat4(1.0f);
-    float m_FOV = 45.0f;
-    float m_aspect = 1.2f;
-    float m_near = 0.01f;
-    float m_far = 1000.0f; 
-    float m_yaw = 0.0f;
-    float m_pitch = 0.0f;
-    float m_speed = 0.75f;
-    float m_sensitivity = 0.1f;
+
+    float m_zoom;
+    float m_yaw;
+    float m_pitch;
+    float m_speed;
+    float m_sensitivity;
     int width;
     int height;
 
-
-    Camera()=default;
-    Camera(glm::vec3 from,glm::vec3 to,glm::vec3 up);
-    void set(glm::vec3 from,glm::vec3 to,glm::vec3 up);
-    void setProjection(float FOV,float aspect,float nearPlane,float farPlane);
-    void setView();
-    void setVectors();
+    Camera(glm::vec3 position = glm::vec3(0.0f,0.0f,0.0f),glm::vec3 up = glm::vec3(0.0f,1.0f,0.0f),float yaw = YAW, float pitch = PITCH) : CamFront(glm::vec3(0.0f,0.0f,-1.0f)), m_speed(SPEED), m_sensitivity(SENSITIVITY), m_zoom(ZOOM)    {
+        CamPos = position;
+        WorldUp = up;
+        m_yaw = yaw;
+        m_pitch = pitch;
+        setVectors();
+    }
     void processMouseMovement(float newX,float newY,bool contrainPitch = true);
-    glm::mat4 getView(){return ViewMat;}
-    glm::mat4 getProjection(){return ProjecMat;}
-
+    glm::mat4 getView(){return glm::lookAt(CamPos, CamPos + CamFront, CamUp);};
     void Move(float x, float y, float deltaTime);
 
 private:
+    void setVectors()
+    {
+        glm::vec3 newFront;
+        newFront.x = cos(glm::radians(m_yaw) * cos(glm::radians(m_pitch)));
+        newFront.y = sin(glm::radians(m_pitch));
+        newFront.z = sin(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
+        CamFront = glm::normalize(newFront);
+        
+        CamRight = glm::normalize(glm::cross(CamFront,WorldUp));
+        CamUp = glm::normalize(glm::cross(CamRight,CamFront));
+        std::cout << "RIGHT: " << glm::to_string(CamRight) << std::endl;
+        std::cout << "UP: " << glm::to_string(CamUp) << std::endl;
+        std::cout << "FRONT: " << glm::to_string(CamFront) << std::endl;
+    };
 
 
 };
