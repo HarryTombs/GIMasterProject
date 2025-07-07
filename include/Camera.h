@@ -9,6 +9,14 @@ const float SPEED = 2.5f;
 const float SENSITIVITY = 0.1f;
 const float ZOOM = 45.0f;
 
+enum Camera_Movement
+{
+    FORWARD,
+    BACKWARD,
+    LEFT,
+    RIGHT
+};
+
 class Camera 
 {
 public:
@@ -33,9 +41,21 @@ public:
         m_pitch = pitch;
         setVectors();
     }
+    void Move(Camera_Movement direction, float deltaTime)
+    {
+        float velocity = m_speed * deltaTime;
+        if (direction == FORWARD)
+            CamPos += CamFront * velocity;
+        if (direction == BACKWARD)
+            CamPos -= CamFront * velocity;
+        if (direction == LEFT)
+            CamPos -= CamRight * velocity;
+        if (direction == RIGHT)
+            CamPos += CamRight * velocity;
+    }
     void processMouseMovement(float newX,float newY,bool contrainPitch = true);
     glm::mat4 getView(){return glm::lookAt(CamPos, CamPos + CamFront, CamUp);};
-    void Move(float x, float y, float deltaTime);
+
 
 private:
     void setVectors()

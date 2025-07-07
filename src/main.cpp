@@ -248,10 +248,35 @@ void Input() {
     SDL_Event e;
     while (SDL_PollEvent(&e) != 0) 
     {
-        if (e.type == SDL_QUIT) 
+
+        
+        if (e.type ==  SDL_QUIT)
         {
             std::cout << "Bye!" << std::endl;
             gQuit = true;
+        }
+        if (e.type == SDL_KEYDOWN)
+        {
+            // std::cout << "KeyPressed: " << e.key.keysym.sym << std::endl;
+            switch(e.key.keysym.sym)
+            {
+                case 119: // W
+                    std::cout << "w pressed" << std::endl;
+                    fpsCamera.Move(FORWARD,deltaTime);
+                    break;
+                case 115: // S
+                    std::cout << "s pressed" << std::endl;
+                    fpsCamera.Move(BACKWARD,deltaTime);
+                    break;
+                case 97: // S
+                    std::cout << "a pressed" << std::endl;
+                    fpsCamera.Move(LEFT,deltaTime);
+                    break;
+                case 100: // S
+                    std::cout << "d pressed" << std::endl;
+                    fpsCamera.Move(RIGHT,deltaTime);
+                    break;
+            }
         }
     }
 }
