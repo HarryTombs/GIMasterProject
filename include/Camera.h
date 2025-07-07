@@ -53,7 +53,23 @@ public:
         if (direction == RIGHT)
             CamPos += CamRight * velocity;
     }
-    void processMouseMovement(float newX,float newY,bool contrainPitch = true);
+    void processMouseMovement(float newX,float newY,bool contrainPitch = true)
+    {
+        newX *= m_sensitivity;
+        newY *= m_sensitivity;
+
+        m_yaw += newX;
+        m_pitch += newY;
+
+        if (contrainPitch = true)
+        {
+            if (m_pitch > 89.0f)
+                m_pitch = 89.0f;
+            if (m_pitch > 89.0f)
+                m_pitch = 89.0f;
+        }
+        setVectors();
+    }
     glm::mat4 getView(){return glm::lookAt(CamPos, CamPos + CamFront, CamUp);};
 
 
@@ -68,9 +84,9 @@ private:
         
         CamRight = glm::normalize(glm::cross(CamFront,WorldUp));
         CamUp = glm::normalize(glm::cross(CamRight,CamFront));
-        std::cout << "RIGHT: " << glm::to_string(CamRight) << std::endl;
-        std::cout << "UP: " << glm::to_string(CamUp) << std::endl;
-        std::cout << "FRONT: " << glm::to_string(CamFront) << std::endl;
+        // std::cout << "RIGHT: " << glm::to_string(CamRight) << std::endl;
+        // std::cout << "UP: " << glm::to_string(CamUp) << std::endl;
+        // std::cout << "FRONT: " << glm::to_string(CamFront) << std::endl;
     };
 
 

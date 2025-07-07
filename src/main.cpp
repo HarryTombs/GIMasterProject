@@ -26,6 +26,9 @@ SDL_Window* GraphicsApplicationWindow = nullptr;
 SDL_GLContext OpenGlConext = nullptr;
 bool gQuit = false;
 
+bool mouseDown = false;
+float glX;
+float glY;
 Model* cubeModel;
 Camera fpsCamera(glm::vec3(0.0f,0.0f,3.0f));
 
@@ -263,27 +266,58 @@ void Input() {
             switch(e.key.keysym.sym)
             {
                 case 119: // W
-                    // std::cout << "w pressed" << std::endl;
                     fpsCamera.Move(FORWARD,deltaTime);
                     break;
                 case 115: // S
-                    // std::cout << "s pressed" << std::endl;
                     fpsCamera.Move(BACKWARD,deltaTime);
                     break;
                 case 97: // A
-                    // std::cout << "a pressed" << std::endl;
                     fpsCamera.Move(LEFT,deltaTime);
                     break;
                 case 100: // D
-                    // std::cout << "d pressed" << std::endl;
                     fpsCamera.Move(RIGHT,deltaTime);
                     break;
             }
         }
-
         // Change this
         // Try doing a while pressed check so it works without the intial stutter
         // and can handle multiple inputs (i think?)
+
+        if (e.type == SDL_MOUSEBUTTONDOWN) 
+        {
+
+            if (e.button.button == SDL_BUTTON_LEFT) 
+            {
+                mouseDown = true;
+                glX = ( e.motion.x); 
+                glY = ((ScreenHeight - e.motion.y));
+            }
+        }
+        if (e.type == SDL_MOUSEMOTION) 
+        {
+            if (e.motion.state & SDL_BUTTON_LMASK) 
+            {
+                float xpos =  static_cast<float>(e.motion.x);
+                float ypos =  static_cast<float>(ScreenHeight- e.motion.y);
+
+                float xoffset = xpos - glX;
+                float yoffset = ypos - glY;
+                glX = xpos;
+                glY = ypos;
+                fpsCamera.processMouseMovement(xoffset,yoffset);
+            }
+            
+        }
+        if (e.type == SDL_MOUSEBUTTONUP) 
+        {
+            if (e.button.button == SDL_BUTTON_LEFT) 
+            {
+                mouseDown = false;
+                glX = 0.0; 
+                glY = 0.0;  
+                
+            }
+        }
     }
 }
 
