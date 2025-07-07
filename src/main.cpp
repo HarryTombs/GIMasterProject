@@ -249,35 +249,41 @@ void Input() {
     while (SDL_PollEvent(&e) != 0) 
     {
 
-        
+        // Quit event
         if (e.type ==  SDL_QUIT)
         {
             std::cout << "Bye!" << std::endl;
             gQuit = true;
         }
+
+        // WASD Movement 
+
         if (e.type == SDL_KEYDOWN)
         {
-            // std::cout << "KeyPressed: " << e.key.keysym.sym << std::endl;
             switch(e.key.keysym.sym)
             {
                 case 119: // W
-                    std::cout << "w pressed" << std::endl;
+                    // std::cout << "w pressed" << std::endl;
                     fpsCamera.Move(FORWARD,deltaTime);
                     break;
                 case 115: // S
-                    std::cout << "s pressed" << std::endl;
+                    // std::cout << "s pressed" << std::endl;
                     fpsCamera.Move(BACKWARD,deltaTime);
                     break;
-                case 97: // S
-                    std::cout << "a pressed" << std::endl;
+                case 97: // A
+                    // std::cout << "a pressed" << std::endl;
                     fpsCamera.Move(LEFT,deltaTime);
                     break;
-                case 100: // S
-                    std::cout << "d pressed" << std::endl;
+                case 100: // D
+                    // std::cout << "d pressed" << std::endl;
                     fpsCamera.Move(RIGHT,deltaTime);
                     break;
             }
         }
+
+        // Change this
+        // Try doing a while pressed check so it works without the intial stutter
+        // and can handle multiple inputs (i think?)
     }
 }
 
