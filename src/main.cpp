@@ -224,6 +224,30 @@ void InitialiseProgram()
         std::cout << "Gbuffer Complete" << std::endl;
     }
 
+    glUseProgram(lightShader);
+    glUniform1i(glGetUniformLocation(lightShader, "gPosition"), 0);
+    glUniform1i(glGetUniformLocation(lightShader, "gNorm"), 1);
+    glUniform1i(glGetUniformLocation(lightShader, "gAlbedoSpec"), 2);
+
+    // lights
+
+    const unsigned int NR_Lights = 32;
+    std::vector<glm::vec3> lightPos;
+    std::vector<glm::vec3> lightCol;
+    srand(13);
+    for (unsigned int i = 0; i < NR_Lights; i++)
+    {
+        float xPos = static_cast<float>(((rand() % 100) / 100.0) * 6.0 - 3.0);
+        float yPos = static_cast<float>(((rand() % 100) / 100.0) * 6.0 - 4.0);
+        float zPos = static_cast<float>(((rand() % 100) / 100.0) * 6.0 - 3.0);
+        lightPos.push_back(glm::vec3(xPos, yPos, zPos));
+        // also calculate random color
+        float rColor = static_cast<float>(((rand() % 100) / 200.0f) + 0.5); // between 0.5 and 1.0
+        float gColor = static_cast<float>(((rand() % 100) / 200.0f) + 0.5); // between 0.5 and 1.0
+        float bColor = static_cast<float>(((rand() % 100) / 200.0f) + 0.5); // between 0.5 and 1.0
+        lightCol.push_back(glm::vec3(rColor, gColor, bColor));
+    }
+
 }
 
 void LoadMatricies (GLuint shaderProgram) 
@@ -340,8 +364,8 @@ void MainLoop() {
         glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         LoadMatricies(gbufferShader);
-        // glActiveTexture(GL_TEXTURE0);
-        // glBindTexture(GL_TEXTURE_2D, texture);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture);
         cubeModel->Draw();
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         CheckGLError("GBuffer Pass");
@@ -350,9 +374,6 @@ void MainLoop() {
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glUseProgram(lightShader);
-        glUniform1i(glGetUniformLocation(lightShader, "gPosition"), 0);
-        glUniform1i(glGetUniformLocation(lightShader, "gNorm"), 1);
-        glUniform1i(glGetUniformLocation(lightShader, "gAlbedoSpec"), 2);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, gPosition);
         glActiveTexture(GL_TEXTURE1);
