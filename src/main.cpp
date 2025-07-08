@@ -38,6 +38,10 @@ GLuint quadVAO,quadVBO;
 unsigned int gPosition, gNormal, gAlbedoSpec;
 unsigned int gBuffer;
 
+const unsigned int NR_Lights = 32;
+std::vector<glm::vec3> lightPos;
+std::vector<glm::vec3> lightCol;
+
 Uint64 NOW = SDL_GetPerformanceCounter();
 Uint64 LAST = 0;
 double deltaTime = 0;
@@ -231,15 +235,13 @@ void InitialiseProgram()
 
     // lights
 
-    const unsigned int NR_Lights = 32;
-    std::vector<glm::vec3> lightPos;
-    std::vector<glm::vec3> lightCol;
+
     srand(13);
     for (unsigned int i = 0; i < NR_Lights; i++)
     {
-        float xPos = static_cast<float>(((rand() % 100) / 100.0) * 6.0 - 3.0);
-        float yPos = static_cast<float>(((rand() % 100) / 100.0) * 6.0 - 4.0);
-        float zPos = static_cast<float>(((rand() % 100) / 100.0) * 6.0 - 3.0);
+        float xPos = static_cast<float>(((rand() % 100) / 100.0) * 0.5 - 0.2);
+        float yPos = static_cast<float>(((rand() % 100) / 100.0) * 1.0 - 0.6);
+        float zPos = static_cast<float>(((rand() % 100) / 100.0) * 1.0 - 0.1);
         lightPos.push_back(glm::vec3(xPos, yPos, zPos));
         // also calculate random color
         float rColor = static_cast<float>(((rand() % 100) / 200.0f) + 0.5); // between 0.5 and 1.0
@@ -248,6 +250,9 @@ void InitialiseProgram()
         lightCol.push_back(glm::vec3(rColor, gColor, bColor));
     }
 
+    // !!!!
+    // change this i don't like this setup
+    // !!!!
 }
 
 void LoadMatricies (GLuint shaderProgram) 
@@ -298,10 +303,13 @@ void Input() {
                     break;
             }
         }
+
+        // !!!!
         // Change this
         // Try doing a while pressed check so it works without the intial stutter
         // and can handle multiple inputs (i think?)
-
+        // !!!!
+        
         if (e.type == SDL_MOUSEBUTTONDOWN) 
         {
 
@@ -381,6 +389,19 @@ void MainLoop() {
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, gAlbedoSpec);
         CheckGLError("Light Pass");
+
+        for (unsigned int i = 0; i < lightPos.size(); i++)
+        {
+            setVec3(lightShader,("lights[" + std::to_string(i) + "].Position"), lightPos[i]);
+            setVec3(lightShader,("lights[" + std::to_string(i) + "].Color"), lightCol[i]);
+
+            const float linear = 0.7f;
+            const float quadratic = 1.8f;
+            setFloat(lightShader,("lights[" + std::to_string(i) + "].Linear"), linear);
+            setFloat(lightShader,("lights[" + std::to_string(i) + "].Quadratic"), quadratic);
+        }
+        setVec3(lightShader,"viewPos", fpsCamera.CamPos);
+        CheckGLError("Light creation");
 
         // Render screen quad
 

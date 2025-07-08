@@ -67,8 +67,20 @@ GLuint loadShaderProgram(const std::string& inVertPath, const std::string& inFra
     return program;
 }
 
+void setFloat(GLuint program, const std::string& name, float value)
+{
+    GLuint location = glGetUniformLocation(program, name.c_str());
+    glUniform1f(location, value);
+}
+
 void setMat4(GLuint program, const std::string& name, const glm::mat4 &value) 
 {
     GLint location = glGetUniformLocation(program, name.c_str());
     glUniformMatrix4fv(location, 1, GL_FALSE, &value[0][0]);
+}
+
+void setVec3(GLuint program, const std::string& name, const glm::vec3 &value)
+{
+    GLint location = glGetUniformLocation(program, name.c_str());
+    glUniform3fv(location,1,&value[0]);
 }
