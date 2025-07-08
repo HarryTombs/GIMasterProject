@@ -13,5 +13,5 @@ void main()
         vec3 fragPos = texture(gPosition, uv).xyz;
         vec3 Normal = texture(gNorm, uv).xyz;
         vec3 Abledo = texture(gAlbedoSpec, uv).xyz;
-        FragColor = vec4(Abledo,1.0);
+        FragColor = vec4(fragPos,1.0);
     }
