@@ -41,7 +41,7 @@ public:
     }
 
 
-    void Draw(unsigned int &shader)
+    void Draw()
     {
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
@@ -87,10 +87,10 @@ public:
         loadModel(std::string(ASSET_DIR) + path);
     }
 
-    void Draw(unsigned int &shader)
+    void Draw()
     {
         for (unsigned int i = 0; i < meshes.size(); i++)
-            meshes[i].Draw(shader);
+            meshes[i].Draw();
     }
     std::vector<Mesh> meshes;
     std::string directory;
