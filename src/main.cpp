@@ -289,16 +289,16 @@ void Input() {
         {
             switch(e.key.keysym.sym)
             {
-                case 119: // W
+                case SDLK_w:
                     fpsCamera.Move(FORWARD,deltaTime);
                     break;
-                case 115: // S
+                case SDLK_s: 
                     fpsCamera.Move(BACKWARD,deltaTime);
                     break;
-                case 97: // A
+                case SDLK_a: 
                     fpsCamera.Move(LEFT,deltaTime);
                     break;
-                case 100: // D
+                case SDLK_d: 
                     fpsCamera.Move(RIGHT,deltaTime);
                     break;
             }
