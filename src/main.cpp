@@ -18,7 +18,7 @@
 #include "ShaderUtils.h"
 #include "Mesh.h"
 #include "Camera.h"
-
+#include "FrameBufferObject.h"
 
 int ScreenHeight = 512;
 int ScreenWidth = 512;
@@ -34,6 +34,11 @@ Camera fpsCamera(glm::vec3(0.0f,0.0f,3.0f));
 
 GLuint renderShader, gbufferShader, lightShader; 
 GLuint quadVAO,quadVBO;
+
+FrameBufferObject gBufferFBO;
+
+TextureFormat GPosFmt;
+TextureObj GPos;
 
 unsigned int gPosition, gNormal, gAlbedoSpec;
 unsigned int gBuffer;
@@ -89,7 +94,7 @@ void GetOpenGLVersionInfo()
     std::cout << "Shading Language: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
 }
 
-void InitialiseProgram() 
+void InitialiseSDL()
 {
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         std::cerr << "Could not initialize SDL Video Subsystem: " << SDL_GetError() << std::endl;
@@ -129,6 +134,11 @@ void InitialiseProgram()
 
     GetOpenGLVersionInfo();
     std::cout << "OpenGL initialized successfully!" << std::endl;
+}
+
+void InitialiseProgram() 
+{
+    InitialiseSDL();
 
     glEnable(GL_DEPTH_TEST);
 
@@ -186,8 +196,11 @@ void InitialiseProgram()
 
     /// GBuffer Creation
 
-    glGenFramebuffers(1, &gBuffer);
-    glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
+    // glGenFramebuffers(1, &gBuffer);
+    // glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
+
+    gBufferFBO.create();
+    gBufferFBO.bind();
 
     // Texture Creation
     
@@ -240,7 +253,7 @@ void InitialiseProgram()
     for (unsigned int i = 0; i < NR_Lights; i++)
     {
         float xPos = static_cast<float>(((rand() % 100) / 100.0) * 0.5 - 0.2);
-        float yPos = static_cast<float>(((rand() % 100) / 100.0) * 1.0 - 0.6);
+        float yPos = static_cast<float>(((rand() % 100) / 100.0) * 1.0 - 0.2);
         float zPos = static_cast<float>(((rand() % 100) / 100.0) * 1.0 - 0.1);
         lightPos.push_back(glm::vec3(xPos, yPos, zPos));
         // also calculate random color
@@ -369,7 +382,7 @@ void MainLoop() {
 
         // GBuffer Pass
 
-        glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
+        glBindFramebuffer(GL_FRAMEBUFFER, gBufferFBO.getID());
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         LoadMatricies(gbufferShader);
         glActiveTexture(GL_TEXTURE0);
@@ -389,6 +402,7 @@ void MainLoop() {
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, gAlbedoSpec);
         CheckGLError("Light Pass");
+        
 
         for (unsigned int i = 0; i < lightPos.size(); i++)
         {
