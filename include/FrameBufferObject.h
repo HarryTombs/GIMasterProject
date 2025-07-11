@@ -20,7 +20,7 @@ public:
     void *data;
     GLuint texID;
     
-    void createTex(int w, int h, TextureFormat& fmt, GLenum attachment);
+    void create(int w, int h, TextureFormat& fmt, GLenum attachment);
 
 };
 

@@ -1,6 +1,6 @@
 #include "FrameBufferObject.h"
 
-void TextureObj::createTex(int w, int h, TextureFormat& fmt, GLenum attachment)
+void TextureObj::create(int w, int h, TextureFormat& fmt, GLenum attachment)
 {
 
     width = w;
