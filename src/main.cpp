@@ -26,6 +26,11 @@ SDL_Window* GraphicsApplicationWindow = nullptr;
 SDL_GLContext OpenGlConext = nullptr;
 bool gQuit = false;
 
+bool upPress = false;
+bool downPress = false;
+bool rightPress = false;
+bool leftPress = false;
+
 bool mouseDown = false;
 float glX;
 float glY;
@@ -280,32 +285,6 @@ void Input() {
             gQuit = true;
         }
 
-        // WASD Movement 
-
-        if (e.type == SDL_KEYDOWN)
-        {
-            switch(e.key.keysym.sym)
-            {
-                case SDLK_w:
-                    fpsCamera.Move(FORWARD,deltaTime);
-                    break;
-                case SDLK_s: 
-                    fpsCamera.Move(BACKWARD,deltaTime);
-                    break;
-                case SDLK_a: 
-                    fpsCamera.Move(LEFT,deltaTime);
-                    break;
-                case SDLK_d: 
-                    fpsCamera.Move(RIGHT,deltaTime);
-                    break;
-            }
-        }
-
-        // !!!!
-        // Change this
-        // Try doing a while pressed check so it works without the intial stutter
-        // and can handle multiple inputs (i think?)
-        // !!!!
         
         if (e.type == SDL_MOUSEBUTTONDOWN) 
         {
@@ -343,6 +322,17 @@ void Input() {
             }
         }
     }
+
+    // WASD Movement 
+
+    const Uint8* keystates = SDL_GetKeyboardState(NULL);
+    if (keystates[SDL_SCANCODE_W]) fpsCamera.Move(FORWARD, deltaTime);
+    if (keystates[SDL_SCANCODE_S]) fpsCamera.Move(BACKWARD, deltaTime);
+    if (keystates[SDL_SCANCODE_A]) fpsCamera.Move(LEFT, deltaTime);
+    if (keystates[SDL_SCANCODE_D]) fpsCamera.Move(RIGHT, deltaTime);
+    if (keystates[SDL_SCANCODE_E]) fpsCamera.Move(UP, deltaTime);
+    if (keystates[SDL_SCANCODE_Q]) fpsCamera.Move(DOWN, deltaTime);
+
 }
 
 

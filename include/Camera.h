@@ -6,7 +6,7 @@
 const float YAW = -90.f; 
 const float PITCH = 0.0f;
 const float SPEED = 2.5f;
-const float SENSITIVITY = 0.1f;
+const float SENSITIVITY = 0.2f;
 const float ZOOM = 45.0f;
 
 enum Camera_Movement
@@ -14,7 +14,9 @@ enum Camera_Movement
     FORWARD,
     BACKWARD,
     LEFT,
-    RIGHT
+    RIGHT,
+    UP,
+    DOWN,
 };
 
 class Camera 
@@ -44,14 +46,13 @@ public:
     void Move(Camera_Movement direction, float deltaTime)
     {
         float velocity = m_speed * deltaTime;
-        if (direction == FORWARD)
-            CamPos += CamFront * velocity;
-        if (direction == BACKWARD)
-            CamPos -= CamFront * velocity;
-        if (direction == LEFT)
-            CamPos -= CamRight * velocity;
-        if (direction == RIGHT)
-            CamPos += CamRight * velocity;
+        if (direction == FORWARD)   CamPos += CamFront * velocity;
+        if (direction == BACKWARD)  CamPos -= CamFront * velocity;
+        if (direction == LEFT)      CamPos -= CamRight * velocity;
+        if (direction == RIGHT)     CamPos += CamRight * velocity;
+        if (direction == UP)        CamPos += CamUp * velocity;
+        if (direction == DOWN)      CamPos -= CamUp * velocity;
+
     }
     void processMouseMovement(float newX,float newY,bool contrainPitch = true)
     {
