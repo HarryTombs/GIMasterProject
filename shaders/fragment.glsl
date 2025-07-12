@@ -1,12 +1,9 @@
 #version 430 core
 
-in vec2 uv;
-out vec4 color;
+layout (location = 0) out vec4 FragColor;
 
-uniform sampler2D useTexture;
 
 void main() 
     {
-        vec4 loadtexture = texture(useTexture,uv);
-        color = vec4(1,1,1,1);
+        FragColor = vec4(1,1,1,1);
     }

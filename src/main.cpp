@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <random>
 
 #include <SDL2/SDL.h>
 #include <GL/glew.h>
@@ -69,6 +70,8 @@ float screenQuadVerticies[] =
 };
 
 
+
+
 void CheckSDLError(const std::string& message) 
 {
     const char* error = SDL_GetError();
@@ -89,6 +92,86 @@ void CheckGLError(const std::string& message)
         exit(1);
     }
 }
+
+// CITED FROM learnopengl.com 
+
+unsigned int cubeVAO = 0;
+unsigned int cubeVBO = 0;
+
+void renderCube()
+{
+    if (cubeVAO == 0)
+    {
+        float cubeVerticies[] = 
+            {
+                -1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 0.0f, 0.0f, // bottom-left
+                1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 1.0f, 1.0f, // top-right
+                1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 1.0f, 0.0f, // bottom-right         
+                1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 1.0f, 1.0f, // top-right
+                -1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 0.0f, 0.0f, // bottom-left
+                -1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 0.0f, 1.0f, // top-left
+                // front face
+                -1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f, 0.0f, // bottom-left
+                1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, 0.0f, // bottom-right
+                1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, 1.0f, // top-right
+                1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, 1.0f, // top-right
+                -1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f, 1.0f, // top-left
+                -1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f, 0.0f, // bottom-left
+                // left face
+                -1.0f,  1.0f,  1.0f, -1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-right
+                -1.0f,  1.0f, -1.0f, -1.0f,  0.0f,  0.0f, 1.0f, 1.0f, // top-left
+                -1.0f, -1.0f, -1.0f, -1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-left
+                -1.0f, -1.0f, -1.0f, -1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-left
+                -1.0f, -1.0f,  1.0f, -1.0f,  0.0f,  0.0f, 0.0f, 0.0f, // bottom-right
+                -1.0f,  1.0f,  1.0f, -1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-right
+                // right face
+                1.0f,  1.0f,  1.0f,  1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-left
+                1.0f, -1.0f, -1.0f,  1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-right
+                1.0f,  1.0f, -1.0f,  1.0f,  0.0f,  0.0f, 1.0f, 1.0f, // top-right         
+                1.0f, -1.0f, -1.0f,  1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-right
+                1.0f,  1.0f,  1.0f,  1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-left
+                1.0f, -1.0f,  1.0f,  1.0f,  0.0f,  0.0f, 0.0f, 0.0f, // bottom-left     
+                // bottom face
+                -1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f, 0.0f, 1.0f, // top-right
+                1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f, 1.0f, 1.0f, // top-left
+                1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f, 1.0f, 0.0f, // bottom-left
+                1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f, 1.0f, 0.0f, // bottom-left
+                -1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f, 0.0f, 0.0f, // bottom-right
+                -1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f, 0.0f, 1.0f, // top-right
+                // top face
+                -1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f, 0.0f, 1.0f, // top-left
+                1.0f,  1.0f , 1.0f,  0.0f,  1.0f,  0.0f, 1.0f, 0.0f, // bottom-right
+                1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f, 1.0f, 1.0f, // top-right     
+                1.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f, 1.0f, 0.0f, // bottom-right
+                -1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f, 0.0f, 1.0f, // top-left
+                -1.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f, 0.0f, 0.0f  // bottom-left     
+            };
+            glGenVertexArrays(1, &cubeVAO);
+            glGenBuffers(1, &cubeVBO);
+            // fill buffer
+            glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
+            glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVerticies), &cubeVerticies, GL_STATIC_DRAW);
+            // link vertex attributes
+            glBindVertexArray(cubeVAO);
+            glEnableVertexAttribArray(0);
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+            glEnableVertexAttribArray(1);
+            glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+            glEnableVertexAttribArray(2);
+            glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+            glBindVertexArray(0);
+            std::cout << "CubeMade" << std::endl;
+    }
+    glBindVertexArray(cubeVAO);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    glBindVertexArray(0);
+
+    CheckGLError("CubeMaking");
+    
+}
+
+// end of citation
 
 void GetOpenGLVersionInfo() 
 {
@@ -241,34 +324,41 @@ void InitialiseProgram()
     srand(13);
     for (unsigned int i = 0; i < NR_Lights; i++)
     {
-        float xPos = static_cast<float>(((rand() % 100) / 100.0) * 0.5 - 0.2);
-        float yPos = static_cast<float>(((rand() % 100) / 100.0) * 1.0 - 0.2);
-        float zPos = static_cast<float>(((rand() % 100) / 100.0) * 1.0 - 0.1);
+        std::random_device rd;
+        std::uniform_real_distribution<double> posDist(-0.7f,0.7f);
+        std::uniform_real_distribution<double> ColDist(0.1,1.0);
+        float xPos = posDist(rd);
+        float yPos = posDist(rd);
+        float zPos = posDist(rd);
         lightPos.push_back(glm::vec3(xPos, yPos, zPos));
         // also calculate random color
-        float rColor = static_cast<float>(((rand() % 100) / 200.0f) + 0.5); // between 0.5 and 1.0
-        float gColor = static_cast<float>(((rand() % 100) / 200.0f) + 0.5); // between 0.5 and 1.0
-        float bColor = static_cast<float>(((rand() % 100) / 200.0f) + 0.5); // between 0.5 and 1.0
+        float rColor = ColDist(rd);
+        float gColor = ColDist(rd);
+        float bColor = ColDist(rd);
         lightCol.push_back(glm::vec3(rColor, gColor, bColor));
     }
 
     // !!!!
-    // change this i don't like this setup
+    // Fix the lights in the shader somethings wrong its only picking one
     // !!!!
 }
 
-void LoadMatricies (GLuint shaderProgram) 
+void LoadMatricies (GLuint shaderProgram, bool useModelMatrix) 
 {
     glUseProgram(shaderProgram);
-    glm::mat4 model = glm::mat4(1.0f);
+
     glm::mat4 view = fpsCamera.getView();
     glm::mat4 projection = glm::perspective(glm::radians(fpsCamera.m_zoom), (float)ScreenWidth/ (float)ScreenHeight,0.01f,1000.0f);
 
-    model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
-    float angle = static_cast<float>(SDL_GetTicks()) / 1000.0f * 50.0f; 
-    model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.5f, 0.1f));
+    if (useModelMatrix == true)
+    {
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
+        float angle = static_cast<float>(SDL_GetTicks()) / 1000.0f * 50.0f; 
+        model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.5f, 0.1f));
+        setMat4(shaderProgram, "model", model);  
+    }    
 
-    setMat4(shaderProgram, "model", model);  
     setMat4(shaderProgram, "view", view);
     setMat4(shaderProgram, "projection", projection);
 }
@@ -349,7 +439,6 @@ void MainLoop() {
         deltaTime = (double)((NOW - LAST) * 1000) / SDL_GetPerformanceFrequency();
         deltaTime /= 1000.0;
 
-        // glClearColor(0.8, 0.4, 0.15, 1);
         glClearColor(0.0,0.0,0.0,1.0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         CheckGLError("Clear Color");
@@ -358,7 +447,7 @@ void MainLoop() {
 
         glBindFramebuffer(GL_FRAMEBUFFER, gBufferFBO.getID());
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        LoadMatricies(gbufferShader);
+        LoadMatricies(gbufferShader,true);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture);
         cubeModel->Draw();
@@ -391,12 +480,36 @@ void MainLoop() {
         setVec3(lightShader,"viewPos", fpsCamera.CamPos);
         CheckGLError("Light creation");
 
+        glDisable(GL_DEPTH_TEST);
+
         // Render screen quad
 
         glBindVertexArray(quadVAO);
         glDrawArrays(GL_TRIANGLES, 0, 6);
         glBindVertexArray(0);
 
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+        glEnable(GL_DEPTH_TEST);
+
+        // render cubes for lights
+
+        glUseProgram(renderShader);
+
+        glm::mat4 view = fpsCamera.getView();
+        glm::mat4 projection = glm::perspective(glm::radians(fpsCamera.m_zoom), (float)ScreenWidth/ (float)ScreenHeight,0.01f,1000.0f);
+        setMat4(renderShader, "projection", projection);
+        setMat4(renderShader, "view", view);
+
+        for (unsigned int i = 0; i < lightPos.size(); i ++)
+        {
+            glm::mat4 model = glm::mat4(1.0f);
+            model = glm::translate(model, lightPos[i]);
+            model = glm::scale(model, glm::vec3(0.05f));
+            setMat4(renderShader, "model", model);
+            glUseProgram(renderShader);
+            renderCube();
+        }
 
         // glBindTexture(GL_TEXTURE_2D, texture);
 
