@@ -20,6 +20,7 @@ target_sources(${TargetName} PRIVATE ${PROJECT_SOURCE_DIR}/src/main.cpp
 			${PROJECT_SOURCE_DIR}/include/ShaderUtils.h
 			${PROJECT_SOURCE_DIR}/include/Camera.h
 			${PROJECT_SOURCE_DIR}/include/FrameBufferObject.h
+			${PROJECT_SOURCE_DIR}/include/Pass.h
 			${PROJECT_SOURCE_DIR}/include/Mesh.h)
 
 

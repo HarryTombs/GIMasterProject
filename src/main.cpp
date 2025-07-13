@@ -445,7 +445,7 @@ void MainLoop() {
 
         // GBuffer Pass
 
-        glBindFramebuffer(GL_FRAMEBUFFER, gBufferFBO.getID());
+        gBufferFBO.bind();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         LoadMatricies(gbufferShader,true);
         glActiveTexture(GL_TEXTURE0);
