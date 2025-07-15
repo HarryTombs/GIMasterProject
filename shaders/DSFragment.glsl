@@ -2,7 +2,7 @@
 
 in vec3 FragPos;
 in vec3 Normal;
-in vec2 TexCoord;
+in vec2 TexCoords;
 
 uniform sampler2D tex;
 
@@ -16,6 +16,6 @@ void main()
 {
     gPosition = FragPos;
     gNormal = normalize(Normal);
-    gAlbedoSpec.rgb = texture(tex,TexCoord).rgb;
+    gAlbedoSpec.rgb = texture(tex,TexCoords).rgb;
     gAlbedoSpec.a = 1.0;
 }
