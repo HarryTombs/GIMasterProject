@@ -11,7 +11,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/string_cast.hpp>
 
-#define STB_IMAGE_IMPLEMENTATION
+// #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 #include <filesystem>
 
@@ -231,6 +231,14 @@ void InitialiseProgram()
 
 
     std::string modelPath = "models/test2.obj";
+
+    /*
+    !!!
+    TO DO 
+    Add a scene graph for geometry and lights
+    !!! 
+    */
+
 
     cubeModel = new Model(modelPath);
 
