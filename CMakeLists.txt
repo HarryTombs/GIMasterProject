@@ -21,6 +21,7 @@ target_sources(${TargetName} PRIVATE ${PROJECT_SOURCE_DIR}/src/main.cpp
 			${PROJECT_SOURCE_DIR}/include/Camera.h
 			${PROJECT_SOURCE_DIR}/include/FrameBufferObject.h
 			${PROJECT_SOURCE_DIR}/include/Pass.h
+			${PROJECT_SOURCE_DIR}/include/Scene.h
 			${PROJECT_SOURCE_DIR}/include/Mesh.h)
 
 
