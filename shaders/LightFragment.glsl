@@ -31,12 +31,14 @@ void main()
         for (int i = 0; i < NR_Lights; i++)
         {
             vec3 lightDir = normalize(lights[i].Position - fragPos);
-            Abledo = max(dot(Normal,lightDir), 0.0) * Abledo * lights[i].Color;
+            float diff = max(dot(Normal,lightDir), 0.0);
 
             float distance = length(lights[i].Position - fragPos);
             float attenuation = 1.0 / (1.0 + lights[i].Linear * distance + lights[i].Quadratic * distance * distance);
-            Abledo *= attenuation;
-            lighting += Abledo;
+
+            vec3 diffuse = diff * Abledo * lights[i].Color * attenuation;
+            
+            lighting += diffuse;
         }
         FragColor = vec4(lighting,1.0);
     }

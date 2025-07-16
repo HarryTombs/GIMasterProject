@@ -299,10 +299,12 @@ void InitialiseProgram()
     GPos.create(ScreenWidth,ScreenHeight,GPosFmt,GL_COLOR_ATTACHMENT0);
     gBufferFBO.attachTexture(GPos);
 
+    /// THESE ARE JUST INTS YOU CAN DO GL_COLOR_ATTACH + 1
+
     GNorm.create(ScreenWidth,ScreenHeight,GNormFmt,GL_COLOR_ATTACHMENT1);
     gBufferFBO.attachTexture(GNorm);
 
-    GAlbSpec.create(ScreenWidth,ScreenHeight,GAbSpFmt,GL_COLOR_ATTACHMENT2);
+    GAlbSpec.create(ScreenWidth,ScreenHeight,GAbSpFmt,GL_COLOR_ATTACHMENT1 + 1);
     gBufferFBO.attachTexture(GAlbSpec);
 
     unsigned int attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
@@ -459,8 +461,10 @@ void MainLoop() {
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture);
         cubeModel->Draw();
+        glBlitFramebuffer(0, 0, ScreenWidth, ScreenHeight, 0, 0, ScreenWidth, ScreenHeight, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         CheckGLError("GBuffer Pass");
+
 
         // Light Pass
 
@@ -479,7 +483,6 @@ void MainLoop() {
         {
             setVec3(lightShader,("lights[" + std::to_string(i) + "].Position"), lightPos[i]);
             setVec3(lightShader,("lights[" + std::to_string(i) + "].Color"), lightCol[i]);
-
             const float linear = 0.7f;
             const float quadratic = 1.8f;
             setFloat(lightShader,("lights[" + std::to_string(i) + "].Linear"), linear);
@@ -515,6 +518,7 @@ void MainLoop() {
             model = glm::translate(model, lightPos[i]);
             model = glm::scale(model, glm::vec3(0.05f));
             setMat4(renderShader, "model", model);
+            setVec3(renderShader,"lightColor", lightCol[i]);
             glUseProgram(renderShader);
             renderCube();
         }

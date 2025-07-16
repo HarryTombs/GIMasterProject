@@ -27,7 +27,7 @@ private:
         int i = 0;
         for (TextureObj tex : In)
         {
-            // active textures???
+            //Textures need to be created before this
             frameBuffer.attachTexture(tex);
             i++;
         }

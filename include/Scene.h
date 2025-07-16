@@ -9,9 +9,7 @@ class Scene
     std::vector<Mesh> Meshes;
     std::vector<Camera> Cameras;
 
-    int currentCam;
-
-    Camera getCurrentCam();
+    Camera currentCam;
 };
 
 #endif
