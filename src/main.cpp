@@ -373,6 +373,11 @@ void MainLoop() {
 
         renderQuad();
 
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, gBufferFBO.getID());
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0); // write to default framebuffer
+        glBlitFramebuffer(
+        0, 0, ScreenWidth, ScreenHeight, 0, 0, ScreenWidth, ScreenHeight, GL_DEPTH_BUFFER_BIT, GL_NEAREST
+        );
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
         glEnable(GL_DEPTH_TEST);
@@ -396,14 +401,6 @@ void MainLoop() {
             glUseProgram(renderShader);
             renderCube();
         }
-
-        // glBindTexture(GL_TEXTURE_2D, texture);
-
-        // CheckGLError("Bind Texture");
-
-        // LoadMatricies(renderShader);
-
-        // cubeModel->Draw();
 
         SDL_GL_SwapWindow(GraphicsApplicationWindow);
         
