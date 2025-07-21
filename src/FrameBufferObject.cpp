@@ -1,6 +1,6 @@
 #include "FrameBufferObject.h"
 
-void TextureObj::create(int w, int h, TextureFormat& fmt, GLenum attachment)
+void TextureObj::create(int w, int h, TextureFormat& fmt, GLenum attachment, bool isImageTex)
 {
 
     width = w;

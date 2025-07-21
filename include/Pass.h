@@ -12,14 +12,17 @@ class Pass
 {
 public:
 
-    Pass(std::string vertpath, std::string fragpath, bool screenQuad = false)
+    Pass(std::string vertpath, std::string fragpath, bool screenQuad = false,const std::vector<TextureObj>& texturesIn = {}, const std::vector<TextureObj>& texturesOut = {})
     {
         vert = vertpath;
         frag = fragpath;
         isScreenQuad = screenQuad;
+        In = texturesIn;
+        Out = texturesOut;
     };
     std::vector<TextureObj> In;
     std::vector<TextureObj> Out;
+    std::vector<TextureFormat> InFmt;
     FrameBufferObject frameBuffer;
 
     bool isScreenQuad;
@@ -39,6 +42,18 @@ public:
         unsigned int prog = loadShaderProgram(vert, frag);
         shaderProgram = prog;
     }
+
+    void loadtextures()
+    {
+        
+        for( int i=0; i < In.size(); i++ )
+        {
+            
+        }
+
+    }
+
+
     // Maybe consolidate into an init ()
     // init shaders textures 
 
@@ -70,6 +85,14 @@ struct Graph
 {
     std::vector<Pass> Passes;
     float deltaTime;
+
+    void initGraph()
+    {
+        Passes[0].In[0].create(ScreenWidth,ScreenHeight,Passes[0].InFmt[0],GL_COLOR_ATTACHMENT0,true);
+    }
+
+    // pass 1 create input textures then for each check if texture exists
+
 
     void executePasses()
     {

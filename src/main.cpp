@@ -22,8 +22,7 @@
 #include "Pass.h"
 #include "FrameBufferObject.h"
 
-int ScreenHeight = 512;
-int ScreenWidth = 512;
+
 SDL_Window* GraphicsApplicationWindow = nullptr;
 SDL_GLContext OpenGlConext = nullptr;
 bool gQuit = false;
@@ -40,12 +39,17 @@ GLuint renderShader;
 FrameBufferObject gBufferFBO;
 TextureObj GPos, GNorm, GAlbSpec;
 
-Pass lightspass("shaders/LightVertex.glsl","shaders/LightFragment.glsl");
-Pass GbufferPass("shaders/DSVertex.glsl", "shaders/DSFragment.glsl");
-
 TextureFormat GPosFmt = {GL_RGB16F, GL_RGBA, GL_FLOAT };
 TextureFormat GNormFmt = {GL_RGB16F, GL_RGBA, GL_FLOAT };
 TextureFormat GAbSpFmt = {GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE };
+
+std::string input[] = {"GPos","GNorm","GAlbSpec"};
+
+std::vector<TextureObj> inputs = {GPos, GNorm, GAlbSpec};
+std::vector<TextureFormat> inputFmts = {GPosFmt, GNormFmt, GAbSpFmt};
+
+Pass lightspass("shaders/LightVertex.glsl","shaders/LightFragment.glsl", true);
+Pass GbufferPass("shaders/DSVertex.glsl", "shaders/DSFragment.glsl",false);
 
 const unsigned int NR_Lights = 32;
 std::vector<glm::vec3> lightPos;
@@ -131,8 +135,8 @@ void InitialiseProgram()
 
     renderShader = loadShaderProgram("shaders/vertex.glsl", "shaders/fragment.glsl");
 
-    lightspass.createShaderProgram();
-    GbufferPass.createShaderProgram();
+    lightspass.init();
+    GbufferPass.init();
 
     if (renderShader == 0) {
         std::cerr << "Failed to load shaders." << std::endl;
@@ -224,9 +228,6 @@ void InitialiseProgram()
         lightCol.push_back(glm::vec3(rColor, gColor, bColor));
     }
 
-    // !!!!
-    // Fix the lights in the shader somethings wrong its only picking one
-    // !!!!
 }
 
 void LoadMatricies (GLuint shaderProgram, bool useModelMatrix) 

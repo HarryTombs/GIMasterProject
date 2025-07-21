@@ -2,6 +2,7 @@
 #define FRAMEBUFFEROBJECT_H 
 #include <GL/glew.h>
 #include <vector>
+#include <string>
 
 struct TextureFormat
 {
@@ -13,14 +14,17 @@ struct TextureFormat
 struct TextureObj
 {
 public: 
+    TextureObj(bool isImageTex = false){
+        
+    }
+    std::string name;
     int width;
     int height;
     TextureFormat format;
     GLenum attachmentPoint;
-    void *data;
     GLuint texID;
     
-    void create(int w, int h, TextureFormat& fmt, GLenum attachment);
+    void create(int w, int h, TextureFormat& fmt, GLenum attachment,bool isImageTex = false);
 
 };
 

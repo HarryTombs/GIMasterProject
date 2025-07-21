@@ -6,6 +6,10 @@
 #include <glm/glm.hpp>
 
 
+int ScreenHeight = 512;
+int ScreenWidth = 512;
+
+
 std::string readFile(const std::string& path) {
     std::ifstream file(path);
     std::stringstream buffer;
