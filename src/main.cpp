@@ -167,36 +167,10 @@ void InitialiseProgram()
     stbi_image_free(data);
     CheckGLError("Texture Loading");
 
-    /// GBuffer Creation
+    GbufferPass.drawBuffers();
+    GbufferPass.depthBufferSetup();
 
-    // gBufferFBO.create();
-    // gBufferFBO.bind();
-
-    // Texture Creation
-
-    GbufferPass.createTextures();
-    // GbufferPass.bindTextures();
     
-    // GPos.create(ScreenWidth,ScreenHeight,GPosFmt,GL_COLOR_ATTACHMENT0);
-    // gBufferFBO.attachTexture(GPos);
-
-    /// THESE ARE JUST INTS YOU CAN DO GL_COLOR_ATTACH + 1
-
-    // GNorm.create(ScreenWidth,ScreenHeight,GNormFmt,GL_COLOR_ATTACHMENT1);
-    // gBufferFBO.attachTexture(GNorm);
-
-    // GAlbSpec.create(ScreenWidth,ScreenHeight,GAbSpFmt,GL_COLOR_ATTACHMENT1 + 1);
-    // gBufferFBO.attachTexture(GAlbSpec);
-
-    unsigned int attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
-    glDrawBuffers(3, attachments);
-
-    unsigned int rboDepth;
-    glGenRenderbuffers(1, &rboDepth);   
-    glBindRenderbuffer(GL_RENDERBUFFER, rboDepth);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, ScreenWidth , ScreenHeight);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rboDepth);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
     CheckGLError("GBuffer Creation");
 
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE)

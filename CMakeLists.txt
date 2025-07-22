@@ -16,6 +16,7 @@ target_link_libraries(${TargetName} ${SDL2_LIBRARIES} )
 include_directories(include $ENV{HOME}/NGL/include)
 target_sources(${TargetName} PRIVATE ${PROJECT_SOURCE_DIR}/src/main.cpp
 			${PROJECT_SOURCE_DIR}/src/FrameBufferObject.cpp
+			${PROJECT_SOURCE_DIR}/src/Pass.cpp
 			${PROJECT_SOURCE_DIR}/include/SDLWindow.h
 			${PROJECT_SOURCE_DIR}/include/ShaderUtils.h
 			${PROJECT_SOURCE_DIR}/include/Camera.h

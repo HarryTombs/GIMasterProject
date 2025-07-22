@@ -27,6 +27,8 @@ public:
     std::vector<TextureFormat> InFmt;
     std::vector<TextureFormat> OutFmt;
 
+    std::vector<GLenum> attachments;
+
     std::vector<TextureObj> newOutsobjs;
     FrameBufferObject frameBuffer;
 
@@ -40,6 +42,7 @@ public:
     {
         createShaderProgram();
         frameBuffer.create();
+        createTextures();
     }
     void execute();
 
@@ -70,12 +73,12 @@ public:
                     newTexObjs.push_back(newTex);
 
                     // just use a textureobj class until you implent the json reading
-            }
+            }            
 
         }
 
         std::vector<TextureObj> newOuts;
-
+        std::vector<GLenum> newAttachments;
         for ( int i = 0; i < Out.size(); i++)
         {
             TextureFormat newFmt;
@@ -86,20 +89,29 @@ public:
 
             TextureObj newTex;
 
-            // How do i get them to have different names?
-
             newTex.create(Out[i],ScreenWidth,ScreenHeight,newFmt,GL_COLOR_ATTACHMENT0 + i);
-
-            // gbuffer attach?
+            newAttachments.push_back(GL_COLOR_ATTACHMENT0 + i);
             newOuts.push_back(newTex);
             frameBuffer.attachTexture(newTex);
-
-            std::cout << "TexID is: " << newTex.texID << std::endl;
-
-            std::cout << "made Texture " << Out[i] << std::endl;
         }
         newOutsobjs = newOuts;
+        attachments = newAttachments;
         CheckGLError("Pass create textureobj");
+    }
+
+    void depthBufferSetup()
+    {
+        unsigned int rboDepth;
+        glGenRenderbuffers(1, &rboDepth);   
+        glBindRenderbuffer(GL_RENDERBUFFER, rboDepth);
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, ScreenWidth , ScreenHeight);
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rboDepth);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
+
+    void drawBuffers()
+    {
+        glDrawBuffers(static_cast<GLsizei>(attachments.size()), attachments.data());
     }
 
     void bindTextures()
