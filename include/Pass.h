@@ -12,17 +12,22 @@ class Pass
 {
 public:
 
-    Pass(std::string vertpath, std::string fragpath, bool screenQuad = false,const std::vector<TextureObj>& texturesIn = {}, const std::vector<TextureObj>& texturesOut = {})
+    Pass(std::string vertpath, std::string fragpath, bool screenQuad = false,const std::vector<std::string>& texturesIn = {}, const std::vector<std::string>& texturesOut = {},const std::vector<TextureFormat> formatIn = {},const std::vector<TextureFormat> formatOut = {})
     {
         vert = vertpath;
         frag = fragpath;
         isScreenQuad = screenQuad;
         In = texturesIn;
         Out = texturesOut;
+        InFmt = formatIn;
+        OutFmt = formatOut;
     };
-    std::vector<TextureObj> In;
-    std::vector<TextureObj> Out;
+    std::vector<std::string> In;
+    std::vector<std::string> Out;
     std::vector<TextureFormat> InFmt;
+    std::vector<TextureFormat> OutFmt;
+
+    std::vector<TextureObj> newOutsobjs;
     FrameBufferObject frameBuffer;
 
     bool isScreenQuad;
@@ -34,6 +39,7 @@ public:
     void init()
     {
         createShaderProgram();
+        frameBuffer.create();
     }
     void execute();
 
@@ -43,16 +49,68 @@ public:
         shaderProgram = prog;
     }
 
-    void loadtextures()
+    void createTextures()
     {
-        
-        for( int i=0; i < In.size(); i++ )
+        bool texExists = true;
+        // CHECK IF THEY EXIST !!!!!
+        if (texExists != true)
         {
-            
+            std::vector<TextureObj> newTexObjs;
+            for( int i=0; i < In.size(); i++ )
+            {
+                    TextureFormat newFmt;
+
+                    newFmt.internalFormat = InFmt[i].internalFormat;
+                    newFmt.format = InFmt[i].format;
+                    newFmt.type = InFmt[i].type;
+
+                    TextureObj newTex;
+
+                    newTex.create(In[i],ScreenWidth,ScreenHeight,newFmt,GL_COLOR_ATTACHMENT0 + i);
+                    newTexObjs.push_back(newTex);
+
+                    // just use a textureobj class until you implent the json reading
+            }
+
         }
 
+        std::vector<TextureObj> newOuts;
+
+        for ( int i = 0; i < Out.size(); i++)
+        {
+            TextureFormat newFmt;
+
+            newFmt.internalFormat = OutFmt[i].internalFormat;
+            newFmt.format = OutFmt[i].format;
+            newFmt.type = OutFmt[i].type;
+
+            TextureObj newTex;
+
+            // How do i get them to have different names?
+
+            newTex.create(Out[i],ScreenWidth,ScreenHeight,newFmt,GL_COLOR_ATTACHMENT0 + i);
+
+            // gbuffer attach?
+            newOuts.push_back(newTex);
+            frameBuffer.attachTexture(newTex);
+
+            std::cout << "TexID is: " << newTex.texID << std::endl;
+
+            std::cout << "made Texture " << Out[i] << std::endl;
+        }
+        newOutsobjs = newOuts;
+        CheckGLError("Pass create textureobj");
     }
 
+    void bindTextures()
+    {
+
+        for (int i = 0; i < Out.size(); i++)
+        {
+            frameBuffer.attachTexture(newOutsobjs[i]);
+        }
+        CheckGLError("BindingTextures");
+    }
 
     // Maybe consolidate into an init ()
     // init shaders textures 
@@ -69,16 +127,7 @@ private:
     unsigned int compute;
 
     bool checkTextures();
-    void bindTextures()
-    {
-        int i = 0;
-        for (TextureObj tex : In)
-        {
-            //Textures need to be created before this
-            frameBuffer.attachTexture(tex);
-            i++;
-        }
-    }
+
 };
 
 struct Graph
@@ -88,7 +137,7 @@ struct Graph
 
     void initGraph()
     {
-        Passes[0].In[0].create(ScreenWidth,ScreenHeight,Passes[0].InFmt[0],GL_COLOR_ATTACHMENT0,true);
+        // Passes[0].In[0].create(ScreenWidth,ScreenHeight,Passes[0].InFmt[0],GL_COLOR_ATTACHMENT0,true);
     }
 
     // pass 1 create input textures then for each check if texture exists

@@ -37,19 +37,17 @@ GLuint renderShader;
 
 
 FrameBufferObject gBufferFBO;
-TextureObj GPos, GNorm, GAlbSpec;
+// TextureObj GPos, GNorm, GAlbSpec;
 
 TextureFormat GPosFmt = {GL_RGB16F, GL_RGBA, GL_FLOAT };
 TextureFormat GNormFmt = {GL_RGB16F, GL_RGBA, GL_FLOAT };
 TextureFormat GAbSpFmt = {GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE };
 
-std::string input[] = {"GPos","GNorm","GAlbSpec"};
-
-std::vector<TextureObj> inputs = {GPos, GNorm, GAlbSpec};
-std::vector<TextureFormat> inputFmts = {GPosFmt, GNormFmt, GAbSpFmt};
+std::vector<std::string> outputs = {"GPos","GNorm","GAlbSpec"};
+std::vector<TextureFormat> outputFmts = {GPosFmt, GNormFmt, GAbSpFmt};
 
 Pass lightspass("shaders/LightVertex.glsl","shaders/LightFragment.glsl", true);
-Pass GbufferPass("shaders/DSVertex.glsl", "shaders/DSFragment.glsl",false);
+Pass GbufferPass("shaders/DSVertex.glsl", "shaders/DSFragment.glsl",false,{},outputs,{},outputFmts);
 
 const unsigned int NR_Lights = 32;
 std::vector<glm::vec3> lightPos;
@@ -171,21 +169,24 @@ void InitialiseProgram()
 
     /// GBuffer Creation
 
-    gBufferFBO.create();
-    gBufferFBO.bind();
+    // gBufferFBO.create();
+    // gBufferFBO.bind();
 
     // Texture Creation
+
+    GbufferPass.createTextures();
+    // GbufferPass.bindTextures();
     
-    GPos.create(ScreenWidth,ScreenHeight,GPosFmt,GL_COLOR_ATTACHMENT0);
-    gBufferFBO.attachTexture(GPos);
+    // GPos.create(ScreenWidth,ScreenHeight,GPosFmt,GL_COLOR_ATTACHMENT0);
+    // gBufferFBO.attachTexture(GPos);
 
     /// THESE ARE JUST INTS YOU CAN DO GL_COLOR_ATTACH + 1
 
-    GNorm.create(ScreenWidth,ScreenHeight,GNormFmt,GL_COLOR_ATTACHMENT1);
-    gBufferFBO.attachTexture(GNorm);
+    // GNorm.create(ScreenWidth,ScreenHeight,GNormFmt,GL_COLOR_ATTACHMENT1);
+    // gBufferFBO.attachTexture(GNorm);
 
-    GAlbSpec.create(ScreenWidth,ScreenHeight,GAbSpFmt,GL_COLOR_ATTACHMENT1 + 1);
-    gBufferFBO.attachTexture(GAlbSpec);
+    // GAlbSpec.create(ScreenWidth,ScreenHeight,GAbSpFmt,GL_COLOR_ATTACHMENT1 + 1);
+    // gBufferFBO.attachTexture(GAlbSpec);
 
     unsigned int attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
     glDrawBuffers(3, attachments);
@@ -332,7 +333,7 @@ void MainLoop() {
 
         // GBuffer Pass
 
-        gBufferFBO.bind();
+        GbufferPass.frameBuffer.bind();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         LoadMatricies(GbufferPass.shaderProgram,true);
         glActiveTexture(GL_TEXTURE0);
@@ -348,11 +349,11 @@ void MainLoop() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glUseProgram(lightspass.shaderProgram);
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, GPos.texID);
+        glBindTexture(GL_TEXTURE_2D, GbufferPass.newOutsobjs[0].texID);
         glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, GNorm.texID);
+        glBindTexture(GL_TEXTURE_2D, GbufferPass.newOutsobjs[1].texID);
         glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_2D, GAlbSpec.texID);
+        glBindTexture(GL_TEXTURE_2D, GbufferPass.newOutsobjs[2].texID);
         CheckGLError("Light Pass");
         
 
@@ -374,7 +375,7 @@ void MainLoop() {
 
         renderQuad();
 
-        glBindFramebuffer(GL_READ_FRAMEBUFFER, gBufferFBO.getID());
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, GbufferPass.frameBuffer.getID());
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0); // write to default framebuffer
         glBlitFramebuffer(
         0, 0, ScreenWidth, ScreenHeight, 0, 0, ScreenWidth, ScreenHeight, GL_DEPTH_BUFFER_BIT, GL_NEAREST

@@ -1,8 +1,8 @@
 #include "FrameBufferObject.h"
 
-void TextureObj::create(int w, int h, TextureFormat& fmt, GLenum attachment, bool isImageTex)
+void TextureObj::create(std::string inName, int w, int h, TextureFormat& fmt, GLenum attachment, bool isImageTex)
 {
-
+    name = inName;
     width = w;
     height = h;
     format = fmt;
@@ -31,7 +31,7 @@ void FrameBufferObject::attachTexture(TextureObj tex)
 {
     bind();
     glFramebufferTexture2D(GL_FRAMEBUFFER, tex.attachmentPoint, GL_TEXTURE_2D, tex.texID, 0);
-    Textures.push_back(tex);
+    // Textures.push_back(tex);
 }
 
 GLuint FrameBufferObject::getID() 

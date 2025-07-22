@@ -24,7 +24,7 @@ public:
     GLenum attachmentPoint;
     GLuint texID;
     
-    void create(int w, int h, TextureFormat& fmt, GLenum attachment,bool isImageTex = false);
+    void create(std::string inName, int w, int h, TextureFormat& fmt, GLenum attachment,bool isImageTex = false);
 
 };
 
