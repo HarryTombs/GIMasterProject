@@ -39,6 +39,8 @@ GLuint renderShader;
 FrameBufferObject gBufferFBO;
 // TextureObj GPos, GNorm, GAlbSpec;
 
+TextureObj wallTex;
+
 TextureFormat GPosFmt = {GL_RGB16F, GL_RGBA, GL_FLOAT };
 TextureFormat GNormFmt = {GL_RGB16F, GL_RGBA, GL_FLOAT };
 TextureFormat GAbSpFmt = {GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE };
@@ -141,30 +143,9 @@ void InitialiseProgram()
         exit(1);
     }
 
-    glGenTextures(1, &texture);
 
-    glBindTexture(GL_TEXTURE_2D, texture);
+    wallTex.create("walltex", ScreenWidth,ScreenHeight,GPosFmt,GL_COLOR_ATTACHMENT0,"textures/white-brick-wall-seamless-texture-free.png",true);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    int width, height, channels;
-    constexpr const char* stbi_path = (ASSET_DIR "textures/white-brick-wall-seamless-texture-free.png");
-    unsigned char *data = stbi_load(stbi_path, &width, &height, &channels, 4);
-
-    if (data)
-    {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    }
-    else 
-    {
-        std::cerr << "Failed to load texture: " << stbi_path << std::endl;
-        std::cerr << "stbi error: " << stbi_failure_reason() << std::endl;
-
-    }
-    stbi_image_free(data);
     CheckGLError("Texture Loading");
 
     GbufferPass.drawBuffers();
@@ -311,7 +292,7 @@ void MainLoop() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         LoadMatricies(GbufferPass.shaderProgram,true);
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texture);
+        glBindTexture(GL_TEXTURE_2D, wallTex.texID);
         cubeModel->Draw();
         glBlitFramebuffer(0, 0, ScreenWidth, ScreenHeight, 0, 0, ScreenWidth, ScreenHeight, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);

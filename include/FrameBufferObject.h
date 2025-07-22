@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 
+
 struct TextureFormat
 {
     GLenum internalFormat;
@@ -23,8 +24,9 @@ public:
     TextureFormat format;
     GLenum attachmentPoint;
     GLuint texID;
+    std::string filePath;
     
-    void create(std::string inName, int w, int h, TextureFormat& fmt, GLenum attachment,bool isImageTex = false);
+    void create(std::string inName, int w, int h, TextureFormat& fmt, GLenum attachment, const std::string& inTexFile = "",bool isImageTex = false);
 
 };
 
