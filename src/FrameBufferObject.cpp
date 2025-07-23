@@ -58,7 +58,6 @@ void FrameBufferObject::bind()
 
 void FrameBufferObject::attachTexture(TextureObj tex)
 {
-    bind();
     glFramebufferTexture2D(GL_FRAMEBUFFER, tex.attachmentPoint, GL_TEXTURE_2D, tex.texID, 0);
     // Textures.push_back(tex);
 }

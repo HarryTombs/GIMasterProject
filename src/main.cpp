@@ -35,6 +35,8 @@ Camera fpsCamera(glm::vec3(0.0f,0.0f,3.0f));
 
 GLuint renderShader; 
 
+Graph defferedShadingGraph;
+
 
 FrameBufferObject gBufferFBO;
 // TextureObj GPos, GNorm, GAlbSpec;
@@ -282,14 +284,13 @@ void MainLoop() {
         deltaTime = (double)((NOW - LAST) * 1000) / SDL_GetPerformanceFrequency();
         deltaTime /= 1000.0;
 
-        glClearColor(0.0,0.0,0.0,1.0);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        defferedShadingGraph.clearBuffers();
         CheckGLError("Clear Color");
 
         // GBuffer Pass
 
         GbufferPass.frameBuffer.bind();
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        GbufferPass.clear();
         LoadMatricies(GbufferPass.shaderProgram,true);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, wallTex.texID);

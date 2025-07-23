@@ -92,6 +92,7 @@ public:
             newTex.create(Out[i],ScreenWidth,ScreenHeight,newFmt,GL_COLOR_ATTACHMENT0 + i);
             newAttachments.push_back(GL_COLOR_ATTACHMENT0 + i);
             newOuts.push_back(newTex);
+            frameBuffer.bind();
             frameBuffer.attachTexture(newTex);
         }
         newOutsobjs = newOuts;
@@ -124,6 +125,11 @@ public:
         CheckGLError("BindingTextures");
     }
 
+    void clear()
+    {
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    }
+
     // Maybe consolidate into an init ()
     // init shaders textures 
 
@@ -150,6 +156,11 @@ struct Graph
     void initGraph()
     {
         // Passes[0].In[0].create(ScreenWidth,ScreenHeight,Passes[0].InFmt[0],GL_COLOR_ATTACHMENT0,true);
+    }
+    void clearBuffers(double r = 0.0, double g = 0.0, double b = 0.0, double a = 1.0)
+    {
+        glClearColor(r,g,b,a);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
     // pass 1 create input textures then for each check if texture exists
