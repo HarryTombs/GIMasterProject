@@ -31,8 +31,8 @@ bool mouseDown = false;
 float glX;
 float glY;
 Model* cubeModel;
-glm::mat4 mdtrans = glm::mat4(1.0f);
 
+std::vector<Model> modelList;
 
 Camera fpsCamera(glm::vec3(0.0f,0.0f,3.0f));
 
@@ -136,7 +136,9 @@ void InitialiseProgram()
     */
 
 
-    cubeModel = new Model(modelPath);
+    Model cubeModel(modelPath);
+
+    modelList.push_back(cubeModel);
 
     renderShader = loadShaderProgram("shaders/vertex.glsl", "shaders/fragment.glsl");
 
@@ -189,26 +191,6 @@ void InitialiseProgram()
         lightCol.push_back(glm::vec3(rColor, gColor, bColor));
     }
 
-}
-
-void LoadMatricies (GLuint shaderProgram, bool useModelMatrix) 
-{
-    glUseProgram(shaderProgram);
-
-    glm::mat4 view = fpsCamera.getView();
-    glm::mat4 projection = glm::perspective(glm::radians(fpsCamera.m_zoom), (float)ScreenWidth/ (float)ScreenHeight,0.01f,1000.0f);
-
-    if (useModelMatrix == true)
-    {
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
-        float angle = static_cast<float>(SDL_GetTicks()) / 1000.0f * 50.0f; 
-        model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.5f, 0.1f));
-        setMat4(shaderProgram, "model", model);  
-    }    
-
-    setMat4(shaderProgram, "view", view);
-    setMat4(shaderProgram, "projection", projection);
 }
 
 void Input() {
@@ -295,13 +277,19 @@ void MainLoop() {
         GbufferPass.frameBuffer.bind();
         GbufferPass.clear();
         GbufferPass.loadViewProjMatricies(fpsCamera);
-        mdtrans = glm::translate(mdtrans,cubeModel->pos);
+        for (Model m : modelList)
+        {
+            GbufferPass.loadModelMatricies(m.transMat);
 
-        GbufferPass.loadModelMatricies(mdtrans);
-        // LoadMatricies(GbufferPass.shaderProgram,true);
+        }
+
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, wallTex.texID);
-        cubeModel->Draw();
+        for (Model m : modelList)
+        {
+            m.Draw();
+
+        }
         glBlitFramebuffer(0, 0, ScreenWidth, ScreenHeight, 0, 0, ScreenWidth, ScreenHeight, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         CheckGLError("GBuffer Pass");

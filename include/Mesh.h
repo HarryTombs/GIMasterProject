@@ -92,12 +92,20 @@ public:
         for (unsigned int i = 0; i < meshes.size(); i++)
             meshes[i].Draw();
     }
+
+    void translate(glm::vec3 trans)
+    {
+        transMat = glm::translate(transMat, trans);
+        pos += trans;
+    }
     std::vector<Mesh> meshes;
     std::string directory;
 
     glm::vec3 pos = glm::vec3(0.0,0.0,0.0);
     glm::vec3 rot;
     glm::vec3 scale;
+
+    glm::mat4 transMat = glm::mat4(1.0f);
 private:
 
 
@@ -119,6 +127,8 @@ private:
         directory = path.substr(0, path.find_last_of('/'));
 
         processNode(scene->mRootNode, scene);
+        transMat = glm::translate(transMat,pos);
+
     }
     void processNode(aiNode *node, const aiScene *scene)
     {
