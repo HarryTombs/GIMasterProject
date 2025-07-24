@@ -31,6 +31,9 @@ bool mouseDown = false;
 float glX;
 float glY;
 Model* cubeModel;
+glm::mat4 mdtrans = glm::mat4(1.0f);
+
+
 Camera fpsCamera(glm::vec3(0.0f,0.0f,3.0f));
 
 GLuint renderShader; 
@@ -291,7 +294,11 @@ void MainLoop() {
 
         GbufferPass.frameBuffer.bind();
         GbufferPass.clear();
-        LoadMatricies(GbufferPass.shaderProgram,true);
+        GbufferPass.loadViewProjMatricies(fpsCamera);
+        mdtrans = glm::translate(mdtrans,cubeModel->pos);
+
+        GbufferPass.loadModelMatricies(mdtrans);
+        // LoadMatricies(GbufferPass.shaderProgram,true);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, wallTex.texID);
         cubeModel->Draw();

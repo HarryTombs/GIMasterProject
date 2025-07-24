@@ -3,6 +3,8 @@
 #include "FrameBufferObject.h"
 #include "ShaderUtils.h"
 #include "SDLWindow.h"
+#include "Camera.h"
+#include "Mesh.h"
 #include <vector>
 #include <GL/glew.h>
 #include <string>
@@ -50,6 +52,31 @@ public:
     {
         unsigned int prog = loadShaderProgram(vert, frag);
         shaderProgram = prog;
+    }
+
+    void loadViewProjMatricies (Camera cam) 
+    {
+        glUseProgram(shaderProgram);
+
+        glm::mat4 view = cam.getView();
+        glm::mat4 projection = glm::perspective(glm::radians(cam.m_zoom), (float)ScreenWidth/ (float)ScreenHeight,0.01f,1000.0f);
+        setMat4(shaderProgram, "view", view);
+        setMat4(shaderProgram, "projection", projection);
+    }
+
+    void loadModelMatricies(glm::mat4 modelTransform, bool useModelArray = false, std::vector<Model> modelArray = {})
+    {
+        setMat4(shaderProgram, "model", modelTransform);
+        if (useModelArray)
+        {
+            for (Model m : modelArray)
+            {
+                glm::mat4 model = glm::mat4(1.0f);
+                model = glm::translate(model,m.pos);
+                // do rotations
+                model = glm::scale(model,m.scale);
+            }
+        }
     }
 
     void createTextures()
