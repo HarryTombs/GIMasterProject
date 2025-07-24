@@ -137,8 +137,12 @@ void InitialiseProgram()
 
 
     Model cubeModel(modelPath);
+    Model cubeModel2(modelPath);
+
+    cubeModel2.translate(glm::vec3(2.0f,0.0f,0.0f));
 
     modelList.push_back(cubeModel);
+    modelList.push_back(cubeModel2);
 
     renderShader = loadShaderProgram("shaders/vertex.glsl", "shaders/fragment.glsl");
 
@@ -277,19 +281,15 @@ void MainLoop() {
         GbufferPass.frameBuffer.bind();
         GbufferPass.clear();
         GbufferPass.loadViewProjMatricies(fpsCamera);
-        for (Model m : modelList)
-        {
-            GbufferPass.loadModelMatricies(m.transMat);
-
-        }
-
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, wallTex.texID);
         for (Model m : modelList)
         {
+            GbufferPass.loadModelMatricies(m.transMat);
             m.Draw();
 
         }
+
         glBlitFramebuffer(0, 0, ScreenWidth, ScreenHeight, 0, 0, ScreenWidth, ScreenHeight, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         CheckGLError("GBuffer Pass");
