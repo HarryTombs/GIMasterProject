@@ -50,10 +50,10 @@ TextureFormat GPosFmt = {GL_RGB16F, GL_RGBA, GL_FLOAT };
 TextureFormat GNormFmt = {GL_RGB16F, GL_RGBA, GL_FLOAT };
 TextureFormat GAbSpFmt = {GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE };
 
-std::vector<std::string> outputs = {"GPos","GNorm","GAlbSpec"};
+std::vector<std::string> outputs = {"gPosition","gNormal","gAlbedoSpec"};
 std::vector<TextureFormat> outputFmts = {GPosFmt, GNormFmt, GAbSpFmt};
 
-Pass lightspass("shaders/LightVertex.glsl","shaders/LightFragment.glsl", true);
+Pass lightspass("shaders/LightVertex.glsl","shaders/LightFragment.glsl", true,outputs,{},outputFmts,{});
 Pass GbufferPass("shaders/DSVertex.glsl", "shaders/DSFragment.glsl",false,{},outputs,{},outputFmts);
 
 const unsigned int NR_Lights = 32;
@@ -146,34 +146,22 @@ void InitialiseProgram()
 
     renderShader = loadShaderProgram("shaders/vertex.glsl", "shaders/fragment.glsl");
 
-    lightspass.init();
     GbufferPass.init();
-
-    if (renderShader == 0) {
-        std::cerr << "Failed to load shaders." << std::endl;
-        exit(1);
-    }
+    lightspass.init();
+    CheckGLError("Pass init");
 
 
     wallTex.create("walltex", ScreenWidth,ScreenHeight,GPosFmt,GL_COLOR_ATTACHMENT0,"textures/white-brick-wall-seamless-texture-free.png",true);
-
     CheckGLError("Texture Loading");
 
     GbufferPass.drawBuffers();
     GbufferPass.depthBufferSetup();
-
-    
     CheckGLError("GBuffer Creation");
 
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE)
     {
         std::cout << "Gbuffer Complete" << std::endl;
     }
-
-    glUseProgram(lightspass.shaderProgram);
-    glUniform1i(glGetUniformLocation(lightspass.shaderProgram, "gPosition"), 0);
-    glUniform1i(glGetUniformLocation(lightspass.shaderProgram, "gNorm"), 1);
-    glUniform1i(glGetUniformLocation(lightspass.shaderProgram, "gAlbedoSpec"), 2);
 
     // lights
 

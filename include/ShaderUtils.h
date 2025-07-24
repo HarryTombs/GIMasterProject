@@ -71,6 +71,12 @@ GLuint loadShaderProgram(const std::string& inVertPath, const std::string& inFra
     return program;
 }
 
+void setInt (GLuint program, const std::string& name, int value)
+{
+    GLuint location = glGetUniformLocation(program,name.c_str());
+    glUniform1i(location,value);
+}
+
 void setFloat(GLuint program, const std::string& name, float value)
 {
     GLuint location = glGetUniformLocation(program, name.c_str());

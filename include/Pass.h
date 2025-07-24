@@ -45,6 +45,7 @@ public:
         createShaderProgram();
         frameBuffer.create();
         createTextures();
+        textureUniforms();
     }
     void execute();
 
@@ -125,6 +126,15 @@ public:
         newOutsobjs = newOuts;
         attachments = newAttachments;
         CheckGLError("Pass create textureobj");
+    }
+
+    void textureUniforms()
+    {
+        glUseProgram(shaderProgram);
+        for(int i = 0; i < In.size(); i++)
+        {
+            setInt(shaderProgram,In[i],i);
+        }
     }
 
     void depthBufferSetup()
