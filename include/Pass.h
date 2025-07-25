@@ -8,7 +8,9 @@
 #include <vector>
 #include <GL/glew.h>
 #include <string>
+#include <rapidjson/document.h>
 
+using namespace rapidjson;
 
 class Pass
 {
@@ -59,11 +61,11 @@ public:
     {
         frameBuffer.bind();
         clear();
-        for(int i = 0; i < In.size(); i++)
-        {
-            glActiveTexture(GL_TEXTURE0 + i);
-            glBindTexture(GL_TEXTURE_2D, newInTexobjs[i].texID);
-        }
+        // for(int i = 0; i < In.size(); i++)
+        // {
+        //     glActiveTexture(GL_TEXTURE0 + i);
+        //     glBindTexture(GL_TEXTURE_2D, newInTexobjs[i].texID);
+        // }
 
         // if (!isScreenQuad)
         // {
@@ -110,7 +112,7 @@ public:
 
     void createTextures()
     {
-        bool texExists = true;
+        bool texExists = false;
         // CHECK IF THEY EXIST !!!!!
         if (texExists != true)
         {
@@ -226,7 +228,7 @@ struct Graph
     {
         // Passes[0].In[0].create(ScreenWidth,ScreenHeight,Passes[0].InFmt[0],GL_COLOR_ATTACHMENT0,true);
     }
-    void clearBuffers(double r = 0.0, double g = 0.0, double b = 0.0, double a = 1.0)
+    void clearBuffers(float r = 0.0, float g = 0.0, float b = 0.0, float a = 1.0)
     {
         glClearColor(r,g,b,a);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -234,6 +236,11 @@ struct Graph
 
     // pass 1 create input textures then for each check if texture exists
 
+    void readJson(const char* json)
+    {
+        Document d;
+        d.Parse(json);
+    }
 
     void executePasses()
     {
