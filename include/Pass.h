@@ -14,7 +14,9 @@ class Pass
 {
 public:
 
-    Pass(std::string vertpath, std::string fragpath, bool screenQuad = false,const std::vector<std::string>& texturesIn = {}, const std::vector<std::string>& texturesOut = {},const std::vector<TextureFormat> formatIn = {},const std::vector<TextureFormat> formatOut = {})
+    Pass(std::string vertpath, std::string fragpath, Camera cam, std::vector<Model> models = {}, bool screenQuad = false,
+        const std::vector<std::string>& texturesIn = {}, const std::vector<std::string>& texturesOut = {},
+        const std::vector<TextureFormat> formatIn = {},const std::vector<TextureFormat> formatOut = {})
     {
         vert = vertpath;
         frag = fragpath;
@@ -23,6 +25,8 @@ public:
         Out = texturesOut;
         InFmt = formatIn;
         OutFmt = formatOut;
+        useCamera = cam;
+        useModels = models;
     };
     std::vector<std::string> In;
     std::vector<std::string> Out;
@@ -32,6 +36,10 @@ public:
     std::vector<GLenum> attachments;
 
     std::vector<TextureObj> newOutsobjs;
+    std::vector<TextureObj> newInTexobjs;
+
+    std::vector<Model> useModels;
+    Camera useCamera;
     FrameBufferObject frameBuffer;
 
     bool isScreenQuad;
@@ -47,7 +55,27 @@ public:
         createTextures();
         textureUniforms();
     }
-    void execute();
+    void execute()
+    {
+        frameBuffer.bind();
+        clear();
+        for(int i = 0; i < In.size(); i++)
+        {
+            glActiveTexture(GL_TEXTURE0 + i);
+            glBindTexture(GL_TEXTURE_2D, newInTexobjs[i].texID);
+        }
+
+        // if (!isScreenQuad)
+        // {
+        //     loadViewProjMatricies(useCamera);  
+        //     for (Model m : useModels)
+        //     {
+        //         loadModelMatricies(m.transMat);
+        //         m.Draw();
+
+        //     } 
+        // }
+    }
 
     void createShaderProgram()
     {
@@ -102,6 +130,10 @@ public:
 
                     // just use a textureobj class until you implent the json reading
             }            
+            newInTexobjs = newTexObjs;
+        }
+        else 
+        {
 
         }
 

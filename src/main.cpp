@@ -53,8 +53,8 @@ TextureFormat GAbSpFmt = {GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE };
 std::vector<std::string> outputs = {"gPosition","gNormal","gAlbedoSpec"};
 std::vector<TextureFormat> outputFmts = {GPosFmt, GNormFmt, GAbSpFmt};
 
-Pass lightspass("shaders/LightVertex.glsl","shaders/LightFragment.glsl", true,outputs,{},outputFmts,{});
-Pass GbufferPass("shaders/DSVertex.glsl", "shaders/DSFragment.glsl",false,{},outputs,{},outputFmts);
+Pass lightspass("shaders/LightVertex.glsl","shaders/LightFragment.glsl",fpsCamera,{}, true, outputs,{},outputFmts,{});
+Pass GbufferPass("shaders/DSVertex.glsl", "shaders/DSFragment.glsl",fpsCamera,modelList,false,{},outputs,{},outputFmts);
 
 const unsigned int NR_Lights = 32;
 std::vector<glm::vec3> lightPos;
@@ -266,17 +266,21 @@ void MainLoop() {
 
         // GBuffer Pass
 
-        GbufferPass.frameBuffer.bind();
-        GbufferPass.clear();
-        GbufferPass.loadViewProjMatricies(fpsCamera);
+        // GbufferPass.frameBuffer.bind();
+        // GbufferPass.clear();
+        GbufferPass.execute();
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, wallTex.texID);
+
+        GbufferPass.loadViewProjMatricies(fpsCamera);
         for (Model m : modelList)
         {
             GbufferPass.loadModelMatricies(m.transMat);
             m.Draw();
 
         }
+
+        
 
         glBlitFramebuffer(0, 0, ScreenWidth, ScreenHeight, 0, 0, ScreenWidth, ScreenHeight, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
