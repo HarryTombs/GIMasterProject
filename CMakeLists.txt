@@ -17,11 +17,13 @@ include_directories(include $ENV{HOME}/NGL/include)
 target_sources(${TargetName} PRIVATE ${PROJECT_SOURCE_DIR}/src/main.cpp
 			${PROJECT_SOURCE_DIR}/src/FrameBufferObject.cpp
 			${PROJECT_SOURCE_DIR}/src/Pass.cpp
+			${PROJECT_SOURCE_DIR}/src/ShaderUtils.cpp
 			${PROJECT_SOURCE_DIR}/include/SDLWindow.h
 			${PROJECT_SOURCE_DIR}/include/ShaderUtils.h
 			${PROJECT_SOURCE_DIR}/include/Camera.h
 			${PROJECT_SOURCE_DIR}/include/FrameBufferObject.h
 			${PROJECT_SOURCE_DIR}/include/Pass.h
+			${PROJECT_SOURCE_DIR}/include/Graph.h
 			${PROJECT_SOURCE_DIR}/include/Scene.h
 			${PROJECT_SOURCE_DIR}/include/Mesh.h)
 
@@ -41,6 +43,11 @@ target_link_libraries(${TargetName}  ${OPENGL_LIBRARIES})
 
 find_package(assimp REQUIRED)
 target_link_libraries(${TargetName}  ${ASSIMP_LIBRARIES})
+
+
+target_include_directories(${TargetName} PRIVATE /home/harry/vcpkg/installed/x64-linux/include)
+
+# don't hard code this dumbass
 
 add_compile_definitions(ASSET_DIR="${CMAKE_CURRENT_SOURCE_DIR}/")
 

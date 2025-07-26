@@ -5,6 +5,7 @@
 #include "SDLWindow.h"
 #include "Camera.h"
 #include "Mesh.h"
+#include "Graph.h"
 #include <vector>
 #include <GL/glew.h>
 #include <string>
@@ -18,18 +19,10 @@ public:
 
     Pass(std::string vertpath, std::string fragpath, Camera cam, std::vector<Model> models = {}, bool screenQuad = false,
         const std::vector<std::string>& texturesIn = {}, const std::vector<std::string>& texturesOut = {},
-        const std::vector<TextureFormat> formatIn = {},const std::vector<TextureFormat> formatOut = {})
-    {
-        vert = vertpath;
-        frag = fragpath;
-        isScreenQuad = screenQuad;
-        In = texturesIn;
-        Out = texturesOut;
-        InFmt = formatIn;
-        OutFmt = formatOut;
-        useCamera = cam;
-        useModels = models;
-    };
+        const std::vector<TextureFormat> formatIn = {},const std::vector<TextureFormat> formatOut = {});
+
+    // Graph* graph;
+
     std::vector<std::string> In;
     std::vector<std::string> Out;
     std::vector<TextureFormat> InFmt;
@@ -41,7 +34,7 @@ public:
     std::vector<TextureObj> newInTexobjs;
 
     std::vector<Model> useModels;
-    Camera useCamera;
+    // Camera* useCamera = graph->currentCam;
     FrameBufferObject frameBuffer;
 
     bool isScreenQuad;
@@ -50,13 +43,7 @@ public:
 
     std::string vert;
     std::string frag;
-    void init()
-    {
-        createShaderProgram();
-        frameBuffer.create();
-        createTextures();
-        textureUniforms();
-    }
+    void init();
     void execute()
     {
         frameBuffer.bind();
@@ -219,148 +206,10 @@ private:
 
 };
 
-struct Graph
-{
-    std::vector<Pass> Passes;
-    float deltaTime;
 
-    void initGraph()
-    {
-        // Passes[0].In[0].create(ScreenWidth,ScreenHeight,Passes[0].InFmt[0],GL_COLOR_ATTACHMENT0,true);
-    }
-    void clearBuffers(float r = 0.0, float g = 0.0, float b = 0.0, float a = 1.0)
-    {
-        glClearColor(r,g,b,a);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    }
 
-    // pass 1 create input textures then for each check if texture exists
 
-    void readJson(const char* json)
-    {
-        Document d;
-        d.Parse(json);
-    }
 
-    void executePasses()
-    {
-        for (Pass p : Passes)
-        {
-            p.frameBuffer.bind();
-        }
-    };
-};
-
-unsigned int quadVAO = 0;
-unsigned int quadVBO = 0;
-
-void renderQuad()
-{
-    if (quadVAO == 0)
-    {
-        float screenQuadVerticies[] = 
-        {
-            1.0f,  1.0f, 0.0f,   1.0f, 1.0f,
-            1.0f, -1.0f, 0.0f,   1.0f, 0.0f,
-            -1.0f,  1.0f, 0.0f,   0.0f, 1.0f,
-            1.0f, -1.0f, 0.0f,   1.0f, 0.0f,
-            -1.0f, -1.0f, 0.0f,   0.0f, 0.0f,
-            -1.0f,  1.0f, 0.0f,   0.0f, 1.0f
-        };
-
-        glGenVertexArrays(1, &quadVAO);
-        glGenBuffers(1, &quadVBO);
-        glBindVertexArray(quadVAO);
-        glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
-        glBufferData(GL_ARRAY_BUFFER,sizeof(screenQuadVerticies),&screenQuadVerticies,GL_STATIC_DRAW);
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3,GL_FLOAT, GL_FALSE, 5 * sizeof(float),(void*)0);
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 2,GL_FLOAT, GL_FALSE, 5 * sizeof(float),(void*)(3*sizeof(float)));
-        CheckGLError("Make Quad");
-    }
-    
-    glBindVertexArray(quadVAO);
-    glDrawArrays(GL_TRIANGLES, 0, 6);
-    glBindVertexArray(0);
-    CheckGLError("Render Quad");
-}
-
-unsigned int cubeVAO = 0;
-unsigned int cubeVBO = 0;
-
-void renderCube()
-{
-    if (cubeVAO == 0)
-    {
-        float cubeVerticies[] = 
-            {
-                -1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 0.0f, 0.0f, // bottom-left
-                1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 1.0f, 1.0f, // top-right
-                1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 1.0f, 0.0f, // bottom-right         
-                1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 1.0f, 1.0f, // top-right
-                -1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 0.0f, 0.0f, // bottom-left
-                -1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 0.0f, 1.0f, // top-left
-                // front face
-                -1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f, 0.0f, // bottom-left
-                1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, 0.0f, // bottom-right
-                1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, 1.0f, // top-right
-                1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, 1.0f, // top-right
-                -1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f, 1.0f, // top-left
-                -1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f, 0.0f, // bottom-left
-                // left face
-                -1.0f,  1.0f,  1.0f, -1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-right
-                -1.0f,  1.0f, -1.0f, -1.0f,  0.0f,  0.0f, 1.0f, 1.0f, // top-left
-                -1.0f, -1.0f, -1.0f, -1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-left
-                -1.0f, -1.0f, -1.0f, -1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-left
-                -1.0f, -1.0f,  1.0f, -1.0f,  0.0f,  0.0f, 0.0f, 0.0f, // bottom-right
-                -1.0f,  1.0f,  1.0f, -1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-right
-                // right face
-                1.0f,  1.0f,  1.0f,  1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-left
-                1.0f, -1.0f, -1.0f,  1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-right
-                1.0f,  1.0f, -1.0f,  1.0f,  0.0f,  0.0f, 1.0f, 1.0f, // top-right         
-                1.0f, -1.0f, -1.0f,  1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-right
-                1.0f,  1.0f,  1.0f,  1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-left
-                1.0f, -1.0f,  1.0f,  1.0f,  0.0f,  0.0f, 0.0f, 0.0f, // bottom-left     
-                // bottom face
-                -1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f, 0.0f, 1.0f, // top-right
-                1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f, 1.0f, 1.0f, // top-left
-                1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f, 1.0f, 0.0f, // bottom-left
-                1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f, 1.0f, 0.0f, // bottom-left
-                -1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f, 0.0f, 0.0f, // bottom-right
-                -1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f, 0.0f, 1.0f, // top-right
-                // top face
-                -1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f, 0.0f, 1.0f, // top-left
-                1.0f,  1.0f , 1.0f,  0.0f,  1.0f,  0.0f, 1.0f, 0.0f, // bottom-right
-                1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f, 1.0f, 1.0f, // top-right     
-                1.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f, 1.0f, 0.0f, // bottom-right
-                -1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f, 0.0f, 1.0f, // top-left
-                -1.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f, 0.0f, 0.0f  // bottom-left     
-            };
-            glGenVertexArrays(1, &cubeVAO);
-            glGenBuffers(1, &cubeVBO);
-            // fill buffer
-            glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
-            glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVerticies), &cubeVerticies, GL_STATIC_DRAW);
-            // link vertex attributes
-            glBindVertexArray(cubeVAO);
-            glEnableVertexAttribArray(0);
-            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-            glEnableVertexAttribArray(1);
-            glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-            glEnableVertexAttribArray(2);
-            glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-            glBindBuffer(GL_ARRAY_BUFFER, 0);
-            glBindVertexArray(0);
-            std::cout << "CubeMade" << std::endl;
-            CheckGLError("Make Cube");
-    }
-    glBindVertexArray(cubeVAO);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
-    glBindVertexArray(0);
-    CheckGLError("Render Cube");
-    
-}
 
 
 #endif

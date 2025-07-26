@@ -11,7 +11,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/string_cast.hpp>
 
-// #define STB_IMAGE_IMPLEMENTATION
+#define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 #include <filesystem>
 
@@ -20,6 +20,7 @@
 #include "Mesh.h"
 #include "Camera.h"
 #include "Pass.h"
+#include "Graph.h"
 #include "FrameBufferObject.h"
 
 
