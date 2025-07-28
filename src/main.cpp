@@ -159,6 +159,8 @@ void InitialiseProgram()
     GbufferPass.depthBufferSetup();
     CheckGLError("GBuffer Creation");
 
+    defferedShadingGraph.readJson("example.json");
+
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE)
     {
         std::cout << "Gbuffer Complete" << std::endl;

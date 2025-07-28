@@ -1,0 +1,79 @@
+{
+    "Graph":
+    {
+        "Passes":
+        [
+            {   
+                "PassName" : "Gbuffer",
+                "FrameBuffer":"GbufferFBO",
+                "Shaders":
+                {
+                    "Vertex":"shaders/DSVertex.glsl",
+                    "Fragment":"shaders/DSFragment.glsl"
+                },
+                "Inputs":
+                [
+                    {
+                        "name": "inputUvTexture",
+                        "width": 512,
+                        "height": 512,
+                        "format":
+                        {
+                            "internalFormat":"GL_RGBA",
+                            "format":"GL_RGBA",
+                            "type":"GL_FLOAT"
+                        },
+                        "attachmentPoint":"GL_COLOR_ATTACHMENT0",
+                        "isImageTex": true
+                    }
+                ],
+                "Outputs": 
+                [
+                    {
+                        "name": "GPos",
+                        "width": 512,
+                        "height": 512,
+                        "format": 
+                        {
+                            "internalFormat": "GL_RGBA16F",
+                            "format": "GL_RGBA",
+                            "type": "GL_FLOAT"
+                        },
+                        "attachmentPoint": "GL_COLOR_ATTACHMENT0",
+                        "isImageTex": false
+                    },
+                    {
+                        "name": "GNorm",
+                        "width": 512,
+                        "height": 512,
+                        "format": 
+                        {
+                            "internalFormat": "GL_RGBA16F",
+                            "format": "GL_RGBA",
+                            "type": "GL_FLOAT"
+                        },
+                        "attachmentPoint": "GL_COLOR_ATTACHMENT1",
+                        "isImageTex": false
+                    },
+                    {
+                        "name": "GAlbeSpec",
+                        "width": 512,
+                        "height": 512,
+                        "format": 
+                        {
+                            "internalFormat": "GL_RGBA",
+                            "format": "GL_RGBA",
+                            "type": "GL_UNSIGNED_BYTE"
+                        },
+                        "attachmentPoint": "GL_COLOR_ATTACHMENT2",
+                        "isImageTex": false
+                    }
+                ]
+            },
+            {
+                "PassName" : "LightPass",
+                "FrameBuffer":"LightPassFBO"
+            }
+        ]
+    }
+}

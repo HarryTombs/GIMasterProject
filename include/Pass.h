@@ -26,6 +26,8 @@ public:
 
     Graph* graph = nullptr;
 
+    std::string name;
+
     std::vector<std::string> In;
     std::vector<std::string> Out;
     std::vector<TextureFormat> InFmt;
