@@ -14,7 +14,7 @@ using namespace rapidjson;
 
 struct Graph
 {
-    // std::vector<std::unique_ptr<Pass>> passes;
+    std::vector<std::unique_ptr<Pass>> passes;
     Camera* currentCam;
     std::vector<Model> sceneModels;
     float deltaTime;
