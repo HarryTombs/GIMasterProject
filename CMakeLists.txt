@@ -17,6 +17,7 @@ include_directories(include $ENV{HOME}/NGL/include)
 target_sources(${TargetName} PRIVATE ${PROJECT_SOURCE_DIR}/src/main.cpp
 			${PROJECT_SOURCE_DIR}/src/FrameBufferObject.cpp
 			${PROJECT_SOURCE_DIR}/src/Pass.cpp
+			${PROJECT_SOURCE_DIR}/src/Graph.cpp
 			${PROJECT_SOURCE_DIR}/src/ShaderUtils.cpp
 			${PROJECT_SOURCE_DIR}/include/SDLWindow.h
 			${PROJECT_SOURCE_DIR}/include/ShaderUtils.h
