@@ -54,8 +54,8 @@ TextureFormat GAbSpFmt = {GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE };
 std::vector<std::string> outputs = {"gPosition","gNormal","gAlbedoSpec"};
 std::vector<TextureFormat> outputFmts = {GPosFmt, GNormFmt, GAbSpFmt};
 
-Pass lightspass("shaders/LightVertex.glsl","shaders/LightFragment.glsl",fpsCamera,{}, true, outputs,{},outputFmts,{});
-Pass GbufferPass("shaders/DSVertex.glsl", "shaders/DSFragment.glsl",fpsCamera,modelList,false,{},outputs,{},outputFmts);
+// Pass lightspass("shaders/LightVertex.glsl","shaders/LightFragment.glsl",fpsCamera,{}, true, outputs,{},outputFmts,{});
+// Pass GbufferPass("shaders/DSVertex.glsl", "shaders/DSFragment.glsl",fpsCamera,modelList,false,{},outputs,{},outputFmts);
 
 const unsigned int NR_Lights = 32;
 std::vector<glm::vec3> lightPos;
@@ -147,16 +147,16 @@ void InitialiseProgram()
 
     renderShader = loadShaderProgram("shaders/vertex.glsl", "shaders/fragment.glsl");
 
-    GbufferPass.init();
-    lightspass.init();
+    // GbufferPass.init();
+    // lightspass.init();
     CheckGLError("Pass init");
 
 
     wallTex.create("walltex", ScreenWidth,ScreenHeight,GPosFmt,GL_COLOR_ATTACHMENT0,"textures/white-brick-wall-seamless-texture-free.png",true);
     CheckGLError("Texture Loading");
 
-    GbufferPass.drawBuffers();
-    GbufferPass.depthBufferSetup();
+    // GbufferPass.drawBuffers();
+    // GbufferPass.depthBufferSetup();
     CheckGLError("GBuffer Creation");
 
     defferedShadingGraph.readJson("example.json");
@@ -271,62 +271,62 @@ void MainLoop() {
 
         // GbufferPass.frameBuffer.bind();
         // GbufferPass.clear();
-        GbufferPass.execute();
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, wallTex.texID);
+        // GbufferPass.execute();
+        // glActiveTexture(GL_TEXTURE0);
+        // glBindTexture(GL_TEXTURE_2D, wallTex.texID);
 
-        GbufferPass.loadViewProjMatricies(fpsCamera);
-        for (Model m : modelList)
-        {
-            GbufferPass.loadModelMatricies(m.transMat);
-            m.Draw();
+        // GbufferPass.loadViewProjMatricies(fpsCamera);
+        // for (Model m : modelList)
+        // {
+        //     GbufferPass.loadModelMatricies(m.transMat);
+        //     m.Draw();
 
-        }
+        // }
 
         
 
-        glBlitFramebuffer(0, 0, ScreenWidth, ScreenHeight, 0, 0, ScreenWidth, ScreenHeight, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        CheckGLError("GBuffer Pass");
+        // glBlitFramebuffer(0, 0, ScreenWidth, ScreenHeight, 0, 0, ScreenWidth, ScreenHeight, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+        // glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        // CheckGLError("GBuffer Pass");
 
 
-        // Light Pass
+        // // Light Pass
 
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glUseProgram(lightspass.shaderProgram);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, GbufferPass.newOutsobjs[0].texID);
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, GbufferPass.newOutsobjs[1].texID);
-        glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_2D, GbufferPass.newOutsobjs[2].texID);
-        CheckGLError("Light Pass");
+        // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        // glUseProgram(lightspass.shaderProgram);
+        // glActiveTexture(GL_TEXTURE0);
+        // glBindTexture(GL_TEXTURE_2D, GbufferPass.newOutsobjs[0].texID);
+        // glActiveTexture(GL_TEXTURE1);
+        // glBindTexture(GL_TEXTURE_2D, GbufferPass.newOutsobjs[1].texID);
+        // glActiveTexture(GL_TEXTURE2);
+        // glBindTexture(GL_TEXTURE_2D, GbufferPass.newOutsobjs[2].texID);
+        // CheckGLError("Light Pass");
         
 
-        for (unsigned int i = 0; i < lightPos.size(); i++)
-        {
-            setVec3(lightspass.shaderProgram,("lights[" + std::to_string(i) + "].Position"), lightPos[i]);
-            setVec3(lightspass.shaderProgram,("lights[" + std::to_string(i) + "].Color"), lightCol[i]);
-            const float linear = 0.7f;
-            const float quadratic = 1.8f;
-            setFloat(lightspass.shaderProgram,("lights[" + std::to_string(i) + "].Linear"), linear);
-            setFloat(lightspass.shaderProgram,("lights[" + std::to_string(i) + "].Quadratic"), quadratic);
-        }
-        setVec3(lightspass.shaderProgram,"viewPos", fpsCamera.CamPos);
-        CheckGLError("Light creation");
+        // for (unsigned int i = 0; i < lightPos.size(); i++)
+        // {
+        //     setVec3(lightspass.shaderProgram,("lights[" + std::to_string(i) + "].Position"), lightPos[i]);
+        //     setVec3(lightspass.shaderProgram,("lights[" + std::to_string(i) + "].Color"), lightCol[i]);
+        //     const float linear = 0.7f;
+        //     const float quadratic = 1.8f;
+        //     setFloat(lightspass.shaderProgram,("lights[" + std::to_string(i) + "].Linear"), linear);
+        //     setFloat(lightspass.shaderProgram,("lights[" + std::to_string(i) + "].Quadratic"), quadratic);
+        // }
+        // setVec3(lightspass.shaderProgram,"viewPos", fpsCamera.CamPos);
+        // CheckGLError("Light creation");
 
-        glDisable(GL_DEPTH_TEST);
+        // glDisable(GL_DEPTH_TEST);
 
-        // Render screen quad
+        // // Render screen quad
 
-        renderQuad();
+        // renderQuad();
 
-        glBindFramebuffer(GL_READ_FRAMEBUFFER, GbufferPass.frameBuffer.getID());
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0); // write to default framebuffer
-        glBlitFramebuffer(
-        0, 0, ScreenWidth, ScreenHeight, 0, 0, ScreenWidth, ScreenHeight, GL_DEPTH_BUFFER_BIT, GL_NEAREST
-        );
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        // glBindFramebuffer(GL_READ_FRAMEBUFFER, GbufferPass.frameBuffer.getID());
+        // glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0); // write to default framebuffer
+        // glBlitFramebuffer(
+        // 0, 0, ScreenWidth, ScreenHeight, 0, 0, ScreenWidth, ScreenHeight, GL_DEPTH_BUFFER_BIT, GL_NEAREST
+        // );
+        // glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
         glEnable(GL_DEPTH_TEST);
 

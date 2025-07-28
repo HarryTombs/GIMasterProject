@@ -1,4 +1,5 @@
 #include "Graph.h"
+#include "Pass.h"
 
 void Graph::initGraph()
 {
@@ -44,19 +45,16 @@ void Graph::readJson(const std::string& path)
         
         if (graph.HasMember("Passes") && graph["Passes"].IsArray())
         {
-            const auto& passes = graph["Passes"];
+            const auto& passesArray = graph["Passes"];
             std::cout << "I've found passes" << std::endl;
 
-            for (const auto& passVal : passes.GetArray()) 
+            for (const auto& passVal : passesArray.GetArray()) 
             {
-                if (!passVal.IsObject()) continue;
-
-                std::string passName = passVal["PassName"].GetString();
-                std::string framebuffer = passVal["FrameBuffer"].GetString();
-
-                std::cout << "Pass: " << passName << ", FBO: " << framebuffer << std::endl;
-                
+                std::unique_ptr<Pass> newPass = std::make_unique<Pass>(this);
+                newPass->init(passVal);
+                passes.push_back(std::move(newPass));
             }
+            
         }
     }
 

@@ -6,6 +6,7 @@
             {   
                 "PassName" : "Gbuffer",
                 "FrameBuffer":"GbufferFBO",
+                "ScreenQuad":true,
                 "Shaders":
                 {
                     "Vertex":"shaders/DSVertex.glsl",
@@ -19,7 +20,7 @@
                         "height": 512,
                         "format":
                         {
-                            "internalFormat":"GL_RGBA",
+                            "internalFormat": "GL_RGBA",
                             "format":"GL_RGBA",
                             "type":"GL_FLOAT"
                         },
@@ -72,7 +73,58 @@
             },
             {
                 "PassName" : "LightPass",
-                "FrameBuffer":"LightPassFBO"
+                "FrameBuffer":"Default",
+                "ScreenQuad":true,
+                "Shaders":
+                {
+                    "Vertex":"shaders/LightVertex.glsl",
+                    "Fragment":"shaders/LightFragment.glsl"
+                },
+                "Inputs":
+                [
+                    {
+                        "name": "GPos",
+                        "width": 512,
+                        "height": 512,
+                        "format": 
+                        {
+                            "internalFormat": "GL_RGBA16F",
+                            "format": "GL_RGBA",
+                            "type": "GL_FLOAT"
+                        },
+                        "attachmentPoint": "GL_COLOR_ATTACHMENT0",
+                        "isImageTex": false
+                    },
+                    {
+                        "name": "GNorm",
+                        "width": 512,
+                        "height": 512,
+                        "format": 
+                        {
+                            "internalFormat": "GL_RGBA16F",
+                            "format": "GL_RGBA",
+                            "type": "GL_FLOAT"
+                        },
+                        "attachmentPoint": "GL_COLOR_ATTACHMENT1",
+                        "isImageTex": false
+                    },
+                    {
+                        "name": "GAlbeSpec",
+                        "width": 512,
+                        "height": 512,
+                        "format": 
+                        {
+                            "internalFormat": "GL_RGBA",
+                            "format": "GL_RGBA",
+                            "type": "GL_UNSIGNED_BYTE"
+                        },
+                        "attachmentPoint": "GL_COLOR_ATTACHMENT2",
+                        "isImageTex": false
+                    }
+                ],
+                "Outputs":[]
+
+
             }
         ]
     }

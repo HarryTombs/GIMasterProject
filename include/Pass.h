@@ -14,29 +14,23 @@
 using namespace rapidjson;
 
 // forward declaration
-class Graph;
+struct Graph;
 
 class Pass
 {
 public:
 
-    Pass(std::string vertpath, std::string fragpath, Camera cam, std::vector<Model> models = {}, bool screenQuad = false,
-        const std::vector<std::string>& texturesIn = {}, const std::vector<std::string>& texturesOut = {},
-        const std::vector<TextureFormat> formatIn = {},const std::vector<TextureFormat> formatOut = {});
+    Pass(Graph* parentGraph);
 
     Graph* graph = nullptr;
 
     std::string name;
 
-    std::vector<std::string> In;
-    std::vector<std::string> Out;
-    std::vector<TextureFormat> InFmt;
-    std::vector<TextureFormat> OutFmt;
+    std::vector<std::string> InputNames;
+    std::vector<std::string> OutputNames;
 
     std::vector<GLenum> attachments;
 
-    std::vector<TextureObj> newOutsobjs;
-    std::vector<TextureObj> newInTexobjs;
 
     std::vector<Model> useModels;
     Camera* useCamera;
@@ -48,7 +42,7 @@ public:
 
     std::string vert;
     std::string frag;
-    void init();
+    void init(const rapidjson::Value& passJson);
     void execute();
 
     void createShaderProgram();

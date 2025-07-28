@@ -2,39 +2,59 @@
 #include "Graph.h"
 
 
-Pass::Pass(std::string vertpath, std::string fragpath, Camera cam, std::vector<Model> models, bool screenQuad,
-        const std::vector<std::string>& texturesIn, const std::vector<std::string>& texturesOut,
-        const std::vector<TextureFormat> formatIn,const std::vector<TextureFormat> formatOut)
+Pass::Pass(Graph* parentGraph) : graph(parentGraph){}
+
+void Pass::init(const rapidjson::Value& passJson)
+    {
+        if(passJson.HasMember("PassName"))
         {
-            vert = vertpath;
-            frag = fragpath;
-            isScreenQuad = screenQuad;
-            In = texturesIn;
-            Out = texturesOut;
-            InFmt = formatIn;
-            OutFmt = formatOut;
-            useModels = models;
-            
+            name = passJson["PassName"].GetString();
         }
 
-void Pass::init()
-    
-    /*std::string vertpath, std::string fragpath, Camera cam, std::vector<Model> models, bool screenQuad,
-        const std::vector<std::string>& texturesIn, const std::vector<std::string>& texturesOut,
-        const std::vector<TextureFormat> formatIn,const std::vector<TextureFormat> formatOut)*/
-    {
-        // vert = vertpath;
-        // frag = fragpath;
-        // isScreenQuad = screenQuad;
-        // In = texturesIn;
-        // Out = texturesOut;
-        // InFmt = formatIn;
-        // OutFmt = formatOut;
-        // useModels = models;
+        if (passJson.HasMember("Inputs") && passJson["Inputs"].IsArray()) 
+        {
+            for (const auto& input : passJson["Inputs"].GetArray()) 
+            {
+                std::string texName = input["name"].GetString();
+                InputNames.push_back(texName);
+                
+                const auto& format = input["format"];
+                TextureFormat newfmt;
+                
+                // Optionally store more info like format/attachment
+            }
+        }
+
+        if (passJson.HasMember("Outputs") && passJson["Outputs"].IsArray()) 
+        {
+            for (const auto& output : passJson["Outputs"].GetArray()) 
+            {
+                std::string texName = output["name"].GetString();
+                OutputNames.push_back(texName);
+            }
+        }
+
+        if (passJson.HasMember("Shaders") && passJson["Shaders"].IsObject())
+        {
+            const auto& shaders = passJson["Shaders"];
+            if(shaders.HasMember("Vertex"))
+            {
+                std::string inVert = shaders["Vertex"].GetString();
+                vert = inVert;
+            }
+            if(shaders.HasMember("Fragment"))
+            {
+                std::string inFrag = shaders["Fragment"].GetString();
+                frag = inFrag;
+            }
+        }
+        if (passJson.HasMember("ScreenQuad") && passJson["ScreenQuad"].IsBool())
+        {
+            isScreenQuad = passJson["ScreenQuad"].GetBool();
+        }
+
         createShaderProgram();
         frameBuffer.create();
-        createTextures();
-        textureUniforms();
         
     }
 
@@ -91,64 +111,64 @@ void Pass::loadModelMatricies(glm::mat4 modelTransform, bool useModelArray, std:
     }
 }
 
-void Pass::createTextures()
-{
-    bool texExists = false;
-    // CHECK IF THEY EXIST !!!!!
-    if (texExists != true)
-    {
-        std::vector<TextureObj> newTexObjs;
-        for( int i=0; i < In.size(); i++ )
-        {
-                TextureFormat newFmt;
+// void Pass::createTextures()
+// {
+//     bool texExists = false;
+//     // CHECK IF THEY EXIST !!!!!
+//     if (texExists != true)
+//     {
+//         std::vector<TextureObj> newTexObjs;
+//         for( int i=0; i < In.size(); i++ )
+//         {
+//                 TextureFormat newFmt;
 
-                newFmt.internalFormat = InFmt[i].internalFormat;
-                newFmt.format = InFmt[i].format;
-                newFmt.type = InFmt[i].type;
+//                 newFmt.internalFormat = InFmt[i].internalFormat;
+//                 newFmt.format = InFmt[i].format;
+//                 newFmt.type = InFmt[i].type;
 
-                TextureObj newTex;
+//                 TextureObj newTex;
 
-                newTex.create(In[i],ScreenWidth,ScreenHeight,newFmt,GL_COLOR_ATTACHMENT0 + i);
-                newTexObjs.push_back(newTex);
+//                 newTex.create(In[i],ScreenWidth,ScreenHeight,newFmt,GL_COLOR_ATTACHMENT0 + i);
+//                 newTexObjs.push_back(newTex);
 
-                // just use a textureobj class until you implent the json reading
-        }            
-        newInTexobjs = newTexObjs;
-    }
-    else 
-    {
+//                 // just use a textureobj class until you implent the json reading
+//         }            
+//         newInTexobjs = newTexObjs;
+//     }
+//     else 
+//     {
 
-    }
+//     }
 
-    std::vector<TextureObj> newOuts;
-    std::vector<GLenum> newAttachments;
-    for ( int i = 0; i < Out.size(); i++)
-    {
-        TextureFormat newFmt;
+//     std::vector<TextureObj> newOuts;
+//     std::vector<GLenum> newAttachments;
+//     for ( int i = 0; i < Out.size(); i++)
+//     {
+//         TextureFormat newFmt;
 
-        newFmt.internalFormat = OutFmt[i].internalFormat;
-        newFmt.format = OutFmt[i].format;
-        newFmt.type = OutFmt[i].type;
+//         newFmt.internalFormat = OutFmt[i].internalFormat;
+//         newFmt.format = OutFmt[i].format;
+//         newFmt.type = OutFmt[i].type;
 
-        TextureObj newTex;
+//         TextureObj newTex;
 
-        newTex.create(Out[i],ScreenWidth,ScreenHeight,newFmt,GL_COLOR_ATTACHMENT0 + i);
-        newAttachments.push_back(GL_COLOR_ATTACHMENT0 + i);
-        newOuts.push_back(newTex);
-        frameBuffer.bind();
-        frameBuffer.attachTexture(newTex);
-    }
-    newOutsobjs = newOuts;
-    attachments = newAttachments;
-    CheckGLError("Pass create textureobj");
-}
+//         newTex.create(Out[i],ScreenWidth,ScreenHeight,newFmt,GL_COLOR_ATTACHMENT0 + i);
+//         newAttachments.push_back(GL_COLOR_ATTACHMENT0 + i);
+//         newOuts.push_back(newTex);
+//         frameBuffer.bind();
+//         frameBuffer.attachTexture(newTex);
+//     }
+//     newOutsobjs = newOuts;
+//     attachments = newAttachments;
+//     CheckGLError("Pass create textureobj");
+// }
 
 void Pass::textureUniforms()
 {
     glUseProgram(shaderProgram);
-    for(int i = 0; i < In.size(); i++)
+    for(int i = 0; i < InputNames.size(); i++)
     {
-        setInt(shaderProgram,In[i],i);
+        setInt(shaderProgram,InputNames[i],i);
     }
 }
 
@@ -167,15 +187,15 @@ void Pass::drawBuffers()
     glDrawBuffers(static_cast<GLsizei>(attachments.size()), attachments.data());
 }
 
-void Pass::bindTextures()
-{
+// void Pass::bindTextures()
+// {
 
-    for (int i = 0; i < Out.size(); i++)
-    {
-        frameBuffer.attachTexture(newOutsobjs[i]);
-    }
-    CheckGLError("BindingTextures");
-}
+//     for (int i = 0; i < OutputNames.size(); i++)
+//     {
+//         frameBuffer.attachTexture(newOutsobjs[i]);
+//     }
+//     CheckGLError("BindingTextures");
+// }
 
 void Pass::clear()
 {

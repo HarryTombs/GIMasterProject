@@ -17,6 +17,7 @@ struct Graph
 {
     std::vector<std::unique_ptr<Pass>> passes;
     std::unordered_map<std::string, TextureObj> textures;
+    std::unordered_map<std::string, TextureFormat> formats;
 
     Camera* currentCam;
     std::vector<Model> sceneModels;
