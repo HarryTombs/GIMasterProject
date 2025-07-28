@@ -18,8 +18,19 @@ void Pass::init(const rapidjson::Value& passJson)
                 std::string texName = input["name"].GetString();
                 InputNames.push_back(texName);
                 
-                const auto& format = input["format"];
+                // const auto& format = input["format"].GetString();
                 TextureFormat newfmt;
+
+                bool useTexFile;
+                std::string texInputFile;
+                if(input.HasMember("isImageTex"), input["isImageTex"].IsBool())
+                {
+                    if (input["isImageTex"].GetBool())
+                    {
+                        texInputFile = input["TextureFile"].GetString();
+                    }
+                    
+                }
                 
                 // Optionally store more info like format/attachment
             }
@@ -111,57 +122,6 @@ void Pass::loadModelMatricies(glm::mat4 modelTransform, bool useModelArray, std:
     }
 }
 
-// void Pass::createTextures()
-// {
-//     bool texExists = false;
-//     // CHECK IF THEY EXIST !!!!!
-//     if (texExists != true)
-//     {
-//         std::vector<TextureObj> newTexObjs;
-//         for( int i=0; i < In.size(); i++ )
-//         {
-//                 TextureFormat newFmt;
-
-//                 newFmt.internalFormat = InFmt[i].internalFormat;
-//                 newFmt.format = InFmt[i].format;
-//                 newFmt.type = InFmt[i].type;
-
-//                 TextureObj newTex;
-
-//                 newTex.create(In[i],ScreenWidth,ScreenHeight,newFmt,GL_COLOR_ATTACHMENT0 + i);
-//                 newTexObjs.push_back(newTex);
-
-//                 // just use a textureobj class until you implent the json reading
-//         }            
-//         newInTexobjs = newTexObjs;
-//     }
-//     else 
-//     {
-
-//     }
-
-//     std::vector<TextureObj> newOuts;
-//     std::vector<GLenum> newAttachments;
-//     for ( int i = 0; i < Out.size(); i++)
-//     {
-//         TextureFormat newFmt;
-
-//         newFmt.internalFormat = OutFmt[i].internalFormat;
-//         newFmt.format = OutFmt[i].format;
-//         newFmt.type = OutFmt[i].type;
-
-//         TextureObj newTex;
-
-//         newTex.create(Out[i],ScreenWidth,ScreenHeight,newFmt,GL_COLOR_ATTACHMENT0 + i);
-//         newAttachments.push_back(GL_COLOR_ATTACHMENT0 + i);
-//         newOuts.push_back(newTex);
-//         frameBuffer.bind();
-//         frameBuffer.attachTexture(newTex);
-//     }
-//     newOutsobjs = newOuts;
-//     attachments = newAttachments;
-//     CheckGLError("Pass create textureobj");
-// }
 
 void Pass::textureUniforms()
 {
@@ -182,10 +142,10 @@ void Pass::depthBufferSetup()
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void Pass::drawBuffers()
-{
-    glDrawBuffers(static_cast<GLsizei>(attachments.size()), attachments.data());
-}
+// void Pass::drawBuffers()
+// {
+//     glDrawBuffers(static_cast<GLsizei>(attachments.size()), attachments.data());
+// }
 
 // void Pass::bindTextures()
 // {

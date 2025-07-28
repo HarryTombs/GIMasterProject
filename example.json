@@ -25,7 +25,8 @@
                             "type":"GL_FLOAT"
                         },
                         "attachmentPoint":"GL_COLOR_ATTACHMENT0",
-                        "isImageTex": true
+                        "isImageTex": true,
+                        "TextureFile":"textures/white-brick-wall-seamless-texture-free.png"
                     }
                 ],
                 "Outputs": 

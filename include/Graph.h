@@ -23,7 +23,8 @@ struct Graph
     std::vector<Model> sceneModels;
     float deltaTime;
 
-    void initGraph();
+    void initGraph(const std::string& path);
+    void mainLoop();
     void clearBuffers(float r = 0.0, float g = 0.0, float b = 0.0, float a = 1.0);
     void readJson(const std::string& json);
     void executePasses();

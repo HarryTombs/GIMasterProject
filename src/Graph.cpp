@@ -1,9 +1,16 @@
 #include "Graph.h"
 #include "Pass.h"
 
-void Graph::initGraph()
+void Graph::initGraph(const std::string& path)
 {
-    // Passes[0].In[0].create(ScreenWidth,ScreenHeight,Passes[0].InFmt[0],GL_COLOR_ATTACHMENT0,true);
+    readJson(path);
+    createTextures();
+}
+
+void Graph::mainLoop()
+{
+    clearBuffers();
+    executePasses();
 }
 void Graph::clearBuffers(float r, float g, float b, float a)
 {
@@ -71,26 +78,70 @@ void Graph::executePasses()
 
 void Graph::createTextures()
 {
-    std::string texName;
-    TextureFormat fmt;
+    for (const auto& p : passes)
+    {
+        for (std::string texName : p->InputNames)
+        {
+            TextureFormat fmt;
+            GLenum formatss = GL_RGBA;
+            GLenum fors = GL_FLOAT;
+            fmt.format = formatss;
+            fmt.internalFormat = formatss;
+            fmt.type =  fors;
+
+            // Load these properly please it'll work :) 
+
+            if (textures.find(texName) == textures.end())
+            {
+                TextureFormat newFmt;
+
+                newFmt.internalFormat = fmt.internalFormat;
+                newFmt.format = fmt.format;
+                newFmt.type = fmt.type;
+
+                TextureObj newTex;
+
+                newTex.create(texName,ScreenWidth,ScreenHeight,newFmt,GL_COLOR_ATTACHMENT0);
+                textures[texName] = newTex;
+
+                std::cout << "Made texture: " << texName << std::endl;
+            }
+        }
+        for (std::string texName : p->OutputNames)
+        {
+            TextureFormat fmt;
+            GLenum formatss = GL_RGBA;
+            GLenum fors = GL_FLOAT;
+            fmt.format = formatss;
+            fmt.internalFormat = formatss;
+            fmt.type =  fors;
+
+            // Load these properly please it'll work :) 
+
+            if (textures.find(texName) == textures.end())
+            {
+                TextureFormat newFmt;
+
+                newFmt.internalFormat = fmt.internalFormat;
+                newFmt.format = fmt.format;
+                newFmt.type = fmt.type;
+
+                TextureObj newTex;
+
+                newTex.create(texName,ScreenWidth,ScreenHeight,newFmt,GL_COLOR_ATTACHMENT0);
+                textures[texName] = newTex;
+
+                std::cout << "Made texture: " << texName << std::endl;
+            }
+        }
+
+    }
 
     // find the name and format from json !!!!!
 
     // make this a for loop add i to attachment0
 
-    if (textures.find(texName) == textures.end())
-    {
-        TextureFormat newFmt;
-
-        newFmt.internalFormat = fmt.internalFormat;
-        newFmt.format = fmt.format;
-        newFmt.type = fmt.type;
-
-        TextureObj newTex;
-
-        newTex.create(texName,ScreenWidth,ScreenHeight,newFmt,GL_COLOR_ATTACHMENT0);
-        textures[texName] = newTex;
-    }
+    
 }
 
 TextureObj Graph::getTexture(const std::string& name)

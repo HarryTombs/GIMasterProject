@@ -159,7 +159,9 @@ void InitialiseProgram()
     // GbufferPass.depthBufferSetup();
     CheckGLError("GBuffer Creation");
 
-    defferedShadingGraph.readJson("example.json");
+    defferedShadingGraph.initGraph("example.json");
+
+    CheckGLError("JsonLoad");
 
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE)
     {

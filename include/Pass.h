@@ -29,8 +29,11 @@ public:
     std::vector<std::string> InputNames;
     std::vector<std::string> OutputNames;
 
-    std::vector<GLenum> attachments;
+    std::vector<GLenum> inAttachments;
+    std::vector<GLenum> outAttachments;
 
+    std::vector<TextureFormat> inFmts;
+    std::vector<TextureFormat> outFmts;
 
     std::vector<Model> useModels;
     Camera* useCamera;
