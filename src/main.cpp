@@ -31,7 +31,6 @@ bool gQuit = false;
 bool mouseDown = false;
 float glX;
 float glY;
-Model* cubeModel;
 
 std::vector<Model> modelList;
 
@@ -40,22 +39,6 @@ Camera fpsCamera(glm::vec3(0.0f,0.0f,3.0f));
 GLuint renderShader; 
 
 Graph defferedShadingGraph;
-
-
-FrameBufferObject gBufferFBO;
-// TextureObj GPos, GNorm, GAlbSpec;
-
-TextureObj wallTex;
-
-TextureFormat GPosFmt = {GL_RGB16F, GL_RGBA, GL_FLOAT };
-TextureFormat GNormFmt = {GL_RGB16F, GL_RGBA, GL_FLOAT };
-TextureFormat GAbSpFmt = {GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE };
-
-std::vector<std::string> outputs = {"gPosition","gNormal","gAlbedoSpec"};
-std::vector<TextureFormat> outputFmts = {GPosFmt, GNormFmt, GAbSpFmt};
-
-// Pass lightspass("shaders/LightVertex.glsl","shaders/LightFragment.glsl",fpsCamera,{}, true, outputs,{},outputFmts,{});
-// Pass GbufferPass("shaders/DSVertex.glsl", "shaders/DSFragment.glsl",fpsCamera,modelList,false,{},outputs,{},outputFmts);
 
 const unsigned int NR_Lights = 32;
 std::vector<glm::vec3> lightPos;
@@ -152,8 +135,6 @@ void InitialiseProgram()
     CheckGLError("Pass init");
 
 
-    wallTex.create("walltex", ScreenWidth,ScreenHeight,GPosFmt,GL_COLOR_ATTACHMENT0,"textures/white-brick-wall-seamless-texture-free.png",true);
-    CheckGLError("Texture Loading");
 
     // GbufferPass.drawBuffers();
     // GbufferPass.depthBufferSetup();
@@ -286,7 +267,7 @@ void MainLoop() {
         // }
 
         
-
+        defferedShadingGraph.executePasses();
         // glBlitFramebuffer(0, 0, ScreenWidth, ScreenHeight, 0, 0, ScreenWidth, ScreenHeight, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
         // glBindFramebuffer(GL_FRAMEBUFFER, 0);
         // CheckGLError("GBuffer Pass");

@@ -5,6 +5,24 @@ void Graph::initGraph(const std::string& path)
 {
     readJson(path);
     createTextures();
+    for (const auto& p : passes)
+    {
+        std::cout << p->name << p->isScreenQuad << std::endl;
+        if(p->isScreenQuad != true)
+        {
+            p->frameBuffer.bind();
+            p->drawBuffers();
+            p->depthBufferSetup();
+
+            GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+            if (status != GL_FRAMEBUFFER_COMPLETE) 
+            {
+                std::cerr << "Framebuffer not complete in " << p->name << ": " << status << std::endl;
+            }
+
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        }
+    }
 }
 
 void Graph::mainLoop()
@@ -48,12 +66,10 @@ void Graph::readJson(const std::string& path)
     if (d.HasMember("Graph") && d["Graph"].IsObject())
     {
         const auto& graph = d["Graph"];
-        std::cout << "I've found graph" << std::endl;
         
         if (graph.HasMember("Passes") && graph["Passes"].IsArray())
         {
             const auto& passesArray = graph["Passes"];
-            std::cout << "I've found passes" << std::endl;
 
             for (const auto& passVal : passesArray.GetArray()) 
             {
@@ -70,10 +86,25 @@ void Graph::readJson(const std::string& path)
 
 void Graph::executePasses()
 {
-    // for (Pass p : Passes)
-//     {
-//         p.frameBuffer.bind();
-//     }
+    for (const auto& p : passes)
+    {
+        if (!p->isScreenQuad)
+        {
+            p->frameBuffer.bind();
+            p->clear();
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        }
+        glUseProgram(p->shaderProgram);
+        for(int i = 0; i < p->Inputs.size(); i++)
+        {
+            TextureObj tex = getTexture(p->Inputs[i].name);
+            // std::cout << "Attaching Texture: " << p->Inputs[i].name << " To: " << p->name << std::endl;
+            glActiveTexture(GL_TEXTURE0+i);
+            
+            // glBindTexture(GL_TEXTURE_2D, tex.texID);
+        }
+        
+    }
 }
 
 void Graph::createTextures()

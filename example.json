@@ -6,7 +6,7 @@
             {   
                 "PassName" : "Gbuffer",
                 "FrameBuffer":"GbufferFBO",
-                "ScreenQuad":true,
+                "ScreenQuad":false,
                 "Shaders":
                 {
                     "Vertex":"shaders/DSVertex.glsl",

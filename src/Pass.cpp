@@ -19,7 +19,8 @@ void Pass::init(const rapidjson::Value& passJson)
                 tex.name = input["name"].GetString();
                 tex.width = input["width"].GetInt();
                 tex.height = input["height"].GetInt();
-                tex.attachmentPoint = getGLEnumFromString(input["attachmentPoint"].GetString());
+                GLenum attachPoint = getGLEnumFromString(input["attachmentPoint"].GetString());
+                tex.attachmentPoint = attachPoint;
                 tex.isImageTex = input["isImageTex"].GetBool();
                 if (input["isImageTex"].GetBool())
                 {
@@ -31,7 +32,7 @@ void Pass::init(const rapidjson::Value& passJson)
                 tex.format = getGLEnumFromString(fmt["format"].GetString());
                 tex.type = getGLEnumFromString(fmt["type"].GetString());
 
-                
+                attachments.push_back(attachPoint);
                 Inputs.push_back(tex);
                 
                 // Optionally store more info like format/attachment
@@ -82,13 +83,19 @@ void Pass::init(const rapidjson::Value& passJson)
 
         createShaderProgram();
         frameBuffer.create();
+
+        useCamera = graph->currentCam;
+        useModels = graph->sceneModels;
+
+        // depthBufferSetup();
+        // drawBuffers();
         
     }
 
 void Pass::execute()
 {
     frameBuffer.bind();
-    clear();
+    // clear();
     // for(int i = 0; i < In.size(); i++)
     // {
     //     glActiveTexture(GL_TEXTURE0 + i);
@@ -113,29 +120,27 @@ void Pass::createShaderProgram()
     shaderProgram = prog;
 }
 
-void Pass::loadViewProjMatricies(Camera cam)
+void Pass::loadViewProjMatricies()
 {
     glUseProgram(shaderProgram);
 
-    glm::mat4 view = cam.getView();
-    glm::mat4 projection = glm::perspective(glm::radians(cam.m_zoom), (float)ScreenWidth/ (float)ScreenHeight,0.01f,1000.0f);
+    glm::mat4 view = useCamera->getView();
+    glm::mat4 projection = glm::perspective(glm::radians(useCamera->m_zoom), (float)ScreenWidth/ (float)ScreenHeight,0.01f,1000.0f);
     setMat4(shaderProgram, "view", view);
     setMat4(shaderProgram, "projection", projection);
 }
 
-void Pass::loadModelMatricies(glm::mat4 modelTransform, bool useModelArray, std::vector<Model> modelArray)
+void Pass::loadModelMatricies()
 {
-    setMat4(shaderProgram, "model", modelTransform);
-    if (useModelArray)
+    glm::mat4 model = glm::mat4(1.0f);
+    for (Model m : useModels)
     {
-        for (Model m : modelArray)
-        {
-            glm::mat4 model = glm::mat4(1.0f);
-            model = glm::translate(model,m.pos);
-            // do rotations
-            model = glm::scale(model,m.scale);
-        }
+        
+        model = glm::translate(model,m.pos);
+        // do rotations
+        model = glm::scale(model,m.scale);
     }
+    setMat4(shaderProgram, "model", model);
 }
 
 
@@ -158,20 +163,16 @@ void Pass::depthBufferSetup()
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-// void Pass::drawBuffers()
-// {
-//     glDrawBuffers(static_cast<GLsizei>(attachments.size()), attachments.data());
-// }
+void Pass::drawBuffers()
+{
+    glDrawBuffers(static_cast<GLsizei>(attachments.size()), attachments.data());
+}
 
-// void Pass::bindTextures()
-// {
+void Pass::bindTextures()
+{
 
-//     for (int i = 0; i < OutputNames.size(); i++)
-//     {
-//         frameBuffer.attachTexture(newOutsobjs[i]);
-//     }
-//     CheckGLError("BindingTextures");
-// }
+    
+}
 
 void Pass::clear()
 {

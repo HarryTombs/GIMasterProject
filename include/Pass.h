@@ -27,11 +27,10 @@ public:
 
     std::string name;
 
-    // std::vector<std::string> InputNames;
-    // std::vector<std::string> OutputNames;
-
     std::vector<TextureConfig> Inputs;
     std::vector<TextureConfig> Outputs;
+
+    std::vector<GLenum> attachments;
 
     std::vector<Model> useModels;
     Camera* useCamera;
@@ -48,8 +47,8 @@ public:
 
     void createShaderProgram();
 
-    void loadViewProjMatricies (Camera cam);
-    void loadModelMatricies(glm::mat4 modelTransform, bool useModelArray = false, std::vector<Model> modelArray = {});
+    void loadViewProjMatricies ();
+    void loadModelMatricies();
 
     void createTextures();
 
@@ -61,12 +60,6 @@ public:
     void bindTextures();
     void clear();
 
-    // Maybe consolidate into an init ()
-    // init shaders textures 
-
-
-
-    // i'll probably need multiple computes
 
 private:
 
