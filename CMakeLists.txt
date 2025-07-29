@@ -19,8 +19,10 @@ target_sources(${TargetName} PRIVATE ${PROJECT_SOURCE_DIR}/src/main.cpp
 			${PROJECT_SOURCE_DIR}/src/Pass.cpp
 			${PROJECT_SOURCE_DIR}/src/Graph.cpp
 			${PROJECT_SOURCE_DIR}/src/ShaderUtils.cpp
+			${PROJECT_SOURCE_DIR}/src/TextureUtils.cpp
 			${PROJECT_SOURCE_DIR}/include/SDLWindow.h
 			${PROJECT_SOURCE_DIR}/include/ShaderUtils.h
+			${PROJECT_SOURCE_DIR}/include/TextureUtils.h
 			${PROJECT_SOURCE_DIR}/include/Camera.h
 			${PROJECT_SOURCE_DIR}/include/FrameBufferObject.h
 			${PROJECT_SOURCE_DIR}/include/Pass.h

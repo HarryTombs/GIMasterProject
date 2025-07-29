@@ -13,11 +13,13 @@
 using namespace rapidjson;
 
 
+
 struct Graph
 {
     std::vector<std::unique_ptr<Pass>> passes;
     std::unordered_map<std::string, TextureObj> textures;
     std::unordered_map<std::string, TextureFormat> formats;
+    std::unordered_map<std::string, bool> useImages;
 
     Camera* currentCam;
     std::vector<Model> sceneModels;

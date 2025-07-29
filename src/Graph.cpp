@@ -80,67 +80,46 @@ void Graph::createTextures()
 {
     for (const auto& p : passes)
     {
-        for (std::string texName : p->InputNames)
+        for (TextureConfig texconf : p->Inputs)
         {
-            TextureFormat fmt;
-            GLenum formatss = GL_RGBA;
-            GLenum fors = GL_FLOAT;
-            fmt.format = formatss;
-            fmt.internalFormat = formatss;
-            fmt.type =  fors;
 
-            // Load these properly please it'll work :) 
 
-            if (textures.find(texName) == textures.end())
+            if (textures.find(texconf.name) == textures.end())
             {
                 TextureFormat newFmt;
 
-                newFmt.internalFormat = fmt.internalFormat;
-                newFmt.format = fmt.format;
-                newFmt.type = fmt.type;
+                newFmt.internalFormat = texconf.internalFormat;
+                newFmt.format = texconf.format;
+                newFmt.type = texconf.type;
 
                 TextureObj newTex;
 
-                newTex.create(texName,ScreenWidth,ScreenHeight,newFmt,GL_COLOR_ATTACHMENT0);
-                textures[texName] = newTex;
+                newTex.create(texconf.name,texconf.width,texconf.height,newFmt,texconf.attachmentPoint);
+                textures[texconf.name] = newTex;
 
-                std::cout << "Made texture: " << texName << std::endl;
+                std::cout << "Made texture: " << texconf.name << std::endl;
             }
         }
-        for (std::string texName : p->OutputNames)
+        for (TextureConfig texconf : p->Outputs)
         {
-            TextureFormat fmt;
-            GLenum formatss = GL_RGBA;
-            GLenum fors = GL_FLOAT;
-            fmt.format = formatss;
-            fmt.internalFormat = formatss;
-            fmt.type =  fors;
-
-            // Load these properly please it'll work :) 
-
-            if (textures.find(texName) == textures.end())
+            if (textures.find(texconf.name) == textures.end())
             {
                 TextureFormat newFmt;
 
-                newFmt.internalFormat = fmt.internalFormat;
-                newFmt.format = fmt.format;
-                newFmt.type = fmt.type;
+                newFmt.internalFormat = texconf.internalFormat;
+                newFmt.format = texconf.format;
+                newFmt.type = texconf.type;
 
                 TextureObj newTex;
 
-                newTex.create(texName,ScreenWidth,ScreenHeight,newFmt,GL_COLOR_ATTACHMENT0);
-                textures[texName] = newTex;
+                newTex.create(texconf.name,texconf.width,texconf.height,newFmt,texconf.attachmentPoint);
+                textures[texconf.name] = newTex;
 
-                std::cout << "Made texture: " << texName << std::endl;
+                std::cout << "Made texture: " << texconf.name << std::endl;
             }
         }
 
     }
-
-    // find the name and format from json !!!!!
-
-    // make this a for loop add i to attachment0
-
     
 }
 

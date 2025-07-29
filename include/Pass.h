@@ -2,6 +2,7 @@
 #define PASS_H
 #include "FrameBufferObject.h"
 #include "ShaderUtils.h"
+#include "TextureUtils.h"
 #include "SDLWindow.h"
 #include "Camera.h"
 #include "Mesh.h"
@@ -26,14 +27,11 @@ public:
 
     std::string name;
 
-    std::vector<std::string> InputNames;
-    std::vector<std::string> OutputNames;
+    // std::vector<std::string> InputNames;
+    // std::vector<std::string> OutputNames;
 
-    std::vector<GLenum> inAttachments;
-    std::vector<GLenum> outAttachments;
-
-    std::vector<TextureFormat> inFmts;
-    std::vector<TextureFormat> outFmts;
+    std::vector<TextureConfig> Inputs;
+    std::vector<TextureConfig> Outputs;
 
     std::vector<Model> useModels;
     Camera* useCamera;

@@ -15,22 +15,24 @@ void Pass::init(const rapidjson::Value& passJson)
         {
             for (const auto& input : passJson["Inputs"].GetArray()) 
             {
-                std::string texName = input["name"].GetString();
-                InputNames.push_back(texName);
-                
-                // const auto& format = input["format"].GetString();
-                TextureFormat newfmt;
-
-                bool useTexFile;
-                std::string texInputFile;
-                if(input.HasMember("isImageTex"), input["isImageTex"].IsBool())
+                TextureConfig tex; 
+                tex.name = input["name"].GetString();
+                tex.width = input["width"].GetInt();
+                tex.height = input["height"].GetInt();
+                tex.attachmentPoint = getGLEnumFromString(input["attachmentPoint"].GetString());
+                tex.isImageTex = input["isImageTex"].GetBool();
+                if (input["isImageTex"].GetBool())
                 {
-                    if (input["isImageTex"].GetBool())
-                    {
-                        texInputFile = input["TextureFile"].GetString();
-                    }
-                    
+                    tex.imageFile = input["TextureFile"].GetString();
                 }
+
+                const auto& fmt = input["format"];
+                tex.internalFormat = getGLEnumFromString(fmt["internalFormat"].GetString());
+                tex.format = getGLEnumFromString(fmt["format"].GetString());
+                tex.type = getGLEnumFromString(fmt["type"].GetString());
+
+                
+                Inputs.push_back(tex);
                 
                 // Optionally store more info like format/attachment
             }
@@ -40,8 +42,22 @@ void Pass::init(const rapidjson::Value& passJson)
         {
             for (const auto& output : passJson["Outputs"].GetArray()) 
             {
-                std::string texName = output["name"].GetString();
-                OutputNames.push_back(texName);
+                TextureConfig tex; 
+                tex.name = output["name"].GetString();
+                tex.width = output["width"].GetInt();
+                tex.height = output["height"].GetInt();
+                tex.attachmentPoint = getGLEnumFromString(output["attachmentPoint"].GetString());
+                tex.isImageTex = output["isImageTex"].GetBool();
+                if (output["isImageTex"].GetBool())
+                {
+                    tex.imageFile = output["TextureFile"].GetString();
+                }
+
+                const auto& fmt = output["format"];
+                tex.internalFormat = getGLEnumFromString(fmt["internalFormat"].GetString());
+                tex.format = getGLEnumFromString(fmt["format"].GetString());
+                tex.type = getGLEnumFromString(fmt["type"].GetString());
+                Outputs.push_back(tex);
             }
         }
 
@@ -126,9 +142,9 @@ void Pass::loadModelMatricies(glm::mat4 modelTransform, bool useModelArray, std:
 void Pass::textureUniforms()
 {
     glUseProgram(shaderProgram);
-    for(int i = 0; i < InputNames.size(); i++)
+    for(int i = 0; i < Inputs.size(); i++)
     {
-        setInt(shaderProgram,InputNames[i],i);
+        setInt(shaderProgram,Inputs[i].name,i);
     }
 }
 
