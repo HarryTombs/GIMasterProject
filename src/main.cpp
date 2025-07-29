@@ -130,24 +130,10 @@ void InitialiseProgram()
 
     renderShader = loadShaderProgram("shaders/vertex.glsl", "shaders/fragment.glsl");
 
-    // GbufferPass.init();
-    // lightspass.init();
-    CheckGLError("Pass init");
-
-
-
-    // GbufferPass.drawBuffers();
-    // GbufferPass.depthBufferSetup();
-    CheckGLError("GBuffer Creation");
-
     defferedShadingGraph.initGraph("example.json");
 
     CheckGLError("JsonLoad");
 
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE)
-    {
-        std::cout << "Gbuffer Complete" << std::endl;
-    }
 
     // lights
 

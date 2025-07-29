@@ -160,7 +160,6 @@ void Pass::depthBufferSetup()
     glBindRenderbuffer(GL_RENDERBUFFER, rboDepth);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, ScreenWidth , ScreenHeight);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rboDepth);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void Pass::drawBuffers()

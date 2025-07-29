@@ -7,7 +7,6 @@ void Graph::initGraph(const std::string& path)
     createTextures();
     for (const auto& p : passes)
     {
-        std::cout << p->name << p->isScreenQuad << std::endl;
         if(p->isScreenQuad != true)
         {
             p->frameBuffer.bind();
