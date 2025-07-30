@@ -91,17 +91,19 @@ void Graph::executePasses()
         {
             p->frameBuffer.bind();
             p->clear();
-            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+            
         }
         glUseProgram(p->shaderProgram);
         for(int i = 0; i < p->Inputs.size(); i++)
         {
             TextureObj tex = getTexture(p->Inputs[i].name);
-            // std::cout << "Attaching Texture: " << p->Inputs[i].name << " To: " << p->name << std::endl;
+            std::cout << "Attaching Texture: " << p->Inputs[i].name << " To: " << p->name << std::endl;
             glActiveTexture(GL_TEXTURE0+i);
             
-            // glBindTexture(GL_TEXTURE_2D, tex.texID);
+            glBindTexture(GL_TEXTURE_2D, tex.texID);
+            
         }
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
         
     }
 }
@@ -126,6 +128,10 @@ void Graph::createTextures()
 
                 newTex.create(texconf.name,texconf.width,texconf.height,newFmt,texconf.attachmentPoint);
                 textures[texconf.name] = newTex;
+                p->frameBuffer.bind();
+                glFramebufferTexture2D(GL_FRAMEBUFFER, texconf.attachmentPoint, GL_TEXTURE_2D, newTex.texID, 0);
+
+                CheckGLError("TextureCreation");
 
                 std::cout << "Made texture: " << texconf.name << std::endl;
             }
@@ -152,6 +158,8 @@ void Graph::createTextures()
     }
     
 }
+
+
 
 TextureObj Graph::getTexture(const std::string& name)
 {

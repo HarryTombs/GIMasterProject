@@ -53,6 +53,7 @@ public:
     void createTextures();
 
     void textureUniforms();
+    void attachOutputTextures();
 
     void depthBufferSetup();
     void drawBuffers();

@@ -173,6 +173,11 @@ void Pass::bindTextures()
     
 }
 
+void Pass::attachOutputTextures()
+{
+    frameBuffer.bind();
+};
+
 void Pass::clear()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
