@@ -32,7 +32,7 @@ void Pass::init(const rapidjson::Value& passJson)
                 tex.format = getGLEnumFromString(fmt["format"].GetString());
                 tex.type = getGLEnumFromString(fmt["type"].GetString());
 
-                InAttachments.push_back(attachPoint);
+                // InAttachments.push_back(attachPoint);
                 Inputs.push_back(tex);
                 
                 // Optionally store more info like format/attachment
@@ -60,7 +60,7 @@ void Pass::init(const rapidjson::Value& passJson)
                 tex.format = getGLEnumFromString(fmt["format"].GetString());
                 tex.type = getGLEnumFromString(fmt["type"].GetString());
 
-                OutAttachments.push_back(attachPoint);
+                // OutAttachments.push_back(attachPoint);
                 Outputs.push_back(tex);
             }
         }
@@ -158,6 +158,7 @@ void Pass::textureUniforms()
 
 void Pass::depthBufferSetup()
 {
+    frameBuffer.bind();
     unsigned int rboDepth;
     glGenRenderbuffers(1, &rboDepth);   
     glBindRenderbuffer(GL_RENDERBUFFER, rboDepth);
@@ -186,8 +187,13 @@ void Pass::attachOutputTextures(Graph* graph)
         if (graph->textures.find(tex.name) != graph->textures.end())
         {
             GLuint texID = graph->textures[tex.name].texID;
+
+            if (texID == 0)
+            std::cerr << "Warning: texture ID 0 for " << tex.name << std::endl;
+
+
             glFramebufferTexture2D(GL_FRAMEBUFFER, tex.attachmentPoint, GL_TEXTURE_2D,texID,0);
-            // attachments.push_back(tex.attachmentPoint);
+            OutAttachments.push_back(tex.attachmentPoint);
             std::cout << "Texture: " << tex.name << " Attached at: " << tex.attachmentPoint << std::endl;
         }
     }

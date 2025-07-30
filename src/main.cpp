@@ -129,6 +129,7 @@ void InitialiseProgram()
     modelList.push_back(cubeModel2);
 
     renderShader = loadShaderProgram("shaders/vertex.glsl", "shaders/fragment.glsl");
+    CheckGLError("Shaders");
 
     defferedShadingGraph.initGraph("example.json");
 
@@ -253,7 +254,9 @@ void MainLoop() {
         // }
 
         
-        // defferedShadingGraph.executePasses();
+        defferedShadingGraph.executePasses();
+
+        
         // glBlitFramebuffer(0, 0, ScreenWidth, ScreenHeight, 0, 0, ScreenWidth, ScreenHeight, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
         // glBindFramebuffer(GL_FRAMEBUFFER, 0);
         // CheckGLError("GBuffer Pass");
@@ -295,7 +298,7 @@ void MainLoop() {
         // glBlitFramebuffer(
         // 0, 0, ScreenWidth, ScreenHeight, 0, 0, ScreenWidth, ScreenHeight, GL_DEPTH_BUFFER_BIT, GL_NEAREST
         // );
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        // glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
         glEnable(GL_DEPTH_TEST);
 
