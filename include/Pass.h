@@ -30,7 +30,8 @@ public:
     std::vector<TextureConfig> Inputs;
     std::vector<TextureConfig> Outputs;
 
-    std::vector<GLenum> attachments;
+    std::vector<GLenum> InAttachments;
+    std::vector<GLenum> OutAttachments;
 
     std::vector<Model> useModels;
     Camera* useCamera;
@@ -53,7 +54,7 @@ public:
     void createTextures();
 
     void textureUniforms();
-    void attachOutputTextures();
+    void attachOutputTextures(Graph* graph);
 
     void depthBufferSetup();
     void drawBuffers();

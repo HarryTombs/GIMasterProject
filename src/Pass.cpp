@@ -32,7 +32,7 @@ void Pass::init(const rapidjson::Value& passJson)
                 tex.format = getGLEnumFromString(fmt["format"].GetString());
                 tex.type = getGLEnumFromString(fmt["type"].GetString());
 
-                attachments.push_back(attachPoint);
+                InAttachments.push_back(attachPoint);
                 Inputs.push_back(tex);
                 
                 // Optionally store more info like format/attachment
@@ -47,7 +47,8 @@ void Pass::init(const rapidjson::Value& passJson)
                 tex.name = output["name"].GetString();
                 tex.width = output["width"].GetInt();
                 tex.height = output["height"].GetInt();
-                tex.attachmentPoint = getGLEnumFromString(output["attachmentPoint"].GetString());
+                GLenum attachPoint = getGLEnumFromString(output["attachmentPoint"].GetString());
+                tex.attachmentPoint = attachPoint;
                 tex.isImageTex = output["isImageTex"].GetBool();
                 if (output["isImageTex"].GetBool())
                 {
@@ -58,6 +59,8 @@ void Pass::init(const rapidjson::Value& passJson)
                 tex.internalFormat = getGLEnumFromString(fmt["internalFormat"].GetString());
                 tex.format = getGLEnumFromString(fmt["format"].GetString());
                 tex.type = getGLEnumFromString(fmt["type"].GetString());
+
+                OutAttachments.push_back(attachPoint);
                 Outputs.push_back(tex);
             }
         }
@@ -164,7 +167,9 @@ void Pass::depthBufferSetup()
 
 void Pass::drawBuffers()
 {
-    glDrawBuffers(static_cast<GLsizei>(attachments.size()), attachments.data());
+    
+    glDrawBuffers(static_cast<GLsizei>(OutAttachments.size()), OutAttachments.data());
+    std::cout << "Draw Buffers Complete " << OutAttachments.size() << std::endl;
 }
 
 void Pass::bindTextures()
@@ -173,9 +178,29 @@ void Pass::bindTextures()
     
 }
 
-void Pass::attachOutputTextures()
+void Pass::attachOutputTextures(Graph* graph)
 {
     frameBuffer.bind();
+    for (auto& tex : Outputs)
+    {
+        if (graph->textures.find(tex.name) != graph->textures.end())
+        {
+            GLuint texID = graph->textures[tex.name].texID;
+            glFramebufferTexture2D(GL_FRAMEBUFFER, tex.attachmentPoint, GL_TEXTURE_2D,texID,0);
+            // attachments.push_back(tex.attachmentPoint);
+            std::cout << "Texture: " << tex.name << " Attached at: " << tex.attachmentPoint << std::endl;
+        }
+    }
+    drawBuffers();
+
+    GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    if (status != GL_FRAMEBUFFER_COMPLETE)
+    {
+        std::cerr << "Framebuffer not complete for pass: " << name
+                << " Status: 0x" << std::hex << status << std::dec << std::endl;
+    }
+
+    glBindFramebuffer(GL_FRAMEBUFFER,0);
 };
 
 void Pass::clear()

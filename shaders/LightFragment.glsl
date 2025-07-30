@@ -2,9 +2,9 @@
 in vec2 uv;
 out vec4 FragColor;
 
-uniform sampler2D gPosition;
-uniform sampler2D gNorm;
-uniform sampler2D gAlbedoSpec;
+uniform sampler2D GPos;
+uniform sampler2D GNorm;
+uniform sampler2D GAlbeSpec;
 
 struct Light
 {
@@ -22,9 +22,9 @@ uniform vec3 viewPos;
 
 void main() 
     {
-        vec3 fragPos = texture(gPosition, uv).xyz;
-        vec3 Normal = texture(gNorm, uv).xyz;
-        vec3 Abledo = texture(gAlbedoSpec, uv).xyz;
+        vec3 fragPos = texture(GPos, uv).xyz;
+        vec3 Normal = texture(GNorm, uv).xyz;
+        vec3 Abledo = texture(GAlbeSpec, uv).xyz;
 
         vec3 lighting = Abledo * 0.01;
         vec3 viewDir = normalize(viewPos - fragPos);

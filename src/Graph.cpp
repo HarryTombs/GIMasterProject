@@ -5,12 +5,15 @@ void Graph::initGraph(const std::string& path)
 {
     readJson(path);
     createTextures();
+    
     for (const auto& p : passes)
     {
+        
         if(p->isScreenQuad != true)
         {
             p->frameBuffer.bind();
             p->drawBuffers();
+            // p->attachOutputTextures(this);
             p->depthBufferSetup();
 
             GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
@@ -20,6 +23,11 @@ void Graph::initGraph(const std::string& path)
             }
 
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        }
+        if(p->isScreenQuad == true)
+        {
+            p->textureUniforms();
+            std::cout<<"Load uniforms pass: " << p->name << std::endl;
         }
     }
 }
@@ -133,7 +141,7 @@ void Graph::createTextures()
 
                 CheckGLError("TextureCreation");
 
-                std::cout << "Made texture: " << texconf.name << std::endl;
+                std::cout << "Made texture: " << texconf.name << "at attachment: point " << texconf.attachmentPoint << std::endl;
             }
         }
         for (TextureConfig texconf : p->Outputs)
@@ -150,8 +158,10 @@ void Graph::createTextures()
 
                 newTex.create(texconf.name,texconf.width,texconf.height,newFmt,texconf.attachmentPoint);
                 textures[texconf.name] = newTex;
+                p->frameBuffer.bind();
+                glFramebufferTexture2D(GL_FRAMEBUFFER, texconf.attachmentPoint, GL_TEXTURE_2D, newTex.texID, 0);
 
-                std::cout << "Made texture: " << texconf.name << std::endl;
+                std::cout << "Made texture: " << texconf.name << "at attachment: point " << texconf.attachmentPoint << std::endl;
             }
         }
 
