@@ -170,12 +170,10 @@ void Graph::createTextures()
 
                 newTex.create(texconf.name,texconf.width,texconf.height,newFmt,texconf.attachmentPoint);
                 textures[texconf.name] = newTex;
-                // p->frameBuffer.bind();
-                // glFramebufferTexture2D(GL_FRAMEBUFFER, texconf.attachmentPoint, GL_TEXTURE_2D, newTex.texID, 0);
 
                 CheckGLError("TextureCreation");
 
-                std::cout << "Made texture: " << texconf.name << "at attachment: point " << texconf.attachmentPoint << std::endl;
+                std::cout << "Made texture: " << texconf.name <<  std::endl;
             }
         }
         for (TextureConfig texconf : p->Outputs)
@@ -192,10 +190,10 @@ void Graph::createTextures()
 
                 newTex.create(texconf.name,texconf.width,texconf.height,newFmt,texconf.attachmentPoint);
                 textures[texconf.name] = newTex;
-                p->frameBuffer.bind();
-                glFramebufferTexture2D(GL_FRAMEBUFFER, texconf.attachmentPoint, GL_TEXTURE_2D, newTex.texID, 0);
 
-                std::cout << "Made texture: " << texconf.name << "at attachment: point " << texconf.attachmentPoint << std::endl;
+                CheckGLError("TextureCreation");
+
+                std::cout << "Made texture: " << texconf.name <<  std::endl;
             }
         }
 

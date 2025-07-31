@@ -15,9 +15,6 @@ void TextureObj::create(std::string inName, int w, int h, TextureFormat& fmt, GL
 
     glGenTextures(1, &texID);
     glBindTexture(GL_TEXTURE_2D, texID);
-    glTexImage2D(GL_TEXTURE_2D, 0, fmt.internalFormat, w, h, 0, fmt.format, fmt.type, NULL);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     
 
     if (isImageTex)
@@ -39,6 +36,12 @@ void TextureObj::create(std::string inName, int w, int h, TextureFormat& fmt, GL
 
         }
         stbi_image_free(data);
+    }
+    else
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, fmt.internalFormat, w, h, 0, fmt.format, fmt.type, NULL);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     }
 
 

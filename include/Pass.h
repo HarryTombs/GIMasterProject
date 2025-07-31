@@ -48,7 +48,7 @@ public:
 
     void createShaderProgram();
 
-    void loadViewProjMatricies ();
+    void loadViewProjMatricies(Camera cam);
     void loadModelMatricies();
 
     void createTextures();

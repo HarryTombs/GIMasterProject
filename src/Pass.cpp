@@ -123,12 +123,12 @@ void Pass::createShaderProgram()
     shaderProgram = prog;
 }
 
-void Pass::loadViewProjMatricies()
+void Pass::loadViewProjMatricies(Camera cam)
 {
     glUseProgram(shaderProgram);
 
-    glm::mat4 view = useCamera->getView();
-    glm::mat4 projection = glm::perspective(glm::radians(useCamera->m_zoom), (float)ScreenWidth/ (float)ScreenHeight,0.01f,1000.0f);
+    glm::mat4 view = cam.getView();
+    glm::mat4 projection = glm::perspective(glm::radians(cam.m_zoom), (float)ScreenWidth/ (float)ScreenHeight,0.01f,1000.0f);
     setMat4(shaderProgram, "view", view);
     setMat4(shaderProgram, "projection", projection);
 }

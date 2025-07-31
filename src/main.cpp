@@ -40,6 +40,9 @@ GLuint renderShader;
 
 Graph defferedShadingGraph;
 
+TextureObj inTexture;
+TextureFormat fmt = {GL_RGBA,GL_RGBA,GL_FLOAT};
+
 const unsigned int NR_Lights = 32;
 std::vector<glm::vec3> lightPos;
 std::vector<glm::vec3> lightCol;
@@ -130,6 +133,8 @@ void InitialiseProgram()
 
     renderShader = loadShaderProgram("shaders/vertex.glsl", "shaders/fragment.glsl");
     CheckGLError("Shaders");
+
+    inTexture.create("inTex",ScreenWidth,ScreenHeight,fmt,GL_COLOR_ATTACHMENT0,"textures/7051776139_0a12399c9c_o.png",true);
 
     defferedShadingGraph.initGraph("example.json");
 
@@ -239,32 +244,47 @@ void MainLoop() {
 
         // GBuffer Pass
 
-        // GbufferPass.frameBuffer.bind();
-        // GbufferPass.clear();
-        // GbufferPass.execute();
-        // glActiveTexture(GL_TEXTURE0);
-        // glBindTexture(GL_TEXTURE_2D, wallTex.texID);
-
-        // GbufferPass.loadViewProjMatricies(fpsCamera);
-        // for (Model m : modelList)
-        // {
-        //     GbufferPass.loadModelMatricies(m.transMat);
-        //     m.Draw();
-
-        // }
+        defferedShadingGraph.passes[0]->frameBuffer.bind();
+        defferedShadingGraph.passes[0]->clear();
 
         
-        defferedShadingGraph.executePasses();
+
+        defferedShadingGraph.passes[0]->loadViewProjMatricies(fpsCamera);
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D,inTexture.texID);
+
+        for (Model m : modelList)
+        {
+            glm::mat4 model = glm::mat4(1.0f);
+            model = glm::translate(model, m.pos);
+            setMat4(defferedShadingGraph.passes[0]->shaderProgram, "model", model);
+            m.Draw();
+        }
+
 
         
-        // glBlitFramebuffer(0, 0, ScreenWidth, ScreenHeight, 0, 0, ScreenWidth, ScreenHeight, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
-        // glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        // CheckGLError("GBuffer Pass");
+        // defferedShadingGraph.executePasses();
+
+        
+        glBlitFramebuffer(0, 0, ScreenWidth, ScreenHeight, 0, 0, ScreenWidth, ScreenHeight, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        CheckGLError("GBuffer Pass");
 
 
         // // Light Pass
 
-        // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        glUseProgram(defferedShadingGraph.passes[1]->shaderProgram);
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, defferedShadingGraph.textures["GPos"].texID);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, defferedShadingGraph.textures["GNorm"].texID);
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, defferedShadingGraph.textures["GAlbeSpec"].texID);
+
         // glUseProgram(lightspass.shaderProgram);
         // glActiveTexture(GL_TEXTURE0);
         // glBindTexture(GL_TEXTURE_2D, GbufferPass.newOutsobjs[0].texID);
@@ -272,26 +292,26 @@ void MainLoop() {
         // glBindTexture(GL_TEXTURE_2D, GbufferPass.newOutsobjs[1].texID);
         // glActiveTexture(GL_TEXTURE2);
         // glBindTexture(GL_TEXTURE_2D, GbufferPass.newOutsobjs[2].texID);
-        // CheckGLError("Light Pass");
+        CheckGLError("Light Pass");
         
 
-        // for (unsigned int i = 0; i < lightPos.size(); i++)
-        // {
-        //     setVec3(lightspass.shaderProgram,("lights[" + std::to_string(i) + "].Position"), lightPos[i]);
-        //     setVec3(lightspass.shaderProgram,("lights[" + std::to_string(i) + "].Color"), lightCol[i]);
-        //     const float linear = 0.7f;
-        //     const float quadratic = 1.8f;
-        //     setFloat(lightspass.shaderProgram,("lights[" + std::to_string(i) + "].Linear"), linear);
-        //     setFloat(lightspass.shaderProgram,("lights[" + std::to_string(i) + "].Quadratic"), quadratic);
-        // }
-        // setVec3(lightspass.shaderProgram,"viewPos", fpsCamera.CamPos);
-        // CheckGLError("Light creation");
+        for (unsigned int i = 0; i < lightPos.size(); i++)
+        {
+            setVec3(defferedShadingGraph.passes[1]->shaderProgram,("lights[" + std::to_string(i) + "].Position"), lightPos[i]);
+            setVec3(defferedShadingGraph.passes[1]->shaderProgram,("lights[" + std::to_string(i) + "].Color"), lightCol[i]);
+            const float linear = 0.7f;
+            const float quadratic = 1.8f;
+            setFloat(defferedShadingGraph.passes[1]->shaderProgram,("lights[" + std::to_string(i) + "].Linear"), linear);
+            setFloat(defferedShadingGraph.passes[1]->shaderProgram,("lights[" + std::to_string(i) + "].Quadratic"), quadratic);
+        }
+        setVec3(defferedShadingGraph.passes[1]->shaderProgram,"viewPos", fpsCamera.CamPos);
+        CheckGLError("Light creation");
 
-        // glDisable(GL_DEPTH_TEST);
+        glDisable(GL_DEPTH_TEST);
 
         // // Render screen quad
 
-        // renderQuad();
+        renderQuad();
 
         // glBindFramebuffer(GL_READ_FRAMEBUFFER, GbufferPass.frameBuffer.getID());
         // glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0); // write to default framebuffer
