@@ -168,8 +168,18 @@ void Graph::createTextures()
 
                 TextureObj newTex;
 
-                newTex.create(texconf.name,texconf.width,texconf.height,newFmt,texconf.attachmentPoint);
-                textures[texconf.name] = newTex;
+                if(texconf.isImageTex)
+                {
+                    newTex.create(texconf.name,texconf.width,texconf.height,newFmt,texconf.attachmentPoint,texconf.imageFile,texconf.isImageTex);
+                    textures[texconf.name] = newTex;
+                }
+                else
+                {
+                    newTex.create(texconf.name,texconf.width,texconf.height,newFmt,texconf.attachmentPoint);
+                    textures[texconf.name] = newTex;
+                }
+
+                
 
                 CheckGLError("TextureCreation");
 

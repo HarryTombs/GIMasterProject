@@ -247,12 +247,10 @@ void MainLoop() {
         defferedShadingGraph.passes[0]->frameBuffer.bind();
         defferedShadingGraph.passes[0]->clear();
 
-        
-
         defferedShadingGraph.passes[0]->loadViewProjMatricies(fpsCamera);
 
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D,inTexture.texID);
+        glBindTexture(GL_TEXTURE_2D,defferedShadingGraph.textures["inputUvTexture"].texID);
 
         for (Model m : modelList)
         {
