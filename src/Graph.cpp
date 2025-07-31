@@ -1,10 +1,14 @@
 #include "Graph.h"
 #include "Pass.h"
 
-void Graph::initGraph(const std::string& path)
+
+
+void Graph::initGraph(const std::string& path,std::vector<Model> models)
 {
     readJson(path);
     createTextures();
+
+    sceneModels = models;
     
     for (const auto& p : passes)
     {
@@ -95,58 +99,39 @@ void Graph::executePasses()
 {
     for (const auto& p : passes)
     {
-        if (!p->isScreenQuad)
+        if(!p->isScreenQuad)
         {
             p->frameBuffer.bind();
             p->clear();
-            
-            glUseProgram(p->shaderProgram);
-
-            if (!glIsProgram(p->shaderProgram)) {
-                std::cerr << "Invalid shader program in pass: " << p->name << std::endl;
-            }
+            p->loadViewProjMatricies();
             for(int i = 0; i < p->Inputs.size(); i++)
             {
-                if (textures.find(p->Inputs[i].name) != textures.end())
-                {
-                    TextureObj tex = getTexture(p->Inputs[i].name);
-                    std::cout << "Attaching Texture: " << p->Inputs[i].name << " To: " << p->name << " At: " << GL_TEXTURE0+i <<std::endl;
-                    glActiveTexture(GL_TEXTURE0+i);
-
-                    if (tex.texID != 0)
-                    {
-                        glBindTexture(GL_TEXTURE_2D, tex.texID);
-                        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-                        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-                        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-                        // Set uniform
-                        GLint loc = glGetUniformLocation(p->shaderProgram, "tex");
-                        if (loc != -1)
-                        {
-                            glUniform1i(loc, i);  // Link shader uniform `tex` to unit i
-                            std::cout << "Uniform location set: " << i << std::endl;
-                        }
-                        else
-                        {
-                            std::cerr << "Could not find uniform 'tex' in shader " << p->name << std::endl;
-                        }
-                    }
-
-                    else std::cerr << "Invalid texture ID for: " << p->Inputs[i].name << std::endl;
-                }
-                
-                
+                glActiveTexture(GL_TEXTURE0+i);
+                glBindTexture(GL_TEXTURE_2D,textures[p->Inputs[i].name].texID);
             }
-            GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-            if (status != GL_FRAMEBUFFER_COMPLETE)
-                std::cerr << "FBO incomplete in pass " << p->name << ": 0x" << std::hex << status << std::endl;
-
+            for (Model m : sceneModels)
+            {
+                glm::mat4 model = glm::mat4(1.0f);
+                model = glm::translate(model, m.pos);
+                setMat4(p->shaderProgram, "model", model);
+                m.Draw();
+            }
+            glBlitFramebuffer(0, 0, ScreenWidth, ScreenHeight, 0, 0, ScreenWidth, ScreenHeight, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
         }
-        
-        
+        if(p->isScreenQuad)
+        {
+            p->clear();
+            glUseProgram(p->shaderProgram);
+            for(int i = 0; i < p->Inputs.size(); i++)
+            {
+                glActiveTexture(GL_TEXTURE0+i);
+                glBindTexture(GL_TEXTURE_2D,textures[p->Inputs[i].name].texID);
+            }
+            glDisable(GL_DEPTH_TEST);
+            renderQuad();
+            glEnable(GL_DEPTH_TEST);
+        }
     }
 }
 

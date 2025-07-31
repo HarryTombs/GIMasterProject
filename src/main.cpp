@@ -136,7 +136,8 @@ void InitialiseProgram()
 
     inTexture.create("inTex",ScreenWidth,ScreenHeight,fmt,GL_COLOR_ATTACHMENT0,"textures/7051776139_0a12399c9c_o.png",true);
 
-    defferedShadingGraph.initGraph("example.json");
+    defferedShadingGraph.currentCam = &fpsCamera;
+    defferedShadingGraph.initGraph("example.json",modelList);
 
     CheckGLError("JsonLoad");
 
@@ -239,59 +240,8 @@ void MainLoop() {
         deltaTime = (double)((NOW - LAST) * 1000) / SDL_GetPerformanceFrequency();
         deltaTime /= 1000.0;
 
-        defferedShadingGraph.clearBuffers();
-        CheckGLError("Clear Color");
 
-        // GBuffer Pass
-
-        defferedShadingGraph.passes[0]->frameBuffer.bind();
-        defferedShadingGraph.passes[0]->clear();
-
-        defferedShadingGraph.passes[0]->loadViewProjMatricies(fpsCamera);
-
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D,defferedShadingGraph.textures["inputUvTexture"].texID);
-
-        for (Model m : modelList)
-        {
-            glm::mat4 model = glm::mat4(1.0f);
-            model = glm::translate(model, m.pos);
-            setMat4(defferedShadingGraph.passes[0]->shaderProgram, "model", model);
-            m.Draw();
-        }
-
-
-        
-        // defferedShadingGraph.executePasses();
-
-        
-        glBlitFramebuffer(0, 0, ScreenWidth, ScreenHeight, 0, 0, ScreenWidth, ScreenHeight, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        CheckGLError("GBuffer Pass");
-
-
-        // // Light Pass
-
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        glUseProgram(defferedShadingGraph.passes[1]->shaderProgram);
-
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, defferedShadingGraph.textures["GPos"].texID);
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, defferedShadingGraph.textures["GNorm"].texID);
-        glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_2D, defferedShadingGraph.textures["GAlbeSpec"].texID);
-
-        // glUseProgram(lightspass.shaderProgram);
-        // glActiveTexture(GL_TEXTURE0);
-        // glBindTexture(GL_TEXTURE_2D, GbufferPass.newOutsobjs[0].texID);
-        // glActiveTexture(GL_TEXTURE1);
-        // glBindTexture(GL_TEXTURE_2D, GbufferPass.newOutsobjs[1].texID);
-        // glActiveTexture(GL_TEXTURE2);
-        // glBindTexture(GL_TEXTURE_2D, GbufferPass.newOutsobjs[2].texID);
-        CheckGLError("Light Pass");
-        
+        defferedShadingGraph.mainLoop();
 
         for (unsigned int i = 0; i < lightPos.size(); i++)
         {
@@ -309,13 +259,13 @@ void MainLoop() {
 
         // // Render screen quad
 
-        renderQuad();
+        // renderQuad();
 
-        // glBindFramebuffer(GL_READ_FRAMEBUFFER, GbufferPass.frameBuffer.getID());
-        // glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0); // write to default framebuffer
-        // glBlitFramebuffer(
-        // 0, 0, ScreenWidth, ScreenHeight, 0, 0, ScreenWidth, ScreenHeight, GL_DEPTH_BUFFER_BIT, GL_NEAREST
-        // );
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, defferedShadingGraph.passes[0]->frameBuffer.getID());
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0); // write to default framebuffer
+        glBlitFramebuffer(
+        0, 0, ScreenWidth, ScreenHeight, 0, 0, ScreenWidth, ScreenHeight, GL_DEPTH_BUFFER_BIT, GL_NEAREST
+        );
         // glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
         glEnable(GL_DEPTH_TEST);

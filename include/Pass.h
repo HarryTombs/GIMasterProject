@@ -34,7 +34,7 @@ public:
     std::vector<GLenum> OutAttachments;
 
     std::vector<Model> useModels;
-    Camera* useCamera;
+    Camera* useCamera = nullptr;
     FrameBufferObject frameBuffer;
 
     bool isScreenQuad;
@@ -48,7 +48,7 @@ public:
 
     void createShaderProgram();
 
-    void loadViewProjMatricies(Camera cam);
+    void loadViewProjMatricies();
     void loadModelMatricies();
 
     void createTextures();
