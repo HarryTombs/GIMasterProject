@@ -80,7 +80,9 @@ void InitialiseSDL()
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 
-    GraphicsApplicationWindow = SDL_CreateWindow("GLWindow", 0, 0, ScreenWidth, ScreenHeight, SDL_WINDOW_OPENGL);
+    Uint32 windowflags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
+
+    GraphicsApplicationWindow = SDL_CreateWindow("GLWindow", 0, 0, ScreenWidth, ScreenHeight, windowflags);
     if (GraphicsApplicationWindow == nullptr) {
         std::cerr << "SDL_Window was not created: " << SDL_GetError() << std::endl;
         exit(1);
@@ -174,6 +176,14 @@ void Input() {
         {
             std::cout << "Bye!" << std::endl;
             gQuit = true;
+        }
+
+        if (e.type == SDL_WINDOWEVENT && e.window.event == SDL_WINDOWEVENT_RESIZED)
+        {
+            ScreenWidth = e.window.data1;
+            ScreenHeight = e.window.data2;
+            glViewport(0,0,ScreenWidth,ScreenHeight);
+            
         }
 
         
