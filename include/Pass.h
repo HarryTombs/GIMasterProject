@@ -38,6 +38,7 @@ public:
     FrameBufferObject frameBuffer;
 
     bool isScreenQuad;
+    bool useLights;
 
     unsigned int shaderProgram;
 

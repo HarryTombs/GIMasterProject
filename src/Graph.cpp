@@ -3,12 +3,14 @@
 
 
 
-void Graph::initGraph(const std::string& path,std::vector<Model> models)
+
+void Graph::initGraph(const std::string& path,std::vector<Model> models, std::vector<Light> lights)
 {
     readJson(path);
     createTextures();
 
     sceneModels = models;
+    sceneLights = lights;
     
     for (const auto& p : passes)
     {
@@ -130,6 +132,20 @@ void Graph::executePasses()
             glDisable(GL_DEPTH_TEST);
             renderQuad();
             glEnable(GL_DEPTH_TEST);
+        }
+        if(p->useLights)
+        {
+            for (unsigned int i = 0; i < sceneLights.size(); i++)
+            {
+                setVec3(p->shaderProgram,("lights[" + std::to_string(i) + "].Position"), sceneLights[i].pos);
+                setVec3(p->shaderProgram,("lights[" + std::to_string(i) + "].Color"), sceneLights[i].col);
+                const float linear = 0.7f;
+                const float quadratic = 1.8f;
+                setFloat(p->shaderProgram,("lights[" + std::to_string(i) + "].Linear"), linear);
+                setFloat(p->shaderProgram,("lights[" + std::to_string(i) + "].Quadratic"), quadratic);
+            }
+            setVec3(p->shaderProgram,"viewPos", currentCam->CamPos);
+            CheckGLError("Light creation");
         }
     }
 }

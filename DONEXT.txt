@@ -1,6 +1,6 @@
 SSBO setup for SDFs
 compute setup for calculations
 
-also setup a better scene
+setup lights
 
 then like implment it :)

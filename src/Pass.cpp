@@ -83,6 +83,10 @@ void Pass::init(const rapidjson::Value& passJson)
         {
             isScreenQuad = passJson["ScreenQuad"].GetBool();
         }
+        if (passJson.HasMember("UseLights") && passJson["UseLights"].IsBool())
+        {
+            useLights = passJson["UseLights"].GetBool();
+        }
 
         createShaderProgram();
         frameBuffer.create();

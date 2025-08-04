@@ -43,7 +43,7 @@ Graph defferedShadingGraph;
 TextureObj inTexture;
 TextureFormat fmt = {GL_RGBA,GL_RGBA,GL_FLOAT};
 
-const unsigned int NR_Lights = 32;
+const unsigned int NR_Lights = 10;
 std::vector<glm::vec3> lightPos;
 std::vector<glm::vec3> lightCol;
 
@@ -260,33 +260,15 @@ void MainLoop() {
         deltaTime = (double)((NOW - LAST) * 1000) / SDL_GetPerformanceFrequency();
         deltaTime /= 1000.0;
 
-
         defferedShadingGraph.mainLoop();
-
-        for (unsigned int i = 0; i < lightPos.size(); i++)
-        {
-            setVec3(defferedShadingGraph.passes[1]->shaderProgram,("lights[" + std::to_string(i) + "].Position"), lightPos[i]);
-            setVec3(defferedShadingGraph.passes[1]->shaderProgram,("lights[" + std::to_string(i) + "].Color"), lightCol[i]);
-            const float linear = 0.7f;
-            const float quadratic = 1.8f;
-            setFloat(defferedShadingGraph.passes[1]->shaderProgram,("lights[" + std::to_string(i) + "].Linear"), linear);
-            setFloat(defferedShadingGraph.passes[1]->shaderProgram,("lights[" + std::to_string(i) + "].Quadratic"), quadratic);
-        }
-        setVec3(defferedShadingGraph.passes[1]->shaderProgram,"viewPos", fpsCamera.CamPos);
-        CheckGLError("Light creation");
 
         glDisable(GL_DEPTH_TEST);
 
-        // // Render screen quad
-
-        // renderQuad();
-
         glBindFramebuffer(GL_READ_FRAMEBUFFER, defferedShadingGraph.passes[0]->frameBuffer.getID());
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0); // write to default framebuffer
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0); 
         glBlitFramebuffer(
         0, 0, ScreenWidth, ScreenHeight, 0, 0, ScreenWidth, ScreenHeight, GL_DEPTH_BUFFER_BIT, GL_NEAREST
         );
-        // glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
         glEnable(GL_DEPTH_TEST);
 
@@ -313,9 +295,6 @@ void MainLoop() {
         }
 
         SDL_GL_SwapWindow(GraphicsApplicationWindow);
-        
-
-
     }
 }
 
