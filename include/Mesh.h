@@ -82,9 +82,83 @@ private:
 class Model
 {
 public:
-    Model(std::string const path)
+    Model(std::string const path = "", bool isCube = false)
     {
-        loadModel(std::string(ASSET_DIR) + path);
+        if(!isCube)
+        {
+            loadModel(std::string(ASSET_DIR) + path);
+        }
+        /*
+        Following section was gererated from ChatGPT found at https://chatgpt.com/
+        Generated using the prompt: 
+
+        "I've got a script to create a model from a file using assimp but i'd like to have a default cube as an option under the "model" class, 
+        can you add the verticies uvs an normals as float co-ordinate data in the else part of  the !isCube if statement, or just as a separate vairable, 
+        i just need separate arrays of the individual position UV and normal data"
+
+        [Relevant functions listed in prompt]
+
+        CITATION BEGIN:
+        */
+        else
+        {
+            std::vector<Vertex> cubeVerts = {
+            // Front face
+            {{-1.0f, -1.0f,  1.0f}, { 0.0f,  0.0f, 1.0f}, {0.0f, 0.0f}},
+            {{ 1.0f, -1.0f,  1.0f}, { 0.0f,  0.0f, 1.0f}, {1.0f, 0.0f}},
+            {{ 1.0f,  1.0f,  1.0f}, { 0.0f,  0.0f, 1.0f}, {1.0f, 1.0f}},
+            {{-1.0f,  1.0f,  1.0f}, { 0.0f,  0.0f, 1.0f}, {0.0f, 1.0f}},
+
+            // Back face
+            {{ 1.0f, -1.0f, -1.0f}, { 0.0f,  0.0f, -1.0f}, {0.0f, 0.0f}},
+            {{-1.0f, -1.0f, -1.0f}, { 0.0f,  0.0f, -1.0f}, {1.0f, 0.0f}},
+            {{-1.0f,  1.0f, -1.0f}, { 0.0f,  0.0f, -1.0f}, {1.0f, 1.0f}},
+            {{ 1.0f,  1.0f, -1.0f}, { 0.0f,  0.0f, -1.0f}, {0.0f, 1.0f}},
+
+            // Left face
+            {{-1.0f, -1.0f, -1.0f}, {-1.0f,  0.0f,  0.0f}, {0.0f, 0.0f}},
+            {{-1.0f, -1.0f,  1.0f}, {-1.0f,  0.0f,  0.0f}, {1.0f, 0.0f}},
+            {{-1.0f,  1.0f,  1.0f}, {-1.0f,  0.0f,  0.0f}, {1.0f, 1.0f}},
+            {{-1.0f,  1.0f, -1.0f}, {-1.0f,  0.0f,  0.0f}, {0.0f, 1.0f}},
+
+            // Right face
+            {{ 1.0f, -1.0f,  1.0f}, { 1.0f,  0.0f,  0.0f}, {0.0f, 0.0f}},
+            {{ 1.0f, -1.0f, -1.0f}, { 1.0f,  0.0f,  0.0f}, {1.0f, 0.0f}},
+            {{ 1.0f,  1.0f, -1.0f}, { 1.0f,  0.0f,  0.0f}, {1.0f, 1.0f}},
+            {{ 1.0f,  1.0f,  1.0f}, { 1.0f,  0.0f,  0.0f}, {0.0f, 1.0f}},
+
+            // Top face
+            {{-1.0f,  1.0f,  1.0f}, { 0.0f,  1.0f,  0.0f}, {0.0f, 0.0f}},
+            {{ 1.0f,  1.0f,  1.0f}, { 0.0f,  1.0f,  0.0f}, {1.0f, 0.0f}},
+            {{ 1.0f,  1.0f, -1.0f}, { 0.0f,  1.0f,  0.0f}, {1.0f, 1.0f}},
+            {{-1.0f,  1.0f, -1.0f}, { 0.0f,  1.0f,  0.0f}, {0.0f, 1.0f}},
+
+            // Bottom face
+            {{-1.0f, -1.0f, -1.0f}, { 0.0f, -1.0f,  0.0f}, {0.0f, 0.0f}},
+            {{ 1.0f, -1.0f, -1.0f}, { 0.0f, -1.0f,  0.0f}, {1.0f, 0.0f}},
+            {{ 1.0f, -1.0f,  1.0f}, { 0.0f, -1.0f,  0.0f}, {1.0f, 1.0f}},
+            {{-1.0f, -1.0f,  1.0f}, { 0.0f, -1.0f,  0.0f}, {0.0f, 1.0f}},
+            };
+
+            std::vector<unsigned int> cubeIndices = 
+            {
+                // Front face
+                0, 1, 2,  2, 3, 0,
+                // Back face
+                4, 5, 6,  6, 7, 4,
+                // Left face
+                8, 9,10, 10,11, 8,
+                // Right face
+                12,13,14, 14,15,12,
+                // Top face
+                16,17,18, 18,19,16,
+                // Bottom face
+                20,21,22, 22,23,20
+            };
+
+            meshes.push_back(Mesh(cubeVerts, cubeIndices, {}));
+        }
+        // END OF CITATION
     }
 
     void Draw()
@@ -98,12 +172,17 @@ public:
         transMat = glm::translate(transMat, trans);
         pos += trans;
     }
+    void scale (glm::vec3 s)
+    {
+        transMat = glm::scale(transMat,s);
+        sca = s;
+    }
     std::vector<Mesh> meshes;
     std::string directory;
 
     glm::vec3 pos = glm::vec3(0.0,0.0,0.0);
     glm::vec3 rot;
-    glm::vec3 scale;
+    glm::vec3 sca;
 
     glm::mat4 transMat = glm::mat4(1.0f);
 private:

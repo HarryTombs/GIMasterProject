@@ -26,7 +26,7 @@ void main()
         vec3 Normal = texture(GNorm, uv).xyz;
         vec3 Abledo = texture(GAlbeSpec, uv).xyz;
 
-        vec3 lighting = Abledo * 0.1;
+        vec3 lighting = Abledo * 0.01;
         vec3 viewDir = normalize(viewPos - fragPos);
         for (int i = 0; i < NR_Lights; i++)
         {

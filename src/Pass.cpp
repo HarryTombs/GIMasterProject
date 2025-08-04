@@ -137,19 +137,6 @@ void Pass::loadViewProjMatricies()
     setMat4(shaderProgram, "projection", projection);
 }
 
-void Pass::loadModelMatricies()
-{
-    glm::mat4 model = glm::mat4(1.0f);
-    for (Model m : useModels)
-    {
-        
-        model = glm::translate(model,m.pos);
-        // do rotations
-        model = glm::scale(model,m.scale);
-    }
-    setMat4(shaderProgram, "model", model);
-}
-
 
 void Pass::textureUniforms()
 {

@@ -111,9 +111,8 @@ void Graph::executePasses()
             }
             for (Model m : sceneModels)
             {
-                glm::mat4 model = glm::mat4(1.0f);
-                model = glm::translate(model, m.pos);
-                setMat4(p->shaderProgram, "model", model);
+                
+                setMat4(p->shaderProgram, "model", m.transMat);
                 m.Draw();
             }
             glBlitFramebuffer(0, 0, ScreenWidth, ScreenHeight, 0, 0, ScreenWidth, ScreenHeight, GL_DEPTH_BUFFER_BIT, GL_NEAREST);

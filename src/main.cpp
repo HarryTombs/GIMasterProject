@@ -34,7 +34,7 @@ float glY;
 
 std::vector<Model> modelList;
 
-Camera fpsCamera(glm::vec3(0.0f,0.0f,3.0f));
+Camera fpsCamera(glm::vec3(0.0f,0.0f,5.0f));
 
 GLuint renderShader; 
 
@@ -46,6 +46,9 @@ TextureFormat fmt = {GL_RGBA,GL_RGBA,GL_FLOAT};
 const unsigned int NR_Lights = 32;
 std::vector<glm::vec3> lightPos;
 std::vector<glm::vec3> lightCol;
+
+std::vector<glm::vec3> cubePos = {glm::vec3(0.0f,-1.0f,0.0), glm::vec3(0.0f,3.0f,0.0), glm::vec3(0.0f,1.0f,-5.05f), glm::vec3(5.05f,1.0f,0.0f), glm::vec3(-5.05f,1.0f,0.0f)};
+std::vector<glm::vec3> cubeSca = {glm::vec3(5.0f,0.1f,5.0f), glm::vec3(5.0f,0.1f,5.0f), glm::vec3(5.0f,2.5f,0.1f), glm::vec3(0.1f,2.5f,5.0f), glm::vec3(0.1f,2.5f,5.0f)};
 
 Uint64 NOW = SDL_GetPerformanceCounter();
 Uint64 LAST = 0;
@@ -124,19 +127,24 @@ void InitialiseProgram()
     !!! 
     */
 
-
     Model cubeModel(modelPath);
     Model cubeModel2(modelPath);
 
     cubeModel2.translate(glm::vec3(2.0f,0.0f,0.0f));
+
+    for(int i = 0; i < cubeSca.size(); i++)
+    {
+        Model newCube("",true);
+        newCube.translate(cubePos[i]);
+        newCube.scale(cubeSca[i]);
+        modelList.push_back(newCube);
+    }
 
     modelList.push_back(cubeModel);
     modelList.push_back(cubeModel2);
 
     renderShader = loadShaderProgram("shaders/vertex.glsl", "shaders/fragment.glsl");
     CheckGLError("Shaders");
-
-    inTexture.create("inTex",ScreenWidth,ScreenHeight,fmt,GL_COLOR_ATTACHMENT0,"textures/7051776139_0a12399c9c_o.png",true);
 
     defferedShadingGraph.currentCam = &fpsCamera;
     defferedShadingGraph.initGraph("example.json",modelList);

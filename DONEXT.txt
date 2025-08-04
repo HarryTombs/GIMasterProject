@@ -1,4 +1,6 @@
 SSBO setup for SDFs
 compute setup for calculations
 
+also setup a better scene
+
 then like implment it :)
