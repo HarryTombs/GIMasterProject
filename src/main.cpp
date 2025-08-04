@@ -33,6 +33,7 @@ float glX;
 float glY;
 
 std::vector<Model> modelList;
+std::vector<Light> lightList;
 
 Camera fpsCamera(glm::vec3(0.0f,0.0f,5.0f));
 
@@ -43,9 +44,8 @@ Graph defferedShadingGraph;
 TextureObj inTexture;
 TextureFormat fmt = {GL_RGBA,GL_RGBA,GL_FLOAT};
 
-const unsigned int NR_Lights = 10;
-std::vector<glm::vec3> lightPos;
-std::vector<glm::vec3> lightCol;
+std::vector<glm::vec3> lightPos = {glm::vec3(-2.0f,1.0f,0.0), glm::vec3(3.0f,1.0f,0.0), glm::vec3(0.0f,-0.75f,-4.0)};
+std::vector<glm::vec3> lightCol = {glm::vec3(0.0f,1.0f,0.0), glm::vec3(1.0f,0.0f,0.0), glm::vec3(0.0f,0.0f,1.0f)};
 
 std::vector<glm::vec3> cubePos = {glm::vec3(0.0f,-1.0f,0.0), glm::vec3(0.0f,3.0f,0.0), glm::vec3(0.0f,1.0f,-5.05f), glm::vec3(5.05f,1.0f,0.0f), glm::vec3(-5.05f,1.0f,0.0f)};
 std::vector<glm::vec3> cubeSca = {glm::vec3(5.0f,0.1f,5.0f), glm::vec3(5.0f,0.1f,5.0f), glm::vec3(5.0f,2.5f,0.1f), glm::vec3(0.1f,2.5f,5.0f), glm::vec3(0.1f,2.5f,5.0f)};
@@ -139,38 +139,25 @@ void InitialiseProgram()
         newCube.scale(cubeSca[i]);
         modelList.push_back(newCube);
     }
-
     modelList.push_back(cubeModel);
     modelList.push_back(cubeModel2);
+
+    for (int i = 0; i < lightPos.size(); i++)
+    {
+        Light newLight; 
+        newLight.pos = lightPos[i];
+        newLight.col = lightCol[i];
+        lightList.push_back(newLight);
+    }
 
     renderShader = loadShaderProgram("shaders/vertex.glsl", "shaders/fragment.glsl");
     CheckGLError("Shaders");
 
     defferedShadingGraph.currentCam = &fpsCamera;
-    defferedShadingGraph.initGraph("example.json",modelList);
+    defferedShadingGraph.initGraph("example.json",modelList,lightList);
 
     CheckGLError("JsonLoad");
 
-
-    // lights
-
-
-    srand(13);
-    for (unsigned int i = 0; i < NR_Lights; i++)
-    {
-        std::random_device rd;
-        std::uniform_real_distribution<double> posDist(-0.7f,0.7f);
-        std::uniform_real_distribution<double> ColDist(0.1,1.0);
-        float xPos = posDist(rd);
-        float yPos = posDist(rd);
-        float zPos = posDist(rd);
-        lightPos.push_back(glm::vec3(xPos, yPos, zPos));
-        // also calculate random color
-        float rColor = ColDist(rd);
-        float gColor = ColDist(rd);
-        float bColor = ColDist(rd);
-        lightCol.push_back(glm::vec3(rColor, gColor, bColor));
-    }
 
 }
 
