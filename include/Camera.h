@@ -33,8 +33,7 @@ public:
     float m_pitch;
     float m_speed;
     float m_sensitivity;
-    int width;
-    int height;
+
 
     Camera(glm::vec3 position = glm::vec3(0.0f,0.0f,0.0f),glm::vec3 up = glm::vec3(0.0f,1.0f,0.0f),float yaw = YAW, float pitch = PITCH) : CamFront(glm::vec3(0.0f,0.0f,-1.0f)), m_speed(SPEED), m_sensitivity(SENSITIVITY), m_zoom(ZOOM)    {
         CamPos = position;

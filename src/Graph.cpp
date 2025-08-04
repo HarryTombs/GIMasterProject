@@ -160,7 +160,7 @@ void Graph::createTextures()
                 }
                 else
                 {
-                    newTex.create(texconf.name,texconf.width,texconf.height,newFmt,texconf.attachmentPoint);
+                    newTex.create(texconf.name,ScreenWidth,ScreenHeight,newFmt,texconf.attachmentPoint);
                     textures[texconf.name] = newTex;
                 }
 
@@ -183,7 +183,7 @@ void Graph::createTextures()
 
                 TextureObj newTex;
 
-                newTex.create(texconf.name,texconf.width,texconf.height,newFmt,texconf.attachmentPoint);
+                newTex.create(texconf.name,ScreenWidth,ScreenHeight,newFmt,texconf.attachmentPoint);
                 textures[texconf.name] = newTex;
 
                 CheckGLError("TextureCreation");
@@ -194,6 +194,47 @@ void Graph::createTextures()
 
     }
     
+}
+
+void Graph::resizeTextures()
+{
+    for (const auto& p : passes)
+    {
+        if(!p->isScreenQuad)
+        {
+            for (TextureConfig texconf : p->Outputs)
+            {
+                glDeleteTextures(1,&textures[texconf.name].texID);
+                
+                TextureFormat newFmt;
+
+                newFmt.internalFormat = texconf.internalFormat;
+                newFmt.format = texconf.format;
+                newFmt.type = texconf.type;
+
+                TextureObj newTex;
+
+                newTex.create(texconf.name,ScreenWidth,ScreenHeight,newFmt,texconf.attachmentPoint);
+                textures[texconf.name] = newTex;
+
+                CheckGLError("TextureRecreation");
+
+                std::cout << "Made texture: " << texconf.name <<  std::endl;
+
+                p->frameBuffer.bind();
+                p->OutAttachments.clear();
+                p->attachOutputTextures(this);
+                
+                glBindFramebuffer(GL_FRAMEBUFFER,0);
+
+            }
+        }
+        if(p->isScreenQuad)
+        {
+            p->textureUniforms();
+        }
+        
+    }
 }
 
 

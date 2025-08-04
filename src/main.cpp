@@ -182,8 +182,10 @@ void Input() {
         {
             ScreenWidth = e.window.data1;
             ScreenHeight = e.window.data2;
-            glViewport(0,0,ScreenWidth,ScreenHeight);
+            std::cout << "w " << ScreenWidth << " h " << ScreenHeight << std::endl;
             
+            defferedShadingGraph.resizeTextures();
+            glViewport(0,0,ScreenWidth,ScreenHeight);
         }
 
         

@@ -32,6 +32,7 @@ struct Graph
     void executePasses();
     void createTextures();
     TextureObj getTexture(const std::string& name);
+    void resizeTextures();
 };
 
 #endif

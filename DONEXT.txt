@@ -1,0 +1,4 @@
+SSBO setup for SDFs
+compute setup for calculations
+
+then like implment it :)
