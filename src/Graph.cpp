@@ -4,7 +4,7 @@
 
 
 
-void Graph::initGraph(const std::string& path,std::vector<Model> models, std::vector<Light> lights)
+void Graph::initGraph(const std::string& path,std::vector<Model> models, std::vector<SpotLight> lights)
 {
     readJson(path);
     createTextures();
@@ -139,10 +139,10 @@ void Graph::executePasses()
             {
                 setVec3(p->shaderProgram,("lights[" + std::to_string(i) + "].Position"), sceneLights[i].pos);
                 setVec3(p->shaderProgram,("lights[" + std::to_string(i) + "].Color"), sceneLights[i].col);
-                const float linear = 0.7f;
-                const float quadratic = 1.8f;
-                setFloat(p->shaderProgram,("lights[" + std::to_string(i) + "].Linear"), linear);
-                setFloat(p->shaderProgram,("lights[" + std::to_string(i) + "].Quadratic"), quadratic);
+                setFloat(p->shaderProgram,("lights[" + std::to_string(i) + "].Linear"), sceneLights[i].linear);
+                setFloat(p->shaderProgram,("lights[" + std::to_string(i) + "].Quadratic"), sceneLights[i].quadratic);
+                setFloat(p->shaderProgram,("lights[" + std::to_string(i) + "].Cutoff"), sceneLights[i].cutoff);
+                setVec3(p->shaderProgram,("lights[" + std::to_string(i) + "].Direction"), sceneLights[i].direction);
             }
             setVec3(p->shaderProgram,"viewPos", currentCam->CamPos);
             CheckGLError("Light creation");

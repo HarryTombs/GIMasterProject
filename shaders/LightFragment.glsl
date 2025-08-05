@@ -13,6 +13,9 @@ struct Light
 
     float Linear;
     float Quadratic;
+
+    float Cutoff;
+    vec3 Direction;
 };
 const int NR_Lights = 32;
 uniform Light lights[NR_Lights];
@@ -26,19 +29,26 @@ void main()
         vec3 Normal = texture(GNorm, uv).xyz;
         vec3 Abledo = texture(GAlbeSpec, uv).xyz;
 
-        vec3 lighting = Abledo * 0.01;
+        vec3 lighting = Abledo * 0.1;
         vec3 viewDir = normalize(viewPos - fragPos);
         for (int i = 0; i < NR_Lights; i++)
         {
             vec3 lightDir = normalize(lights[i].Position - fragPos);
-            float diff = max(dot(Normal,lightDir), 0.0);
+            float theta = dot(lightDir, normalize(lights[i].Direction));
 
-            float distance = length(lights[i].Position - fragPos);
-            float attenuation = 1.0 / (1.0 + lights[i].Linear * distance + lights[i].Quadratic * distance * distance);
+            if (theta > lights[i].Cutoff)
+            {
+                float diff = max(dot(Normal,lightDir), 0.0);
+                float distance = length(lights[i].Position - fragPos);
+                float attenuation = 1.0 / (1.0 + lights[i].Linear * distance + lights[i].Quadratic * distance * distance);
 
-            vec3 diffuse = diff * Abledo * lights[i].Color * attenuation;
+                vec3 diffuse = diff * Abledo * lights[i].Color * attenuation;
+                
+                lighting += diffuse;
+            }
+
             
-            lighting += diffuse;
+            
         }
         FragColor = vec4(lighting,1.0);
     }

@@ -1,6 +1,7 @@
 SSBO setup for SDFs
 compute setup for calculations
+probe light placement
 
-setup lights
+spot light setup
 
 then like implment it :)

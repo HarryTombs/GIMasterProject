@@ -12,19 +12,26 @@ enum lightType
     SPOT
 };
 
-struct Light
+struct BaseLight
 {
     glm::vec3 pos;
     glm::vec3 col;
+    float quadratic = 0.1f;
+    float linear = 0.1f;
+    virtual ~BaseLight() {}
+};
+
+struct SpotLight : BaseLight
+{
     glm::vec3 direction;
-    lightType type;
+    float cutoff = 0.95f;
 };
 
 class Scene
 {
     std::vector<Model> Meshes;
     std::vector<Camera> Cameras;
-    std::vector<Light> Lights;
+    std::vector<BaseLight> Lights;
     Camera currentCam;
 };
 

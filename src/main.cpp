@@ -33,7 +33,7 @@ float glX;
 float glY;
 
 std::vector<Model> modelList;
-std::vector<Light> lightList;
+std::vector<SpotLight> SpotLightList;
 
 Camera fpsCamera(glm::vec3(0.0f,0.0f,5.0f));
 
@@ -44,8 +44,9 @@ Graph defferedShadingGraph;
 TextureObj inTexture;
 TextureFormat fmt = {GL_RGBA,GL_RGBA,GL_FLOAT};
 
-std::vector<glm::vec3> lightPos = {glm::vec3(-2.0f,1.0f,0.0), glm::vec3(3.0f,1.0f,0.0), glm::vec3(0.0f,-0.75f,-4.0)};
-std::vector<glm::vec3> lightCol = {glm::vec3(0.0f,1.0f,0.0), glm::vec3(1.0f,0.0f,0.0), glm::vec3(0.0f,0.0f,1.0f)};
+std::vector<glm::vec3> lightPos = {glm::vec3(-2.0f,0.5f,0.0), glm::vec3(3.0f,0.7f,4.0), glm::vec3(0.0f,1.0f,-4.0)};
+std::vector<glm::vec3> lightCol = {glm::vec3(1.0f,0.0f,0.0), glm::vec3(0.0f,1.0f,0.0), glm::vec3(0.0f,0.0f,1.0f)};
+std::vector<glm::vec3> lightDir = {glm::vec3(-1.0f,0.0f,0.0f),glm::vec3(0.5f,0.0f,1.0), glm::vec3(-0.5f,0.0f,-1.0f)};
 
 std::vector<glm::vec3> cubePos = {glm::vec3(0.0f,-1.0f,0.0), glm::vec3(0.0f,3.0f,0.0), glm::vec3(0.0f,1.0f,-5.05f), glm::vec3(5.05f,1.0f,0.0f), glm::vec3(-5.05f,1.0f,0.0f)};
 std::vector<glm::vec3> cubeSca = {glm::vec3(5.0f,0.1f,5.0f), glm::vec3(5.0f,0.1f,5.0f), glm::vec3(5.0f,2.5f,0.1f), glm::vec3(0.1f,2.5f,5.0f), glm::vec3(0.1f,2.5f,5.0f)};
@@ -127,10 +128,10 @@ void InitialiseProgram()
     !!! 
     */
 
-    Model cubeModel(modelPath);
-    Model cubeModel2(modelPath);
+    Model inModel(modelPath);
+    Model inModel2(modelPath);
 
-    cubeModel2.translate(glm::vec3(2.0f,0.0f,0.0f));
+    inModel2.translate(glm::vec3(2.0f,0.0f,0.0f));
 
     for(int i = 0; i < cubeSca.size(); i++)
     {
@@ -139,22 +140,23 @@ void InitialiseProgram()
         newCube.scale(cubeSca[i]);
         modelList.push_back(newCube);
     }
-    modelList.push_back(cubeModel);
-    modelList.push_back(cubeModel2);
+    modelList.push_back(inModel);
+    modelList.push_back(inModel2);
 
     for (int i = 0; i < lightPos.size(); i++)
     {
-        Light newLight; 
+        SpotLight newLight; 
         newLight.pos = lightPos[i];
         newLight.col = lightCol[i];
-        lightList.push_back(newLight);
+        newLight.direction = lightDir[i];
+        SpotLightList.push_back(newLight);
     }
 
     renderShader = loadShaderProgram("shaders/vertex.glsl", "shaders/fragment.glsl");
     CheckGLError("Shaders");
 
     defferedShadingGraph.currentCam = &fpsCamera;
-    defferedShadingGraph.initGraph("example.json",modelList,lightList);
+    defferedShadingGraph.initGraph("example.json",modelList,SpotLightList);
 
     CheckGLError("JsonLoad");
 
@@ -248,6 +250,8 @@ void MainLoop() {
         deltaTime /= 1000.0;
 
         defferedShadingGraph.mainLoop();
+
+        
 
         glDisable(GL_DEPTH_TEST);
 
