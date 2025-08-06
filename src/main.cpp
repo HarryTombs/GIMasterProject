@@ -34,10 +34,13 @@ float glY;
 
 std::vector<Model> modelList;
 std::vector<SpotLight> SpotLightList;
+std::vector<SDFPrim> sdfprims;
 
 Camera fpsCamera(glm::vec3(0.0f,0.0f,5.0f));
 
 GLuint renderShader; 
+
+unsigned int ssBuffer;
 
 Graph defferedShadingGraph;
 
@@ -152,12 +155,25 @@ void InitialiseProgram()
         SpotLightList.push_back(newLight);
     }
 
+    for(Model m : modelList)
+    {
+        SDFPrim newSdf;
+        newSdf.pos = m.pos;
+        newSdf.size = m.sca;
+        sdfprims.push_back(newSdf);
+    }
+
     renderShader = loadShaderProgram("shaders/vertex.glsl", "shaders/fragment.glsl");
     CheckGLError("Shaders");
 
     defferedShadingGraph.currentCam = &fpsCamera;
     defferedShadingGraph.initGraph("example.json",modelList,SpotLightList);
 
+    glGenBuffers(1,&ssBuffer);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssBuffer);
+    glBufferData(GL_SHADER_STORAGE_BUFFER,sizeof(SDFPrim)*sdfprims.size(), sdfprims.data(), GL_DYNAMIC_DRAW);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER,0, ssBuffer);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
     CheckGLError("JsonLoad");
 
 
