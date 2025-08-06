@@ -6,17 +6,27 @@ Global Illumination Master Project Harry Tombs
 classDiagram
 class RenderGraph{
 + Pass[] Passes
++ Camera* currentCam
++ Model[] sceneModels
++ Light[] sceneLights
++ Texture[] textures
++ initGraph()
++ createTextures()
 + executePasses()
++ readJson()
 }
 
 class Pass {
 + Texture In
 + Texture Out
 + FrameBuffer FBO
+- Graph parentGraph
 - shader vertex
 - shader fragment
 - shader compute
 + execute()
++ createShaderProgram()
++ createFramebuffer()
 - bindTextures()
 }
 
