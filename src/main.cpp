@@ -38,7 +38,7 @@ std::vector<SDFPrim> sdfprims;
 
 Camera fpsCamera(glm::vec3(0.0f,0.0f,5.0f));
 
-GLuint renderShader; 
+GLuint renderShader, computeShader; 
 
 unsigned int ssBuffer;
 
@@ -163,6 +163,7 @@ void InitialiseProgram()
         sdfprims.push_back(newSdf);
     }
 
+    computeShader = loadComputeShader("shaders/compute.glsl");
     renderShader = loadShaderProgram("shaders/vertex.glsl", "shaders/fragment.glsl");
     CheckGLError("Shaders");
 
@@ -266,6 +267,14 @@ void MainLoop() {
         deltaTime /= 1000.0;
 
         defferedShadingGraph.mainLoop();
+
+        glUseProgram(computeShader);
+
+        glUniform2i(glGetUniformLocation(computeShader, "Resolution"), ScreenWidth, ScreenHeight);
+
+        glDispatchCompute(ScreenWidth, ScreenHeight, 1);
+        glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+        CheckGLError("Compute Shader Dispatch");
 
         
 
