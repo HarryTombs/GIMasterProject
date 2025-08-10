@@ -155,21 +155,39 @@ GLuint loadComputeShader(const std::string& path) {
     const char* cstr = src.c_str();
     glShaderSource(shader, 1, &cstr, NULL);
     glCompileShader(shader);
-    if (glGetError() != GL_NO_ERROR) {
-        std::cerr << "Error compiling compute shader: " << path << std::endl;
+
+    GLint success = 0;
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+    if (!success) 
+    {
+        char infoLog[512];
+        glGetShaderInfoLog(shader, 512, NULL, infoLog);
+        std::cerr << "Compute Shader Compilation Failed:\n" << infoLog << std::endl;
+
+        glDeleteShader(shader);
         return 0;
     }
+
     GLuint program = glCreateProgram();
     glAttachShader(program, shader);
     glLinkProgram(program);
 
-    GLint success = 0;
-    glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-    if (!success) {
-        char infoLog[512];
-        glGetShaderInfoLog(shader, 512, NULL, infoLog);
-        std::cerr << "Compute Shader Compilation Failed:\n" << infoLog << std::endl;
+    glGetProgramiv(program,GL_LINK_STATUS, &success);
+    if (!success)
+    {
+        char infoLog[1024];
+        glGetProgramInfoLog(program,sizeof(infoLog),nullptr, infoLog);
+        std::cerr << "Compute shader link error (" << path << "):\n" 
+                  << infoLog << std::endl;
+        glDeleteProgram(program);
+        glDeleteShader(shader);
+        return 0;
     }
+
+    std::cout << "Loaded compute shader: " << path << std::endl;
+    
+    glDeleteShader(shader);
+    
     return program;
 }
 

@@ -169,13 +169,14 @@ void InitialiseProgram()
 
     defferedShadingGraph.currentCam = &fpsCamera;
     defferedShadingGraph.initGraph("example.json",modelList,SpotLightList);
+    CheckGLError("JsonLoad");
 
     glGenBuffers(1,&ssBuffer);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssBuffer);
     glBufferData(GL_SHADER_STORAGE_BUFFER,sizeof(SDFPrim)*sdfprims.size(), sdfprims.data(), GL_DYNAMIC_DRAW);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER,0, ssBuffer);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-    CheckGLError("JsonLoad");
+    CheckGLError("ssbo Buffer setup");
 
 
 }
