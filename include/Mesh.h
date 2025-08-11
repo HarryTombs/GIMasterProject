@@ -185,6 +185,8 @@ public:
     glm::vec3 sca;
 
     glm::mat4 transMat = glm::mat4(1.0f);
+
+    int type;
 private:
 
 

@@ -2,6 +2,6 @@ SSBO setup for SDFs
 compute setup for calculations
 probe light placement
 
-spot light setup
+Setup compute shadedrs in graph
 
 then like implment it :)

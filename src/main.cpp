@@ -47,6 +47,9 @@ Graph defferedShadingGraph;
 TextureObj inTexture;
 TextureFormat fmt = {GL_RGBA,GL_RGBA,GL_FLOAT};
 
+TextureObj computeTexture;
+TextureFormat comFmt = {};
+
 std::vector<glm::vec3> lightPos = {glm::vec3(-2.0f,0.5f,0.0), glm::vec3(3.0f,0.7f,4.0), glm::vec3(0.0f,1.0f,-4.0)};
 std::vector<glm::vec3> lightCol = {glm::vec3(1.0f,0.0f,0.0), glm::vec3(0.0f,1.0f,0.0), glm::vec3(0.0f,0.0f,1.0f)};
 std::vector<glm::vec3> lightDir = {glm::vec3(-1.0f,0.0f,0.0f),glm::vec3(0.5f,0.0f,1.0), glm::vec3(-0.5f,0.0f,-1.0f)};
@@ -134,6 +137,9 @@ void InitialiseProgram()
     Model inModel(modelPath);
     Model inModel2(modelPath);
 
+    inModel.type = 1;
+    inModel2.type = 1;
+
     inModel2.translate(glm::vec3(2.0f,0.0f,0.0f));
 
     for(int i = 0; i < cubeSca.size(); i++)
@@ -141,6 +147,7 @@ void InitialiseProgram()
         Model newCube("",true);
         newCube.translate(cubePos[i]);
         newCube.scale(cubeSca[i]);
+        newCube.type = 0;
         modelList.push_back(newCube);
     }
     modelList.push_back(inModel);

@@ -156,8 +156,6 @@ GLuint loadComputeShader(const std::string& path) {
     glShaderSource(shader, 1, &cstr, NULL);
     glCompileShader(shader);
 
-    std::cout << "----- Shader source ---\n" << src << "\n -------------------- \n" << std::endl;
-
     GLint success = 0;
     glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
     if (!success) 
@@ -186,7 +184,7 @@ GLuint loadComputeShader(const std::string& path) {
         return 0;
     }
 
-    std::cout << "Loaded compute shader: " << path << std::endl;
+    std::cout << "Compute Shader Linked Successfully: " << path << std::endl;
     
     glDeleteShader(shader);
     

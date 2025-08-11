@@ -27,7 +27,7 @@ public:
     bool useImageTex;
     std::string filePath;
     
-    void create(std::string inName, int w, int h, TextureFormat& fmt, GLenum attachment, const std::string& inTexFile = "",bool isImageTex = false);
+    void create(std::string inName, int w, int h, TextureFormat& fmt, GLenum attachment, bool isCompute = false, const std::string& inTexFile = "",bool isImageTex = false);
 
 };
 
