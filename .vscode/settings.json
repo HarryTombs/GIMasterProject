@@ -83,6 +83,9 @@
         "variant": "cpp",
         "__nullptr": "cpp",
         "__config": "cpp",
-        "filesystem": "cpp"
+        "filesystem": "cpp",
+        "queue": "cpp",
+        "ranges": "cpp",
+        "text_encoding": "cpp"
     }
 }

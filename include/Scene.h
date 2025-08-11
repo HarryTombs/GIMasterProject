@@ -35,13 +35,17 @@ class Scene
     Camera currentCam;
 };
 
-struct SDFPrim 
+struct SDFPrim
 {
-    int type;
-    glm::vec3 pos;
-    glm::vec3 size;
-    glm::vec3 rotation;
-    glm::vec3 radius;
+    int type;          // 4 bytes
+    glm::vec3 pos;     // 12 bytes
+    glm::vec3 size;    // 12 bytes
+    glm::vec3 rotation;// 12 bytes
+    float radius;      // 4 bytes
+    float pad1;        // 4 bytes
+    float pad2;        // 4 bytes
+    float pad3;        // 4 bytes
 };
+
 
 #endif
