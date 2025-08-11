@@ -170,7 +170,7 @@ void Graph::createTextures()
 
                 if(texconf.isImageTex)
                 {
-                    newTex.create(texconf.name,texconf.width,texconf.height,newFmt,texconf.attachmentPoint,texconf.imageFile,texconf.isImageTex);
+                    newTex.create(texconf.name,texconf.width,texconf.height,newFmt,texconf.attachmentPoint,false,texconf.imageFile,texconf.isImageTex);
                     textures[texconf.name] = newTex;
                 }
                 else

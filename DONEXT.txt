@@ -1,7 +1,5 @@
-SSBO setup for SDFs
 compute setup for calculations
 probe light placement
 
 Setup compute shadedrs in graph
-
-then like implment it :)
+write to textures for compute

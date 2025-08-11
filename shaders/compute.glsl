@@ -19,6 +19,35 @@ layout(std430, binding = 0 ) buffer SDFBuffer
     SDFPrimitive primitives[];
 };
 
+float sdSphere( vec3 p, float s) 
+{
+    return length(p)-s;
+};
+
+float sdBox( vec3 p, vec3 b)
+{
+    vec3 q = abs(p) - b;
+    return length(max(q,0.0)) + min(max(q.x,max(q.y,q.z)),0.0);
+};
+
+float sdScene(vec3 p)
+{
+    float dist = 100000000000000000000;
+    for (int i =0; i < primitives.length(); i++)
+    {
+        vec3 localP = p - primitives[i].pos;
+        if (primitives[i].type == 0) // Box;
+        {
+            dist = min(dist, sdBox(localP,primitives[i].size));
+        }
+        else if (primitives[i].type == 1) // Sphere
+        {
+            dist = min(dist, sdSphere(localP, primitives[i].radius));
+        }
+    }
+    return dist;
+}
+
 uniform ivec2 Resolution;
 
 void main()

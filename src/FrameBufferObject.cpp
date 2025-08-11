@@ -4,7 +4,7 @@
 #include <iostream>
 
 
-void TextureObj::create(std::string inName, int w, int h, TextureFormat& fmt, GLenum attachment, const std::string& inTexFile, bool isImageTex)
+void TextureObj::create(std::string inName, int w, int h, TextureFormat& fmt, GLenum attachment,bool isCompute, const std::string& inTexFile, bool isImageTex)
 {
     name = inName;
     width = w;
