@@ -144,14 +144,31 @@ void renderCube()
 
 std::string readFile(const std::string& path) {
     std::ifstream file(path);
+    if(!file.is_open())
+    {
+        std::cerr << "Could not open file: " << path << std::endl;
+        return "";
+    }
     std::stringstream buffer;
     buffer << file.rdbuf();
     return buffer.str();
 }
 
-GLuint loadComputeShader(const std::string& path) {
+GLuint loadComputeShader(const std::string& path) 
+{
+    std::string compPath = (std::string(ASSET_DIR) + path);
+    std::ifstream test(compPath);
+    if (!test.is_open()) 
+    {
+        std::cerr << "ERROR: Could not open shader file: " << path << std::endl;
+    } 
+    else 
+    {
+        std::cerr << "INFO: Opened shader file: " << path << std::endl;
+    }
     GLuint shader = glCreateShader(GL_COMPUTE_SHADER);
-    std::string src = readFile(path);
+    std::string src;
+    src = readFile(compPath);
     const char* cstr = src.c_str();
     glShaderSource(shader, 1, &cstr, NULL);
     glCompileShader(shader);

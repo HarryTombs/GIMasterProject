@@ -13,6 +13,7 @@ include_directories(${CMAKE_SOURCE_DIR}/include)
 target_link_libraries(${TargetName} ${SDL2_LIBRARIES} )
 
 
+
 include_directories(include $ENV{HOME}/NGL/include)
 target_sources(${TargetName} PRIVATE ${PROJECT_SOURCE_DIR}/src/main.cpp
 			${PROJECT_SOURCE_DIR}/src/FrameBufferObject.cpp

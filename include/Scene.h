@@ -27,25 +27,45 @@ struct SpotLight : BaseLight
     float cutoff = 0.95f;
 };
 
+
+struct SDFPrim
+{
+    int type;          
+    glm::vec3 pos;     
+    glm::vec3 size;    
+    glm::vec3 rotation;
+    float radius;      
+    float pad1;        
+    float pad2;        
+    float pad3;        
+};
+
+struct Probe 
+{
+    glm::vec3 Pos;
+    float pad;
+};
+
 class Scene
 {
     std::vector<Model> Meshes;
     std::vector<Camera> Cameras;
     std::vector<BaseLight> Lights;
     Camera currentCam;
-};
 
-struct SDFPrim
-{
-    int type;          // 4 bytes
-    glm::vec3 pos;     // 12 bytes
-    glm::vec3 size;    // 12 bytes
-    glm::vec3 rotation;// 12 bytes
-    float radius;      // 4 bytes
-    float pad1;        // 4 bytes
-    float pad2;        // 4 bytes
-    float pad3;        // 4 bytes
-};
 
+    std::vector<Probe> probes;
+
+    float RoomMinX = -5.0f;
+    float RoomMinY = 0.0f;
+    float RoomMinZ = -5.0f;
+    float RoomMaxX = 5.0f;
+    float RoomMaxY = 3.0f;
+    float RoomMaxZ = 5.0f;
+
+    float spacing = 1.0f;
+
+    void layoutProbes();
+};
 
 #endif

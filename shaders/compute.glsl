@@ -32,7 +32,7 @@ float sdBox( vec3 p, vec3 b)
 
 float sdScene(vec3 p)
 {
-    float dist = 100000000000000000000;
+    float dist = 1e9;
     for (int i =0; i < primitives.length(); i++)
     {
         vec3 localP = p - primitives[i].pos;
