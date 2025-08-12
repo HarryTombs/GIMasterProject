@@ -19,6 +19,7 @@ target_sources(${TargetName} PRIVATE ${PROJECT_SOURCE_DIR}/src/main.cpp
 			${PROJECT_SOURCE_DIR}/src/FrameBufferObject.cpp
 			${PROJECT_SOURCE_DIR}/src/Pass.cpp
 			${PROJECT_SOURCE_DIR}/src/Graph.cpp
+			${PROJECT_SOURCE_DIR}/src/Scene.cpp
 			${PROJECT_SOURCE_DIR}/src/ShaderUtils.cpp
 			${PROJECT_SOURCE_DIR}/src/TextureUtils.cpp
 			${PROJECT_SOURCE_DIR}/include/SDLWindow.h

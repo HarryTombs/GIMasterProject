@@ -14,9 +14,21 @@ struct SDFPrimitive
     float pad3;      // padding
 };
 
+struct Probe
+{
+    vec3 pos;
+    float pad;
+};
+
+
 layout(std430, binding = 0 ) buffer SDFBuffer 
 {
     SDFPrimitive primitives[];
+};
+
+layout(std430, binding = 1) buffer ProbeBuffer
+{
+    Probe probes[];
 };
 
 float sdSphere( vec3 p, float s) 
@@ -47,6 +59,7 @@ float sdScene(vec3 p)
     }
     return dist;
 }
+
 
 uniform ivec2 Resolution;
 

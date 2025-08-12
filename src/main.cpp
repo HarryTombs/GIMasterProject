@@ -19,6 +19,7 @@
 #include "ShaderUtils.h"
 #include "Mesh.h"
 #include "Camera.h"
+#include "Scene.h"
 #include "Pass.h"
 #include "Graph.h"
 #include "FrameBufferObject.h"
@@ -40,7 +41,10 @@ Camera fpsCamera(glm::vec3(0.0f,0.0f,5.0f));
 
 GLuint renderShader, computeShader; 
 
-unsigned int ssBuffer;
+unsigned int sdfBuffer;
+unsigned int probeBuffer;
+
+Scene scene;
 
 Graph defferedShadingGraph;
 
@@ -134,6 +138,8 @@ void InitialiseProgram()
     !!! 
     */
 
+    scene.layoutProbes();
+
     Model inModel(modelPath);
     Model inModel2(modelPath);
 
@@ -178,10 +184,10 @@ void InitialiseProgram()
     defferedShadingGraph.initGraph("example.json",modelList,SpotLightList);
     CheckGLError("JsonLoad");
 
-    glGenBuffers(1,&ssBuffer);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssBuffer);
+    glGenBuffers(1,&sdfBuffer);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, sdfBuffer);
     glBufferData(GL_SHADER_STORAGE_BUFFER,sizeof(SDFPrim)*sdfprims.size(), sdfprims.data(), GL_DYNAMIC_DRAW);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER,0, ssBuffer);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER,0, sdfBuffer);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
     CheckGLError("ssbo Buffer setup");
 
@@ -314,6 +320,16 @@ void MainLoop() {
             model = glm::scale(model, glm::vec3(0.05f));
             setMat4(renderShader, "model", model);
             setVec3(renderShader,"lightColor", lightCol[i]);
+            glUseProgram(renderShader);
+            renderCube();
+        }
+
+        for (unsigned int i = 0; i < scene.probes.size(); i ++)
+        {
+            glm::mat4 model = glm::mat4(1.0f);
+            model = glm::translate(model, scene.probes[i].Pos);
+            model = glm::scale(model, glm::vec3(0.05f));
+            setMat4(renderShader, "model", model);
             glUseProgram(renderShader);
             renderCube();
         }

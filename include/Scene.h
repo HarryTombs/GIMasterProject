@@ -48,24 +48,30 @@ struct Probe
 
 class Scene
 {
+
+    public: 
     std::vector<Model> Meshes;
     std::vector<Camera> Cameras;
-    std::vector<BaseLight> Lights;
+    std::vector<SpotLight> Lights;
+    std::vector<SDFPrim> sdfprims;
+
     Camera currentCam;
 
 
     std::vector<Probe> probes;
 
-    float RoomMinX = -5.0f;
-    float RoomMinY = 0.0f;
-    float RoomMinZ = -5.0f;
-    float RoomMaxX = 5.0f;
-    float RoomMaxY = 3.0f;
-    float RoomMaxZ = 5.0f;
+    float RoomMinX = -5.5f;
+    float RoomMinY = -1.5f;
+    float RoomMinZ = -5.5f;
+    float RoomMaxX = 5.5f;
+    float RoomMaxY = 3.5f;
+    float RoomMaxZ = 5.5f;
 
     float spacing = 1.0f;
 
     void layoutProbes();
+
+    private:
 };
 
 #endif
