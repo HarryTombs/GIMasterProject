@@ -64,13 +64,13 @@ int maxSteps = 128;
 float sdSphere( vec3 p, float s) 
 {
     return length(p)-s;
-};
+}
 
 float sdBox( vec3 p, vec3 b)
 {
     vec3 q = abs(p) - b;
     return length(max(q,0.0)) + min(max(q.x,max(q.y,q.z)),0.0);
-};
+}
 
 float sdScene(vec3 p)
 {
@@ -88,7 +88,7 @@ float sdScene(vec3 p)
         }
     }
     return dist;
-};
+}
 
 bool isBlocked(vec3 start, vec3 dir, float maxDist)
 {
@@ -109,11 +109,22 @@ bool isBlocked(vec3 start, vec3 dir, float maxDist)
 
 vec3 directLighting(vec3 hitPos, vec3 normal, Light light) 
 {
-    vec3 L = normalize(light.pos - hitPos);
+    vec3 L = light.pos - hitPos;
     float dist = length(L);
     if (dist <= 1e-5) return vec3(0.0);
-    vec3 Ldir = L / dist;
-};
+    vec3 Ldir = normalize(L);
+
+    float cosTheta = dot(Ldir, normalize(-light.Dir));
+    if (cosTheta < light.Cutoff) return vec3(0.0);
+
+    vec3 origin = hitPos + normal * (surfaceEps * 3.0);
+    if (!isBlocked(origin, Ldir, dist)) return vec3(0.0);
+
+    float NdotL = max(dot(normal, Ldir), 0.0);
+    float attenuation = 1.0 / (1.0 + light.Linear * dist + light.Quadratic * dist * dist);
+
+    return light.col * (NdotL * attenuation);
+}
 
 
 
