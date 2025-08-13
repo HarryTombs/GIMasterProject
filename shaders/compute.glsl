@@ -17,7 +17,23 @@ struct SDFPrimitive
 struct Probe
 {
     vec3 pos;
-    float pad;
+    float pad1;
+    vec3 col;
+    float pad2;
+};
+
+struct Light 
+{
+    vec3 pos;
+    float pad0;
+    vec3 col;
+    float pad1;
+    float Linear;
+    float Quadratic;
+    float Cutoff;
+    float pad2;
+    vec3 Dir;
+    float pad3; 
 };
 
 
@@ -30,6 +46,20 @@ layout(std430, binding = 1) buffer ProbeBuffer
 {
     Probe probes[];
 };
+
+layout(std430, binding = 2) buffer LightBuffer
+{
+    Light lights[];
+};
+
+uniform int numProbes;
+uniform int numSDFs;
+uniform int numLights;
+uniform ivec2 Resolution;
+float surfaceEps = 0.001;
+float maxDistance = 50.0;
+int raysPerProbe;
+int maxSteps = 128;
 
 float sdSphere( vec3 p, float s) 
 {
@@ -58,10 +88,34 @@ float sdScene(vec3 p)
         }
     }
     return dist;
+};
+
+bool isBlocked(vec3 start, vec3 dir, float maxDist)
+{
+    float travel = 0.0;
+    vec3 pos = start;
+
+    for (int i = 0; i < maxSteps; i++)
+    {
+        float h = sdScene(pos);
+        if (h < surfaceEps) return false; // blocked
+        travel += h;
+        if (travel >= maxDist) break; // Light hit
+        if (travel >= maxDistance) break; // higher than global cull
+        pos += dir * h;
+    }
+    return true;
 }
 
+vec3 directLighting(vec3 hitPos, vec3 normal, Light light) 
+{
+    vec3 L = normalize(light.pos - hitPos);
+    float dist = length(L);
+    if (dist <= 1e-5) return vec3(0.0);
+    vec3 Ldir = L / dist;
+};
 
-uniform ivec2 Resolution;
+
 
 void main()
 {

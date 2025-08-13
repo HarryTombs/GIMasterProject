@@ -10,7 +10,8 @@ void Scene::layoutProbes()
             {
                 Probe p;
                 p.Pos = glm::vec3(x,y,z);
-                p.pad = 0.0f;
+                p.pad1 = 0.0f;
+                p.pad2 = 0.0f;
                 probes.push_back(p);
             }
         }

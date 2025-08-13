@@ -43,6 +43,9 @@ GLuint renderShader, computeShader;
 
 unsigned int sdfBuffer;
 unsigned int probeBuffer;
+unsigned int lightBufffer;
+
+bool rebakeLighting = false;
 
 Scene scene;
 
@@ -189,7 +192,21 @@ void InitialiseProgram()
     glBufferData(GL_SHADER_STORAGE_BUFFER,sizeof(SDFPrim)*sdfprims.size(), sdfprims.data(), GL_DYNAMIC_DRAW);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER,0, sdfBuffer);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+    glGenBuffers(1,&probeBuffer);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, probeBuffer);
+    glBufferData(GL_SHADER_STORAGE_BUFFER,sizeof(Probe)*scene.probes.size(), scene.probes.data(), GL_DYNAMIC_DRAW);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER,1, probeBuffer);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+    glGenBuffers(1,&lightBufffer);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, lightBufffer);
+    glBufferData(GL_SHADER_STORAGE_BUFFER,sizeof(SpotLight)*SpotLightList.size(), SpotLightList.data(), GL_DYNAMIC_DRAW);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER,2, lightBufffer);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
     CheckGLError("ssbo Buffer setup");
+
+    rebakeLighting = true;
 
 
 }
@@ -280,17 +297,25 @@ void MainLoop() {
         deltaTime = (double)((NOW - LAST) * 1000) / SDL_GetPerformanceFrequency();
         deltaTime /= 1000.0;
 
-        defferedShadingGraph.mainLoop();
+        if (rebakeLighting)
+        {
+            glUseProgram(computeShader);
 
-        glUseProgram(computeShader);
+            setInt(computeShader,"numProbes", scene.probes.size());
+            setInt(computeShader,"numSDFs", sdfprims.size());
+            setInt(computeShader,"numLights", SpotLightList.size());
+            glUniform2i(glGetUniformLocation(computeShader, "Resolution"), ScreenWidth, ScreenHeight);
 
-        glUniform2i(glGetUniformLocation(computeShader, "Resolution"), ScreenWidth, ScreenHeight);
-
-        glDispatchCompute(ScreenWidth, ScreenHeight, 1);
-        glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
-        CheckGLError("Compute Shader Dispatch");
+            glDispatchCompute(ScreenWidth, ScreenHeight, 1);
+            glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+            rebakeLighting = false;
+            std::cout << "Rebaked Lighting " << std::endl;
+            CheckGLError("Compute Shader Dispatch");
+        }
 
         
+
+        defferedShadingGraph.mainLoop();
 
         glDisable(GL_DEPTH_TEST);
 
@@ -324,15 +349,15 @@ void MainLoop() {
             renderCube();
         }
 
-        for (unsigned int i = 0; i < scene.probes.size(); i ++)
-        {
-            glm::mat4 model = glm::mat4(1.0f);
-            model = glm::translate(model, scene.probes[i].Pos);
-            model = glm::scale(model, glm::vec3(0.05f));
-            setMat4(renderShader, "model", model);
-            glUseProgram(renderShader);
-            renderCube();
-        }
+        // for (unsigned int i = 0; i < scene.probes.size(); i ++)
+        // {
+        //     glm::mat4 model = glm::mat4(1.0f);
+        //     model = glm::translate(model, scene.probes[i].Pos);
+        //     model = glm::scale(model, glm::vec3(0.05f));
+        //     setMat4(renderShader, "model", model);
+        //     glUseProgram(renderShader);
+        //     renderCube();
+        // }
 
         SDL_GL_SwapWindow(GraphicsApplicationWindow);
     }

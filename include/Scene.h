@@ -43,7 +43,9 @@ struct SDFPrim
 struct Probe 
 {
     glm::vec3 Pos;
-    float pad;
+    float pad1;
+    glm::vec3 Col; // storing indirect light values
+    float pad2;
 };
 
 class Scene
