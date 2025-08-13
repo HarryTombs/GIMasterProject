@@ -5,6 +5,7 @@ out vec4 FragColor;
 uniform sampler2D GPos;
 uniform sampler2D GNorm;
 uniform sampler2D GAlbeSpec;
+uniform sampler2D GProbeIndex;
 
 struct Light
 {

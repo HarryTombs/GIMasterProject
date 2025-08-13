@@ -70,6 +70,19 @@
                         },
                         "attachmentPoint": "GL_COLOR_ATTACHMENT2",
                         "isImageTex": false
+                    },
+                    {
+                        "name": "GProbeIndex",
+                        "width": 512,
+                        "height": 512,
+                        "format": 
+                        {
+                            "internalFormat": "GL_R32I",
+                            "format": "GL_RED_INTEGER",
+                            "type": "GL_INT"
+                        },
+                        "attachmentPoint": "GL_COLOR_ATTACHMENT3",
+                        "isImageTex": false
                     }
                 ]
             },

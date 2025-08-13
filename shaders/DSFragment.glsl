@@ -9,6 +9,7 @@ uniform sampler2D tex;
 layout (location=0)out vec3 GPos;
 layout (location=1)out vec3 GNorm;
 layout (location=2)out vec4 GAlbeSpec;
+layout (location=3)out vec4 GProbeIndex;
 
 
 
@@ -18,4 +19,8 @@ void main()
     GNorm = normalize(Normal);
     GAlbeSpec.rgb = texture(tex,TexCoords).rgb;
     GAlbeSpec.a = 1.0;
+
+
+
+
 }

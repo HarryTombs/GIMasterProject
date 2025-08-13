@@ -312,6 +312,7 @@ void MainLoop() {
             std::cout << "Rebaked Lighting " << std::endl;
             CheckGLError("Compute Shader Dispatch");
         }
+        
 
         
 
