@@ -52,6 +52,11 @@ layout(std430, binding = 2) buffer LightBuffer
     Light lights[];
 };
 
+layout(std430, binding = 3) buffer IndirectResultBuffer
+{
+    vec3 indirectLight[];
+};
+
 uniform int numProbes;
 uniform int numSDFs;
 uniform int numLights;
@@ -126,9 +131,61 @@ vec3 directLighting(vec3 hitPos, vec3 normal, Light light)
     return light.col * (NdotL * attenuation);
 }
 
+vec3 computeIndirectWProbe(Probe probe) 
+{
+    const int NUM_RAYS = 32;
+    vec3 totalLight = vec3(0.0);
+
+    vec3 normal = vec3(0.0,1.0,0.0);
+    for (int r = 0; r < NUM_RAYS; r++) 
+    {
+        float phi = (6.2831853 / NUM_RAYS) * float(r);
+        vec3 dir = normalize(vec3(cos(phi), 0.5, sin(phi)));
+
+        vec3 pos = probe.pos;
+        float travel = 0.0;
+        bool hit = false;
+        vec3 hitPos, hitNormal;
+
+        for (int i = 0; i < maxSteps; i++)
+        {
+            float h = sdScene(pos);
+            if(h < surfaceEps) 
+            {
+                hit = true;
+                hitPos = pos;
+                float eps = 0.001;
+                hitNormal = normalize(vec3(
+                    sdScene(pos + vec3(eps, 0, 0)) - sdScene(pos - vec3(eps, 0, 0)),
+                    sdScene(pos + vec3(0, eps, 0)) - sdScene(pos - vec3(0, eps, 0)),
+                    sdScene(pos + vec3(0, 0, eps)) - sdScene(pos - vec3(0, 0, eps))
+                ));
+                break;
+            }
+            travel += h;
+            if (travel > maxDistance) break;
+            pos += dir * h;
+        }
+        if (hit) 
+        {
+            for (int li = 0; li < numLights; li++)
+            {
+                totalLight += directLighting(hitPos,hitNormal,lights[li]);
+            }
+        }
+    }
+
+    return totalLight / float(NUM_RAYS);
+}
 
 
 void main()
 {
-    
+    uint probeIndex = gl_GlobalInvocationID.x;
+    if (probeIndex >= uint(numProbes)) return;
+
+    Probe probe = probes[probeIndex];
+    vec3 indirect = computeIndirectWProbe(probe);
+
+    indirectLight[probeIndex] = indirect;
 }

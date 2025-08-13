@@ -306,7 +306,7 @@ void MainLoop() {
             setInt(computeShader,"numLights", SpotLightList.size());
             glUniform2i(glGetUniformLocation(computeShader, "Resolution"), ScreenWidth, ScreenHeight);
 
-            glDispatchCompute(ScreenWidth, ScreenHeight, 1);
+            glDispatchCompute(scene.probes.size(), 1, 1);
             glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
             rebakeLighting = false;
             std::cout << "Rebaked Lighting " << std::endl;
