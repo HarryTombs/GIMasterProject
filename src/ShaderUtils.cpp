@@ -215,12 +215,24 @@ GLuint loadShaderProgram(const std::string& inVertPath, const std::string& inFra
         const char* cstr = src.c_str();
         glShaderSource(shader, 1, &cstr, NULL);
         glCompileShader(shader);
+        GLint success = 0;
+        glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+        if (!success) 
+        {
+            char infoLog[512];
+            glGetShaderInfoLog(shader, 512, NULL, infoLog);
+            std::cerr << type << " Shader Compilation Failed:\n" << infoLog << std::endl;
+
+            glDeleteShader(shader);
+            return GLuint(0);
+        }
         return shader;
     };
     std::string vertPath = (std::string(ASSET_DIR) + inVertPath);
     std::string fragPath = (std::string(ASSET_DIR) + inFragPath);
 
     GLuint vert = load(vertPath, GL_VERTEX_SHADER);
+    
     GLuint frag = load(fragPath, GL_FRAGMENT_SHADER);
     GLuint program = glCreateProgram();
     glAttachShader(program, vert);
