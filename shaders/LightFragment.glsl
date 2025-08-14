@@ -22,6 +22,11 @@ const int NR_Lights = 32;
 uniform Light lights[NR_Lights];
 uniform vec3 viewPos;
 
+layout(std430, binding = 3) buffer IndirectResultBuffer
+{
+    vec3 indirectLight[];
+};
+
 
 
 void main() 
@@ -32,6 +37,7 @@ void main()
 
         vec3 lighting = Abledo * 0.1;
         vec3 viewDir = normalize(viewPos - fragPos);
+
         for (int i = 0; i < NR_Lights; i++)
         {
             vec3 lightDir = normalize(lights[i].Position - fragPos);
@@ -47,9 +53,14 @@ void main()
                 
                 lighting += diffuse;
             }
-
-            
-            
         }
+        int probeIndex = int(texelFetch(GProbeIndex, ivec2(gl_FragCoord.xy),0).r);
+
+        if (probeIndex >= 0) 
+        {
+            vec3 indirect = indirectLight[probeIndex] * Abledo;
+            lighting += indirect;
+        }
+
         FragColor = vec4(lighting,1.0);
     }
