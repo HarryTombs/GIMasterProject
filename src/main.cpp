@@ -33,11 +33,8 @@ bool mouseDown = false;
 float glX;
 float glY;
 
-std::vector<Model> modelList;
-std::vector<SpotLight> SpotLightList;
-std::vector<SDFPrim> sdfprims;
 
-Camera fpsCamera(glm::vec3(0.0f,0.0f,5.0f));
+
 
 GLuint renderShader, computeShader; 
 
@@ -56,13 +53,6 @@ TextureFormat fmt = {GL_RGBA,GL_RGBA,GL_FLOAT};
 
 TextureObj computeTexture;
 TextureFormat comFmt = {};
-
-std::vector<glm::vec3> lightPos = {glm::vec3(-2.0f,0.5f,0.0), glm::vec3(3.0f,0.7f,4.0), glm::vec3(0.0f,1.0f,-4.0)};
-std::vector<glm::vec3> lightCol = {glm::vec3(1.0f,0.0f,0.0), glm::vec3(0.0f,1.0f,0.0), glm::vec3(0.0f,0.0f,1.0f)};
-std::vector<glm::vec3> lightDir = {glm::vec3(-1.0f,0.0f,0.0f),glm::vec3(0.5f,0.0f,1.0), glm::vec3(-0.5f,0.0f,-1.0f)};
-
-std::vector<glm::vec3> cubePos = {glm::vec3(0.0f,-1.0f,0.0), glm::vec3(0.0f,3.0f,0.0), glm::vec3(0.0f,1.0f,-5.05f), glm::vec3(5.05f,1.0f,0.0f), glm::vec3(-5.05f,1.0f,0.0f)};
-std::vector<glm::vec3> cubeSca = {glm::vec3(5.0f,0.1f,5.0f), glm::vec3(5.0f,0.1f,5.0f), glm::vec3(5.0f,2.5f,0.1f), glm::vec3(0.1f,2.5f,5.0f), glm::vec3(0.1f,2.5f,5.0f)};
 
 Uint64 NOW = SDL_GetPerformanceCounter();
 Uint64 LAST = 0;
@@ -141,55 +131,19 @@ void InitialiseProgram()
     !!! 
     */
 
-    scene.layoutProbes();
-
-    Model inModel(modelPath);
-    Model inModel2(modelPath);
-
-    inModel.type = 1;
-    inModel2.type = 1;
-
-    inModel2.translate(glm::vec3(2.0f,0.0f,0.0f));
-
-    for(int i = 0; i < cubeSca.size(); i++)
-    {
-        Model newCube("",true);
-        newCube.translate(cubePos[i]);
-        newCube.scale(cubeSca[i]);
-        newCube.type = 0;
-        modelList.push_back(newCube);
-    }
-    modelList.push_back(inModel);
-    modelList.push_back(inModel2);
-
-    for (int i = 0; i < lightPos.size(); i++)
-    {
-        SpotLight newLight; 
-        newLight.pos = lightPos[i];
-        newLight.col = lightCol[i];
-        newLight.direction = lightDir[i];
-        SpotLightList.push_back(newLight);
-    }
-
-    for(Model m : modelList)
-    {
-        SDFPrim newSdf;
-        newSdf.pos = m.pos;
-        newSdf.size = m.sca;
-        sdfprims.push_back(newSdf);
-    }
+    scene.init();
 
     computeShader = loadComputeShader("shaders/compute.glsl");
     renderShader = loadShaderProgram("shaders/vertex.glsl", "shaders/fragment.glsl");
     CheckGLError("Shaders");
 
-    defferedShadingGraph.currentCam = &fpsCamera;
-    defferedShadingGraph.initGraph("example.json",modelList,SpotLightList);
+    defferedShadingGraph.currentCam = &scene.currentCam;
+    defferedShadingGraph.initGraph("example.json",scene);
     CheckGLError("JsonLoad");
 
     glGenBuffers(1,&sdfBuffer);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, sdfBuffer);
-    glBufferData(GL_SHADER_STORAGE_BUFFER,sizeof(SDFPrim)*sdfprims.size(), sdfprims.data(), GL_DYNAMIC_DRAW);
+    glBufferData(GL_SHADER_STORAGE_BUFFER,sizeof(SDFPrim)*scene.sdfprims.size(), scene.sdfprims.data(), GL_DYNAMIC_DRAW);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER,0, sdfBuffer);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
@@ -201,9 +155,12 @@ void InitialiseProgram()
 
     glGenBuffers(1,&lightBufffer);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, lightBufffer);
-    glBufferData(GL_SHADER_STORAGE_BUFFER,sizeof(SpotLight)*SpotLightList.size(), SpotLightList.data(), GL_DYNAMIC_DRAW);
+    glBufferData(GL_SHADER_STORAGE_BUFFER,sizeof(SpotLight)*scene.Lights.size(), scene.Lights.data(), GL_DYNAMIC_DRAW);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER,2, lightBufffer);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+    
+
     CheckGLError("ssbo Buffer setup");
 
     rebakeLighting = true;
@@ -255,7 +212,7 @@ void Input() {
                 float yoffset = ypos - glY;
                 glX = xpos;
                 glY = ypos;
-                fpsCamera.processMouseMovement(xoffset,yoffset);
+                scene.currentCam.processMouseMovement(xoffset,yoffset);
             }
             
         }
@@ -274,12 +231,12 @@ void Input() {
     // WASD Movement 
 
     const Uint8* keystates = SDL_GetKeyboardState(NULL);
-    if (keystates[SDL_SCANCODE_W]) fpsCamera.Move(FORWARD, deltaTime);
-    if (keystates[SDL_SCANCODE_S]) fpsCamera.Move(BACKWARD, deltaTime);
-    if (keystates[SDL_SCANCODE_A]) fpsCamera.Move(LEFT, deltaTime);
-    if (keystates[SDL_SCANCODE_D]) fpsCamera.Move(RIGHT, deltaTime);
-    if (keystates[SDL_SCANCODE_E]) fpsCamera.Move(UP, deltaTime);
-    if (keystates[SDL_SCANCODE_Q]) fpsCamera.Move(DOWN, deltaTime);
+    if (keystates[SDL_SCANCODE_W]) scene.currentCam.Move(FORWARD, deltaTime);
+    if (keystates[SDL_SCANCODE_S]) scene.currentCam.Move(BACKWARD, deltaTime);
+    if (keystates[SDL_SCANCODE_A]) scene.currentCam.Move(LEFT, deltaTime);
+    if (keystates[SDL_SCANCODE_D]) scene.currentCam.Move(RIGHT, deltaTime);
+    if (keystates[SDL_SCANCODE_E]) scene.currentCam.Move(UP, deltaTime);
+    if (keystates[SDL_SCANCODE_Q]) scene.currentCam.Move(DOWN, deltaTime);
 
 }
 
@@ -302,8 +259,8 @@ void MainLoop() {
             glUseProgram(computeShader);
 
             setInt(computeShader,"numProbes", scene.probes.size());
-            setInt(computeShader,"numSDFs", sdfprims.size());
-            setInt(computeShader,"numLights", SpotLightList.size());
+            setInt(computeShader,"numSDFs", scene.sdfprims.size());
+            setInt(computeShader,"numLights", scene.Lights.size());
             glUniform2i(glGetUniformLocation(computeShader, "Resolution"), ScreenWidth, ScreenHeight);
 
             glDispatchCompute(scene.probes.size(), 1, 1);
@@ -334,31 +291,31 @@ void MainLoop() {
 
         glUseProgram(renderShader);
 
-        glm::mat4 view = fpsCamera.getView();
-        glm::mat4 projection = glm::perspective(glm::radians(fpsCamera.m_zoom), (float)ScreenWidth/ (float)ScreenHeight,0.01f,1000.0f);
+        glm::mat4 view = scene.currentCam.getView();
+        glm::mat4 projection = glm::perspective(glm::radians(scene.currentCam.m_zoom), (float)ScreenWidth/ (float)ScreenHeight,0.01f,1000.0f);
         setMat4(renderShader, "projection", projection);
         setMat4(renderShader, "view", view);
 
-        for (unsigned int i = 0; i < lightPos.size(); i ++)
+        for (unsigned int i = 0; i < scene.Lights.size(); i ++)
         {
             glm::mat4 model = glm::mat4(1.0f);
-            model = glm::translate(model, lightPos[i]);
+            model = glm::translate(model, scene.lightPos[i]);
             model = glm::scale(model, glm::vec3(0.05f));
             setMat4(renderShader, "model", model);
-            setVec3(renderShader,"lightColor", lightCol[i]);
+            setVec3(renderShader,"lightColor", scene.lightCol[i]);
             glUseProgram(renderShader);
             renderCube();
         }
 
-        // for (unsigned int i = 0; i < scene.probes.size(); i ++)
-        // {
-        //     glm::mat4 model = glm::mat4(1.0f);
-        //     model = glm::translate(model, scene.probes[i].Pos);
-        //     model = glm::scale(model, glm::vec3(0.05f));
-        //     setMat4(renderShader, "model", model);
-        //     glUseProgram(renderShader);
-        //     renderCube();
-        // }
+        for (unsigned int i = 0; i < scene.probes.size(); i ++)
+        {
+            glm::mat4 model = glm::mat4(1.0f);
+            model = glm::translate(model, scene.probes[i].Pos);
+            model = glm::scale(model, glm::vec3(0.05f));
+            setMat4(renderShader, "model", model);
+            glUseProgram(renderShader);
+            renderCube();
+        }
 
         SDL_GL_SwapWindow(GraphicsApplicationWindow);
     }

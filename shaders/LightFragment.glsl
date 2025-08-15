@@ -5,7 +5,7 @@ out vec4 FragColor;
 uniform sampler2D GPos;
 uniform sampler2D GNorm;
 uniform sampler2D GAlbeSpec;
-uniform sampler2D GProbeIndex;
+uniform isampler2D GProbeIndex;
 
 struct Light
 {
@@ -55,6 +55,10 @@ void main()
             }
         }
         int probeIndex = int(texelFetch(GProbeIndex, ivec2(gl_FragCoord.xy),0).r);
+
+        float t = clamp(float(probeIndex) / 863.0, 0.0,1.0);
+
+        vec3 proCol = vec3(1.0-t, t,0.5 * (1.0-t));
 
         if (probeIndex >= 0) 
         {

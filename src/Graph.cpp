@@ -4,13 +4,14 @@
 
 
 
-void Graph::initGraph(const std::string& path,std::vector<Model> models, std::vector<SpotLight> lights)
+void Graph::initGraph(const std::string& path,Scene scene)
 {
     readJson(path);
     createTextures();
 
-    sceneModels = models;
-    sceneLights = lights;
+    sceneModels = scene.Meshes;
+    sceneLights = scene.Lights;
+    sceneProbes = scene.probes;
     
     for (const auto& p : passes)
     {
@@ -116,6 +117,10 @@ void Graph::executePasses()
                 
                 setMat4(p->shaderProgram, "model", m.transMat);
                 m.Draw();
+            }
+            for (Probe p : sceneProbes)
+            {
+                
             }
             glBlitFramebuffer(0, 0, ScreenWidth, ScreenHeight, 0, 0, ScreenWidth, ScreenHeight, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
             glBindFramebuffer(GL_FRAMEBUFFER, 0);

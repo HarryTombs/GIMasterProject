@@ -4,6 +4,7 @@
 #include "Mesh.h"
 #include "Camera.h"
 #include <glm/glm.hpp>
+#include <string.h>
 
 enum lightType
 {
@@ -59,6 +60,21 @@ class Scene
 
     Camera currentCam;
 
+    // You could put all this in a json huh?
+
+    std::vector<glm::vec3> camPos = {glm::vec3(0.0f,0.0f,5.0f)};
+
+    std::vector<glm::vec3> lightPos = {glm::vec3(-2.0f,0.5f,0.0), glm::vec3(3.0f,0.7f,4.0), glm::vec3(0.0f,1.0f,-4.0)};
+    std::vector<glm::vec3> lightCol = {glm::vec3(1.0f,0.0f,0.0), glm::vec3(0.0f,1.0f,0.0), glm::vec3(0.0f,0.0f,1.0f)};
+    std::vector<glm::vec3> lightDir = {glm::vec3(-1.0f,0.0f,0.0f),glm::vec3(0.5f,0.0f,1.0), glm::vec3(-0.5f,0.0f,-1.0f)};
+
+    std::vector<glm::vec3> cubePos = {glm::vec3(0.0f,-1.0f,0.0), glm::vec3(0.0f,3.0f,0.0), glm::vec3(0.0f,1.0f,-5.05f), glm::vec3(5.05f,1.0f,0.0f), glm::vec3(-5.05f,1.0f,0.0f)};
+    std::vector<glm::vec3> cubeSca = {glm::vec3(5.0f,0.1f,5.0f), glm::vec3(5.0f,0.1f,5.0f), glm::vec3(5.0f,2.5f,0.1f), glm::vec3(0.1f,2.5f,5.0f), glm::vec3(0.1f,2.5f,5.0f)};
+
+    std::vector<glm::vec3> customPos = {glm::vec3(0.0f,0.0f,0.0), glm::vec3(2.0f,0.0f,0.0f)} ;
+    std::vector<std::string> customPath = {"models/test2.obj","models/test2.obj"};
+
+    // end of sarcastic inclusion
 
     std::vector<Probe> probes;
 
@@ -72,6 +88,8 @@ class Scene
     float spacing = 1.0f;
 
     void layoutProbes();
+    void init();
+
 
     private:
 };

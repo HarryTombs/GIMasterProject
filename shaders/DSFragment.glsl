@@ -5,11 +5,12 @@ in vec3 Normal;
 in vec2 TexCoords;
 
 uniform sampler2D tex;
+uniform mat4 model;
 
 layout (location=0)out vec3 GPos;
 layout (location=1)out vec3 GNorm;
 layout (location=2)out vec4 GAlbeSpec;
-layout (location=3)out ivec2 GProbeIndex;
+layout (location=3)out int GProbeIndex;
 
 struct Probe
 {
@@ -34,15 +35,15 @@ void main()
     int nearest = -1;
     float nearestDist = 1e20; 
 
-    for(int i=0; i < probes.length(); i++ )
+    for(int i=0; i < 864; i++ )
     {
-        float dist = distance(FragPos,probes[i].pos);
+        float dist = distance(FragPos, (model * vec4(probes[i].pos,1.0)).rgb);
         if (dist < nearestDist)
         {
             nearestDist = dist;
             nearest = i;
         }
     }
-    GProbeIndex = ivec2(nearest,0);
+    GProbeIndex = nearest;
 
 }

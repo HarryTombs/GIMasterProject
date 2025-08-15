@@ -18,3 +18,45 @@ void Scene::layoutProbes()
     }
     return;
 }
+
+void Scene::init()
+{
+    layoutProbes();
+    for(int i = 0; i < cubeSca.size(); i++)
+    {
+        Model newCube("",true);
+        newCube.translate(cubePos[i]);
+        newCube.scale(cubeSca[i]);
+        newCube.type = 0;
+        Meshes.push_back(newCube);
+    }
+    for(int i = 0; i < customPos.size(); i++)
+    {
+        Model newModel(customPath[i]);
+        newModel.translate(customPos[i]);
+        newModel.type = 1;
+        Meshes.push_back(newModel);
+    }
+    for(Model m : Meshes)
+    {
+        SDFPrim newSdf;
+        newSdf.pos = m.pos;
+        newSdf.size = m.sca;
+        sdfprims.push_back(newSdf);
+    }
+    for (int i = 0; i < lightPos.size(); i++)
+    {
+        SpotLight newLight; 
+        newLight.pos = lightPos[i];
+        newLight.col = lightCol[i];
+        newLight.direction = lightDir[i];
+        Lights.push_back(newLight);
+    }
+    for (int i = 0; i < camPos.size(); i++)
+    {
+        Camera newCam(camPos[i]);
+        Cameras.push_back(newCam);
+    }
+    currentCam = Cameras[0];
+
+}
