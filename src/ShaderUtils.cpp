@@ -221,7 +221,7 @@ GLuint loadShaderProgram(const std::string& inVertPath, const std::string& inFra
         {
             char infoLog[512];
             glGetShaderInfoLog(shader, 512, NULL, infoLog);
-            std::cerr << type << " Shader Compilation Failed:\n" << infoLog << std::endl;
+            std::cerr << type << " Shader Compilation Failed: "<< path <<" \n" << infoLog << std::endl;
 
             glDeleteShader(shader);
             return GLuint(0);

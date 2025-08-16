@@ -1,6 +1,7 @@
 #version 430 core
 in vec2 uv;
-out vec4 FragColor;
+
+layout (location=0)out vec3 LightTexture;
 
 uniform sampler2D GPos;
 uniform sampler2D GNorm;
@@ -133,7 +134,7 @@ void main()
         }
 
         indirect /= float(numSamples);
-        lighting += indirect;
+        // lighting += indirect;
 
-        FragColor = vec4(lighting,1.0);
+        LightTexture = lighting;
     }

@@ -39,6 +39,7 @@ public:
 
     bool isScreenQuad;
     bool useLights;
+    bool isFinalPass;
 
     unsigned int shaderProgram;
 

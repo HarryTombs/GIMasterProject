@@ -37,8 +37,12 @@ void Graph::initGraph(const std::string& path,Scene scene)
             p->textureUniforms();
             setInt(p->shaderProgram,"numProbes", scene.probes.size());
             std::cout<<"Load uniforms pass: " << p->name << std::endl;
-            p->frameBuffer.bind();
-            p->attachOutputTextures(this);
+            if (!p->isFinalPass)
+            {
+                p->frameBuffer.bind();
+                p->attachOutputTextures(this);
+            }
+            
 
             CheckGLError("ScreenQuad");
         }
@@ -108,9 +112,12 @@ void Graph::executePasses()
 {
     for (const auto& p : passes)
     {
-        if(!p->isScreenQuad)
+        if (!p->isFinalPass)
         {
             p->frameBuffer.bind();
+        }
+        if(!p->isScreenQuad)
+        {
             p->clear();
             p->loadViewProjMatricies();
             for(int i = 0; i < p->Inputs.size(); i++)
@@ -146,6 +153,7 @@ void Graph::executePasses()
             glDisable(GL_DEPTH_TEST);
             renderQuad();
             glEnable(GL_DEPTH_TEST);
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
         }
         if(p->useLights)
         {

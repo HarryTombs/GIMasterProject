@@ -8,6 +8,7 @@
                 "FrameBuffer":"GbufferFBO",
                 "ScreenQuad":false,
                 "UseLights":false,
+                "FinalPass":false,
                 "Shaders":
                 {
                     "Vertex":"shaders/DSVertex.glsl",
@@ -96,6 +97,7 @@
                 "FrameBuffer":"LightFBO",
                 "ScreenQuad":true,
                 "UseLights":true,
+                "FinalPass":false,
                 "Shaders":
                 {
                     "Vertex":"shaders/LightVertex.glsl",
@@ -137,8 +139,27 @@
                         "isImageTex": false
                     }
                 ]
-
-
+            },
+            {
+                "PassName" : "RenderPass",
+                "FrameBuffer":"default",
+                "ScreenQuad":true,
+                "UseLights":false,
+                "FinalPass":true,
+                "Shaders":
+                {
+                    "Vertex":"shaders/RenderPassVertex.glsl",
+                    "Fragment":"shaders/RenderPassFragment.glsl"
+                },
+                "Inputs":
+                [
+                    {
+                        "name": "LightTexture",
+                        "existing": true
+                    }
+                ],
+                "Outputs":
+                []
             }
         ]
     }
