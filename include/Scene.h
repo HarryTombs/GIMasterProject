@@ -25,20 +25,23 @@ struct BaseLight
 struct SpotLight : BaseLight
 {
     glm::vec3 direction;
-    float cutoff = 0.95f;
+    float cutoff = -10.0;
 };
 
 
 struct SDFPrim
 {
-    int type;          
-    glm::vec3 pos;     
-    glm::vec3 size;    
-    glm::vec3 rotation;
-    float radius;      
-    float pad1;        
-    float pad2;        
-    float pad3;        
+    int type;           
+    float pad0;         
+    float pad1;         
+    float pad2;         
+    glm::vec3 pos;      
+    glm::vec3 size;     
+    glm::vec3 rotation; 
+    float radius;       
+    float pad3;         
+    float pad4;         
+        
 };
 
 struct Probe 
@@ -68,11 +71,11 @@ class Scene
     std::vector<glm::vec3> lightCol = {glm::vec3(1.0f,0.0f,0.0), glm::vec3(0.0f,1.0f,0.0), glm::vec3(0.0f,0.0f,1.0f)};
     std::vector<glm::vec3> lightDir = {glm::vec3(-1.0f,0.0f,0.0f),glm::vec3(0.5f,0.0f,1.0), glm::vec3(-0.5f,0.0f,-1.0f)};
 
-    std::vector<glm::vec3> cubePos = {glm::vec3(0.0f,-1.0f,0.0), glm::vec3(0.0f,3.0f,0.0), glm::vec3(0.0f,1.0f,-5.05f), glm::vec3(5.05f,1.0f,0.0f), glm::vec3(-5.05f,1.0f,0.0f)};
-    std::vector<glm::vec3> cubeSca = {glm::vec3(5.0f,0.1f,5.0f), glm::vec3(5.0f,0.1f,5.0f), glm::vec3(5.0f,2.5f,0.1f), glm::vec3(0.1f,2.5f,5.0f), glm::vec3(0.1f,2.5f,5.0f)};
+    std::vector<glm::vec3> cubePos = {glm::vec3(0.0f,-1.0f,0.0), glm::vec3(0.0f,3.0f,0.0), glm::vec3(0.0f,1.0f,-5.05f), glm::vec3(5.05f,1.0f,0.0f), glm::vec3(-5.05f,1.0f,0.0f), glm::vec3(2.0,0.0,2.0)};
+    std::vector<glm::vec3> cubeSca = {glm::vec3(5.0f,0.1f,5.0f), glm::vec3(5.0f,0.1f,5.0f), glm::vec3(5.0f,2.5f,0.1f), glm::vec3(0.1f,2.5f,5.0f), glm::vec3(0.1f,2.5f,5.0f), glm::vec3(0.1,1.0,3.0)};
 
-    std::vector<glm::vec3> customPos = {glm::vec3(0.0f,0.0f,0.0), glm::vec3(2.0f,0.0f,0.0f)} ;
-    std::vector<std::string> customPath = {"models/test2.obj","models/test2.obj"};
+    std::vector<glm::vec3> customPos = {glm::vec3(0.0f,0.0f,0.0)} ;
+    std::vector<std::string> customPath = {"models/test2.obj"};
 
     // end of sarcastic inclusion
 

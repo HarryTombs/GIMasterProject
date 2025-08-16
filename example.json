@@ -72,16 +72,16 @@
                         "isImageTex": false
                     },
                     {
-                        "name": "GProbeIndex",
+                        "name": "DepthTexture",
                         "width": 512,
                         "height": 512,
                         "format": 
                         {
-                            "internalFormat": "GL_R32I",
-                            "format": "GL_RED_INTEGER",
-                            "type": "GL_INT"
+                            "internalFormat": "GL_DEPTH_COMPONENT24",
+                            "format": "GL_DEPTH_COMPONENT",
+                            "type": "GL_FLOAT"
                         },
-                        "attachmentPoint": "GL_COLOR_ATTACHMENT3",
+                        "attachmentPoint": "GL_DEPTH_ATTACHMENT",
                         "isImageTex": false
                     }
                 ]
@@ -135,6 +135,19 @@
                             "type": "GL_UNSIGNED_BYTE"
                         },
                         "attachmentPoint": "GL_COLOR_ATTACHMENT2",
+                        "isImageTex": false
+                    },
+                    {
+                        "name": "DepthTexture",
+                        "width": 512,
+                        "height": 512,
+                        "format": 
+                        {
+                            "internalFormat": "GL_DEPTH_COMPONENT24",
+                            "format": "GL_DEPTH_COMPONENT",
+                            "type": "GL_FLOAT"
+                        },
+                        "attachmentPoint": "GL_DEPTH_ATTACHMENT",
                         "isImageTex": false
                     }
                 ],

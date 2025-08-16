@@ -41,7 +41,15 @@ void Scene::init()
     {
         SDFPrim newSdf;
         newSdf.pos = m.pos;
-        newSdf.size = m.sca;
+        if (m.type == 0)
+        {
+            newSdf.size = m.sca;
+        }
+        if (m.type == 1)
+        {
+            newSdf.radius = 1.0f;
+        }
+        newSdf.type = m.type;
         sdfprims.push_back(newSdf);
     }
     for (int i = 0; i < lightPos.size(); i++)

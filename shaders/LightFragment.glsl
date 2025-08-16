@@ -5,7 +5,7 @@ out vec4 FragColor;
 uniform sampler2D GPos;
 uniform sampler2D GNorm;
 uniform sampler2D GAlbeSpec;
-uniform isampler2D GProbeIndex;
+uniform sampler2D DepthTexture;
 
 struct Light
 {
@@ -18,9 +18,25 @@ struct Light
     float Cutoff;
     vec3 Direction;
 };
+
+struct Probe
+{
+    vec3 pos;
+    float pad1;
+    vec3 col;
+    float pad2;
+};
+
 const int NR_Lights = 32;
 uniform Light lights[NR_Lights];
 uniform vec3 viewPos;
+uniform int numProbes;
+
+
+layout(std430, binding = 1) buffer ProbeBuffer
+{
+    Probe probes[];
+};
 
 layout(std430, binding = 3) buffer IndirectResultBuffer
 {
@@ -28,14 +44,14 @@ layout(std430, binding = 3) buffer IndirectResultBuffer
 };
 
 
-
 void main() 
     {
         vec3 fragPos = texture(GPos, uv).xyz;
         vec3 Normal = texture(GNorm, uv).xyz;
         vec3 Abledo = texture(GAlbeSpec, uv).xyz;
+        float Depth = texture(DepthTexture,uv).r;
 
-        vec3 lighting = Abledo * 0.1;
+        vec3 lighting = Abledo * 0.0;
         vec3 viewDir = normalize(viewPos - fragPos);
 
         for (int i = 0; i < NR_Lights; i++)
@@ -54,17 +70,36 @@ void main()
                 lighting += diffuse;
             }
         }
-        int probeIndex = int(texelFetch(GProbeIndex, ivec2(gl_FragCoord.xy),0).r);
 
-        float t = clamp(float(probeIndex) / 863.0, 0.0,1.0);
-
-        vec3 proCol = vec3(1.0-t, t,0.5 * (1.0-t));
-
-        if (probeIndex >= 0) 
+        int nearest = -1;
+        float nearestDist = 1e20;
+        for (int i = 0; i < numProbes; i++)
         {
-            vec3 indirect = indirectLight[probeIndex] * Abledo;
-            lighting += indirect;
+            float dist = distance(fragPos, probes[i].pos);
+            if (dist < nearestDist)
+            {
+                nearestDist = dist;
+                nearest = i;
+            }
         }
 
-        FragColor = vec4(lighting,1.0);
+        float maxDist = 10.0; // or scene bounding box size
+        vec3 nearestPos = probes[nearest].pos;
+        vec3 diff = fragPos - nearestPos;
+        vec3 proCol = vec3(
+            clamp(diff.x / maxDist, 0.0, 1.0),
+            clamp(diff.y / maxDist, 0.0, 1.0),
+            clamp(diff.z / maxDist, 0.0, 1.0)
+        );
+
+        vec3 indirect = vec3(0.0,0.0,0.0);
+        if (nearest >= 0) 
+        {
+            indirect = indirectLight[nearest] * Abledo;
+            lighting += indirect;
+        };
+
+        vec3 bigdepth = vec3(pow(Depth,50.0)); 
+
+        FragColor = vec4(bigdepth,1.0);
     }

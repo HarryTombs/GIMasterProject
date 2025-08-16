@@ -21,7 +21,7 @@ void Graph::initGraph(const std::string& path,Scene scene)
             p->frameBuffer.bind();
             p->attachOutputTextures(this);
             
-            p->depthBufferSetup();
+            // p->depthBufferSetup();
 
             GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
             if (status != GL_FRAMEBUFFER_COMPLETE) 
@@ -30,11 +30,14 @@ void Graph::initGraph(const std::string& path,Scene scene)
             }
 
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
+            CheckGLError("FrameBuffer");
         }
         if(p->isScreenQuad == true)
         {
             p->textureUniforms();
+            setInt(p->shaderProgram,"numProbes", scene.probes.size());
             std::cout<<"Load uniforms pass: " << p->name << std::endl;
+            CheckGLError("ScreenQuad");
         }
     }
 }
@@ -118,10 +121,13 @@ void Graph::executePasses()
                 setMat4(p->shaderProgram, "model", m.transMat);
                 m.Draw();
             }
-            for (Probe p : sceneProbes)
-            {
-                
-            }
+            // for (int i = 0;i < sceneProbes.size(); i++)
+            // {
+            //     glm::mat4 probemat(1.0f);
+            //     probemat = glm::translate(probemat,sceneProbes[i].Pos);
+            //     setMat4(p->shaderProgram, "probeModel", probemat);
+            //     std::cout << "uploaded probe Matrix" << i << std::endl;
+            // }
             glBlitFramebuffer(0, 0, ScreenWidth, ScreenHeight, 0, 0, ScreenWidth, ScreenHeight, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
         }

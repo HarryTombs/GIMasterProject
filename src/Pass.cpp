@@ -155,17 +155,24 @@ void Pass::depthBufferSetup()
 {
     frameBuffer.bind();
     unsigned int rboDepth;
-    glGenRenderbuffers(1, &rboDepth);   
-    glBindRenderbuffer(GL_RENDERBUFFER, rboDepth);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, ScreenWidth , ScreenHeight);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rboDepth);
+    // glGenRenderbuffers(1, &rboDepth);   
+    // glBindRenderbuffer(GL_RENDERBUFFER, rboDepth);
+    // glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, ScreenWidth , ScreenHeight);
+    // glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rboDepth);
 }
 
 void Pass::drawBuffers()
 {
-    
-    glDrawBuffers(static_cast<GLsizei>(OutAttachments.size()), OutAttachments.data());
-    std::cout << "Draw Buffers Complete " << OutAttachments.size() << std::endl;
+    std::vector<GLenum> useAttchments;
+    for (int i = 0; i < OutAttachments.size();i++)
+    {
+        if (OutAttachments[i] != GL_DEPTH_ATTACHMENT)
+        {
+            useAttchments.push_back(OutAttachments[i]);
+        }
+    }   
+    glDrawBuffers(static_cast<GLsizei>(useAttchments.size()), useAttchments.data());
+    std::cout << "Draw Buffers Complete " << useAttchments.size() << std::endl;
 }
 
 void Pass::bindTextures()

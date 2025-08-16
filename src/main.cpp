@@ -36,11 +36,12 @@ float glY;
 
 
 
-GLuint renderShader, computeShader; 
+GLuint renderShader, computeShader, debugShader; 
 
 unsigned int sdfBuffer;
 unsigned int probeBuffer;
 unsigned int lightBufffer;
+unsigned int indirectBuffer;
 
 bool rebakeLighting = false;
 
@@ -135,6 +136,7 @@ void InitialiseProgram()
 
     computeShader = loadComputeShader("shaders/compute.glsl");
     renderShader = loadShaderProgram("shaders/vertex.glsl", "shaders/fragment.glsl");
+    debugShader = loadShaderProgram("shaders/debugVertex.glsl", "shaders/debugFragment.glsl");
     CheckGLError("Shaders");
 
     defferedShadingGraph.currentCam = &scene.currentCam;
@@ -159,9 +161,37 @@ void InitialiseProgram()
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER,2, lightBufffer);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
-    
-
+    glGenBuffers(1,&indirectBuffer);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, indirectBuffer);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec3) * scene.probes.size(), nullptr,GL_DYNAMIC_DRAW);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, indirectBuffer);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
     CheckGLError("ssbo Buffer setup");
+
+    struct Vec3Padded
+    {
+        glm::vec3 color;
+        float pad;
+    };
+    std::vector<Vec3Padded> debugColors(scene.probes.size());
+    for (int i = 0; i < scene.probes.size(); i++)
+    {
+        // Simple color gradient based on probe index
+        float t = float(i) / float(scene.probes.size() - 1);
+        debugColors[i].color = glm::vec3(1.0f - t, t, 0.5f);
+        debugColors[i].pad = 0.0f;
+    }
+
+    // Upload debug data to GPU
+
+    glGenBuffers(1,&indirectBuffer);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, indirectBuffer);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(Vec3Padded) * scene.probes.size(), debugColors.data(),GL_DYNAMIC_DRAW);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, indirectBuffer);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+    CheckGLError("ssbo Buffer setup");
+
+
 
     rebakeLighting = true;
 
@@ -264,7 +294,8 @@ void MainLoop() {
             glUniform2i(glGetUniformLocation(computeShader, "Resolution"), ScreenWidth, ScreenHeight);
 
             glDispatchCompute(scene.probes.size(), 1, 1);
-            glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+            std::cout <<scene.probes.size() << std::endl;
+            glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
             rebakeLighting = false;
             std::cout << "Rebaked Lighting " << std::endl;
             CheckGLError("Compute Shader Dispatch");
@@ -307,15 +338,20 @@ void MainLoop() {
             renderCube();
         }
 
-        for (unsigned int i = 0; i < scene.probes.size(); i ++)
-        {
-            glm::mat4 model = glm::mat4(1.0f);
-            model = glm::translate(model, scene.probes[i].Pos);
-            model = glm::scale(model, glm::vec3(0.05f));
-            setMat4(renderShader, "model", model);
-            glUseProgram(renderShader);
-            renderCube();
-        }
+        glUseProgram(debugShader);
+
+        setMat4(debugShader, "projection", projection);
+        setMat4(debugShader, "view", view);
+
+        // for (unsigned int i = 0; i < scene.probes.size(); i ++)
+        // {
+        //     glm::mat4 model = glm::mat4(1.0f);
+        //     model = glm::translate(model, scene.probes[i].Pos);
+        //     model = glm::scale(model, glm::vec3(0.05f));
+        //     setMat4(debugShader, "model", model);
+        //     glUseProgram(debugShader);
+        //     renderCube();
+        // }
 
         SDL_GL_SwapWindow(GraphicsApplicationWindow);
     }

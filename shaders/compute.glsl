@@ -1,6 +1,6 @@
 #version 430
 
-layout(local_size_x = 16, local_size_y = 16) in;
+layout(local_size_x = 864) in;
 
 struct SDFPrimitive 
 {
@@ -63,7 +63,7 @@ uniform int numLights;
 uniform ivec2 Resolution;
 float surfaceEps = 0.001;
 float maxDistance = 50.0;
-int raysPerProbe;
+int raysPerProbe = 32;
 int maxSteps = 128;
 
 float sdSphere( vec3 p, float s) 
@@ -95,6 +95,14 @@ float sdScene(vec3 p)
     return dist;
 }
 
+vec3 randomDirection(uint i, uint n) 
+{
+    float phi = 6.2831853 * float(i) / float(n);
+    float cosTheta = 2.0 * (float(i % n) / float(n)) - 1.0;
+    float sinTheta = sqrt(1.0 - cosTheta * cosTheta);
+    return vec3(cos(phi) * sinTheta, cosTheta, sin(phi) * sinTheta);
+}
+
 bool isBlocked(vec3 start, vec3 dir, float maxDist)
 {
     float travel = 0.0;
@@ -103,13 +111,13 @@ bool isBlocked(vec3 start, vec3 dir, float maxDist)
     for (int i = 0; i < maxSteps; i++)
     {
         float h = sdScene(pos);
-        if (h < surfaceEps) return false; // blocked
+        if (h < surfaceEps) return true; // blocked
         travel += h;
         if (travel >= maxDist) break; // Light hit
         if (travel >= maxDistance) break; // higher than global cull
         pos += dir * h;
     }
-    return true;
+    return false;
 }
 
 vec3 directLighting(vec3 hitPos, vec3 normal, Light light) 
@@ -123,7 +131,7 @@ vec3 directLighting(vec3 hitPos, vec3 normal, Light light)
     if (cosTheta < light.Cutoff) return vec3(0.0);
 
     vec3 origin = hitPos + normal * (surfaceEps * 3.0);
-    if (!isBlocked(origin, Ldir, dist)) return vec3(0.0);
+    if (isBlocked(origin, Ldir, dist)) return vec3(0.0);
 
     float NdotL = max(dot(normal, Ldir), 0.0);
     float attenuation = 1.0 / (1.0 + light.Linear * dist + light.Quadratic * dist * dist);
@@ -133,14 +141,14 @@ vec3 directLighting(vec3 hitPos, vec3 normal, Light light)
 
 vec3 computeIndirectWProbe(Probe probe) 
 {
-    const int NUM_RAYS = 32;
+    const int NUM_RAYS = 128;
     vec3 totalLight = vec3(0.0);
 
     vec3 normal = vec3(0.0,1.0,0.0);
     for (int r = 0; r < NUM_RAYS; r++) 
     {
-        float phi = (6.2831853 / NUM_RAYS) * float(r);
-        vec3 dir = normalize(vec3(cos(phi), 0.5, sin(phi)));
+
+        vec3 dir = randomDirection(r,NUM_RAYS);
 
         vec3 pos = probe.pos;
         float travel = 0.0;
