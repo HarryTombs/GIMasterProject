@@ -31,6 +31,8 @@ const int NR_Lights = 32;
 uniform Light lights[NR_Lights];
 uniform vec3 viewPos;
 uniform int numProbes;
+uniform mat4 invView;
+uniform mat4 invProjection;
 
 
 layout(std430, binding = 1) buffer ProbeBuffer
@@ -43,6 +45,18 @@ layout(std430, binding = 3) buffer IndirectResultBuffer
     vec3 indirectLight[];
 };
 
+
+vec3 reconstructWorldPos(vec2 uv)
+{
+    float Depth = texture(DepthTexture,uv).r;
+    vec4 clip = vec4(uv * 2.0 - 1.0, Depth * 2.0 - 1.0, 1.0);
+
+    vec4 viewPos = invProjection * clip;
+    viewPos /= viewPos.w;
+
+    vec4 worldPos = invView * viewPos;
+    return worldPos.xyz;
+};
 
 void main() 
     {
@@ -92,14 +106,34 @@ void main()
             clamp(diff.z / maxDist, 0.0, 1.0)
         );
 
-        vec3 indirect = vec3(0.0,0.0,0.0);
+        vec3 indirect = vec3(0.0);
+
         if (nearest >= 0) 
         {
-            indirect = indirectLight[nearest] * Abledo;
+            // indirect = indirectLight[nearest] * Abledo;
             lighting += indirect;
         };
 
-        vec3 bigdepth = vec3(pow(Depth,50.0)); 
+        int numSamples = 128;
 
-        FragColor = vec4(bigdepth,1.0);
+        for (int i = 0; i < numSamples; i++)
+        {
+            vec2 rand = vec2(fract(sin(dot(uv, vec2(12.9898,78.233))) * 43758.5453 + float(i)));
+            float angle = rand.x * 6.2831;
+            float radius = rand.y * 0.1;
+            vec2 offsetUV = uv + radius * vec2(cos(angle), sin(angle));
+
+            vec3 neighborPos = reconstructWorldPos(offsetUV);
+            vec3 nieghborCol = texture(GAlbeSpec, offsetUV).rbg;
+
+            if (dot(neighborPos - fragPos, Normal) > 0.0)
+            {
+                indirect += nieghborCol;
+            }
+        }
+
+        indirect /= float(numSamples);
+        lighting += indirect;
+
+        FragColor = vec4(lighting,1.0);
     }

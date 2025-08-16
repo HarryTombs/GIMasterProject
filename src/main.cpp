@@ -36,7 +36,7 @@ float glY;
 
 
 
-GLuint renderShader, computeShader, debugShader; 
+GLuint renderShader, computeShader; 
 
 unsigned int sdfBuffer;
 unsigned int probeBuffer;
@@ -136,7 +136,6 @@ void InitialiseProgram()
 
     computeShader = loadComputeShader("shaders/compute.glsl");
     renderShader = loadShaderProgram("shaders/vertex.glsl", "shaders/fragment.glsl");
-    debugShader = loadShaderProgram("shaders/debugVertex.glsl", "shaders/debugFragment.glsl");
     CheckGLError("Shaders");
 
     defferedShadingGraph.currentCam = &scene.currentCam;
@@ -284,22 +283,22 @@ void MainLoop() {
         deltaTime = (double)((NOW - LAST) * 1000) / SDL_GetPerformanceFrequency();
         deltaTime /= 1000.0;
 
-        if (rebakeLighting)
-        {
-            glUseProgram(computeShader);
+        // if (rebakeLighting)
+        // {
+        //     glUseProgram(computeShader);
 
-            setInt(computeShader,"numProbes", scene.probes.size());
-            setInt(computeShader,"numSDFs", scene.sdfprims.size());
-            setInt(computeShader,"numLights", scene.Lights.size());
-            glUniform2i(glGetUniformLocation(computeShader, "Resolution"), ScreenWidth, ScreenHeight);
+        //     setInt(computeShader,"numProbes", scene.probes.size());
+        //     setInt(computeShader,"numSDFs", scene.sdfprims.size());
+        //     setInt(computeShader,"numLights", scene.Lights.size());
+        //     glUniform2i(glGetUniformLocation(computeShader, "Resolution"), ScreenWidth, ScreenHeight);
 
-            glDispatchCompute(scene.probes.size(), 1, 1);
-            std::cout <<scene.probes.size() << std::endl;
-            glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
-            rebakeLighting = false;
-            std::cout << "Rebaked Lighting " << std::endl;
-            CheckGLError("Compute Shader Dispatch");
-        }
+        //     glDispatchCompute(scene.probes.size(), 1, 1);
+        //     std::cout <<scene.probes.size() << std::endl;
+        //     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+        //     rebakeLighting = false;
+        //     std::cout << "Rebaked Lighting " << std::endl;
+        //     CheckGLError("Compute Shader Dispatch");
+        // }
         
 
         
@@ -338,20 +337,6 @@ void MainLoop() {
             renderCube();
         }
 
-        glUseProgram(debugShader);
-
-        setMat4(debugShader, "projection", projection);
-        setMat4(debugShader, "view", view);
-
-        // for (unsigned int i = 0; i < scene.probes.size(); i ++)
-        // {
-        //     glm::mat4 model = glm::mat4(1.0f);
-        //     model = glm::translate(model, scene.probes[i].Pos);
-        //     model = glm::scale(model, glm::vec3(0.05f));
-        //     setMat4(debugShader, "model", model);
-        //     glUseProgram(debugShader);
-        //     renderCube();
-        // }
 
         SDL_GL_SwapWindow(GraphicsApplicationWindow);
     }
