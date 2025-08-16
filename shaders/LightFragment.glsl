@@ -46,7 +46,6 @@ layout(std430, binding = 3) buffer IndirectResultBuffer
     vec3 indirectLight[];
 };
 
-
 vec3 reconstructWorldPos(vec2 uv)
 {
     float Depth = texture(DepthTexture,uv).r;
@@ -58,6 +57,7 @@ vec3 reconstructWorldPos(vec2 uv)
     vec4 worldPos = invView * viewPos;
     return worldPos.xyz;
 };
+
 
 void main() 
     {

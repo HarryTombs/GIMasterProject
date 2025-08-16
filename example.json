@@ -1,6 +1,10 @@
 {
     "Graph":
     {
+        "ShaderStorage":
+        {
+            
+        },
         "Passes":
         [
             {   
