@@ -10,6 +10,7 @@ GLenum getGLEnumFromString(const std::string& str);
 struct TextureConfig
 {
     std::string name;
+    bool existing;
     int width;
     int height;
     GLenum internalFormat;

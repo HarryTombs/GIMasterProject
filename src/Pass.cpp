@@ -17,20 +17,25 @@ void Pass::init(const rapidjson::Value& passJson)
             {
                 TextureConfig tex; 
                 tex.name = input["name"].GetString();
-                tex.width = input["width"].GetInt();
-                tex.height = input["height"].GetInt();
-                GLenum attachPoint = getGLEnumFromString(input["attachmentPoint"].GetString());
-                tex.attachmentPoint = attachPoint;
-                tex.isImageTex = input["isImageTex"].GetBool();
-                if (input["isImageTex"].GetBool())
+                tex.existing = input["existing"].GetBool();
+                if (!input["existing"].GetBool())
                 {
-                    tex.imageFile = input["TextureFile"].GetString();
-                }
+                    tex.width = input["width"].GetInt();
+                    tex.height = input["height"].GetInt();
+                    GLenum attachPoint = getGLEnumFromString(input["attachmentPoint"].GetString());
+                    tex.attachmentPoint = attachPoint;
+                    tex.isImageTex = input["isImageTex"].GetBool();
+                    if (input["isImageTex"].GetBool())
+                    {
+                        tex.imageFile = input["TextureFile"].GetString();
+                    }
 
-                const auto& fmt = input["format"];
-                tex.internalFormat = getGLEnumFromString(fmt["internalFormat"].GetString());
-                tex.format = getGLEnumFromString(fmt["format"].GetString());
-                tex.type = getGLEnumFromString(fmt["type"].GetString());
+                    const auto& fmt = input["format"];
+                    tex.internalFormat = getGLEnumFromString(fmt["internalFormat"].GetString());
+                    tex.format = getGLEnumFromString(fmt["format"].GetString());
+                    tex.type = getGLEnumFromString(fmt["type"].GetString());
+                }
+                
 
                 // InAttachments.push_back(attachPoint);
                 Inputs.push_back(tex);

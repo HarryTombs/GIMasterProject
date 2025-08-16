@@ -37,6 +37,9 @@ void Graph::initGraph(const std::string& path,Scene scene)
             p->textureUniforms();
             setInt(p->shaderProgram,"numProbes", scene.probes.size());
             std::cout<<"Load uniforms pass: " << p->name << std::endl;
+            p->frameBuffer.bind();
+            p->attachOutputTextures(this);
+
             CheckGLError("ScreenQuad");
         }
     }
@@ -167,8 +170,6 @@ void Graph::createTextures()
     {
         for (TextureConfig texconf : p->Inputs)
         {
-
-
             if (textures.find(texconf.name) == textures.end())
             {
                 TextureFormat newFmt;

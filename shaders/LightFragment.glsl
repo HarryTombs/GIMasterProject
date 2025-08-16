@@ -114,7 +114,7 @@ void main()
             lighting += indirect;
         };
 
-        int numSamples = 128;
+        int numSamples = 256;
 
         for (int i = 0; i < numSamples; i++)
         {
