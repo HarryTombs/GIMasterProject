@@ -92,9 +92,9 @@ void Pass::init(const rapidjson::Value& passJson)
         {
             useLights = passJson["UseLights"].GetBool();
         }
-        if (passJson.HasMember("FinalPass") && passJson["FinalPass"].IsBool())
+        if (passJson.HasMember("Display") && passJson["Display"].IsBool())
         {
-            isFinalPass = passJson["FinalPass"].GetBool();
+            Display = passJson["Display"].GetBool();
         }
 
         createShaderProgram();

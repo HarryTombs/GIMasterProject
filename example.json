@@ -12,7 +12,7 @@
                 "FrameBuffer":"GbufferFBO",
                 "ScreenQuad":false,
                 "UseLights":false,
-                "FinalPass":false,
+                "Display":false,
                 "Shaders":
                 {
                     "Vertex":"shaders/DSVertex.glsl",
@@ -101,7 +101,7 @@
                 "FrameBuffer":"LightFBO",
                 "ScreenQuad":true,
                 "UseLights":true,
-                "FinalPass":false,
+                "Display":false,
                 "Shaders":
                 {
                     "Vertex":"shaders/LightVertex.glsl",
@@ -145,15 +145,15 @@
                 ]
             },
             {
-                "PassName" : "RenderPass",
-                "FrameBuffer":"default",
+                "PassName" : "SSGIPass",
+                "FrameBuffer":"SSGIFBO",
                 "ScreenQuad":true,
                 "UseLights":false,
-                "FinalPass":true,
+                "Display":false,
                 "Shaders":
                 {
-                    "Vertex":"shaders/RenderPassVertex.glsl",
-                    "Fragment":"shaders/RenderPassFragment.glsl"
+                    "Vertex":"shaders/SSGIPassVertex.glsl",
+                    "Fragment":"shaders/SSGIPassFragment.glsl"
                 },
                 "Inputs":
                 [
@@ -163,7 +163,22 @@
                     }
                 ],
                 "Outputs":
-                []
+                [
+                    {
+                        "name": "SSGITexture",
+                        "existing": false,
+                        "width": 512,
+                        "height": 512,
+                        "format": 
+                        {
+                            "internalFormat": "GL_RGBA16F",
+                            "format": "GL_RGBA",
+                            "type": "GL_FLOAT"
+                        },
+                        "attachmentPoint": "GL_COLOR_ATTACHMENT0",
+                        "isImageTex": false
+                    }
+                ]
             }
         ]
     }

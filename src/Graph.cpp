@@ -37,7 +37,7 @@ void Graph::initGraph(const std::string& path,Scene scene)
             p->textureUniforms();
             setInt(p->shaderProgram,"numProbes", scene.probes.size());
             std::cout<<"Load uniforms pass: " << p->name << std::endl;
-            if (!p->isFinalPass)
+            if (!p->Display)
             {
                 p->frameBuffer.bind();
                 p->attachOutputTextures(this);
@@ -112,7 +112,7 @@ void Graph::executePasses()
 {
     for (const auto& p : passes)
     {
-        if (!p->isFinalPass)
+        if (!p->Display)
         {
             p->frameBuffer.bind();
         }
