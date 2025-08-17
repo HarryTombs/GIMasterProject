@@ -70,28 +70,7 @@ vec3 cosineSampleHemiSsphere(float u1, float u2, vec3 N)
     return T * x + B * y + N * z;
 }
 
-vec3 ndcToView(vec3 ndc)
-{
-    vec4 v = invProjection * vec4(ndc, 1.0);
-    return v.xyz / v.w;
-}
 
-vec3 reconstructViewPos(vec2 uv, float depth)
-{
-    float z = depth * 2.0 - 1.0;
-    vec3 ndc = vec3(uv * 2.0 - 1.0, z);
-    return ndcToView(ndc);
-}
-
-bool projectViewToUV(vec3 viewPos, out vec2 uv, out float ndcZ)
-{
-    vec4 clip = projection * vec4(viewPos, 1.0);
-    if(clip.w <= 0.0) return false;
-    vec3 ndc = clip.xyz / clip.w;
-    uv = ndc.xy * 0.5 + 0.5;
-    ndcZ = ndc.z;
-    return uv.x >= 0.0 && uv.x <= 1.0 && uv.y >= 0.0 && uv.y <= 1.0;
-}
 
 // stochastic Normals
 

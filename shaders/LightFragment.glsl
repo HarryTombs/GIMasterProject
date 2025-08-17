@@ -55,7 +55,7 @@ void main()
         vec3 Abledo = texture(GAlbeSpec, uv).xyz;
         float Depth = texture(DepthTexture,uv).r;
 
-        vec3 lighting = Abledo * 0.1;
+        vec3 lighting = Abledo * 0.01;
         vec3 viewDir = normalize(viewPos - fragPos);
 
         for (int i = 0; i < NR_Lights; i++)

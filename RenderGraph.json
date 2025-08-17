@@ -149,7 +149,7 @@
                 "FrameBuffer":"SNRMFBO",
                 "ScreenQuad":true,
                 "UseLights":false,
-                "Display":true,
+                "Display":false,
                 "Shaders":
                 {
                     "Vertex":"shaders/StochasticNormalsVertex.glsl",
@@ -212,6 +212,10 @@
                     {
                         "name": "DepthTexture",
                         "existing": true
+                    },
+                    {
+                        "name": "SNRMTexture",
+                        "existing": true
                     }
                 ],
                 "Outputs":
@@ -237,7 +241,7 @@
                 "FrameBuffer":"FilterFBO",
                 "ScreenQuad":true,
                 "UseLights":false,
-                "Display":false,
+                "Display":true,
                 "Shaders":
                 {
                     "Vertex":"shaders/BlurVertex.glsl",
