@@ -161,7 +161,8 @@ void Pass::textureUniforms()
         glm::mat4 invProjection = glm::inverse(glm::perspective(glm::radians(useCamera->m_zoom), (float)ScreenWidth/ (float)ScreenHeight,0.01f,1000.0f));
         setMat4(shaderProgram, "invView", invView);
         setMat4(shaderProgram, "invProjection", invProjection);
-    }
+        setVec2(shaderProgram, "texelSize",(glm::vec2(1.0)/glm::vec2(ScreenHeight,ScreenWidth)));
+    } 
 }
 
 void Pass::depthBufferSetup()

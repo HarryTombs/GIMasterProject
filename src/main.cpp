@@ -122,24 +122,13 @@ void InitialiseProgram()
 
     glEnable(GL_DEPTH_TEST);
 
-
-    std::string modelPath = "models/test2.obj";
-
-    /*
-    !!!
-    TO DO 
-    Add a scene graph for geometry and lights
-    !!! 
-    */
-
     scene.init();
 
-    computeShader = loadComputeShader("shaders/compute.glsl");
     renderShader = loadShaderProgram("shaders/vertex.glsl", "shaders/fragment.glsl");
     CheckGLError("Shaders");
 
     defferedShadingGraph.currentCam = &scene.currentCam;
-    defferedShadingGraph.initGraph("example.json",scene);
+    defferedShadingGraph.initGraph("RenderGraph.json",scene);
     CheckGLError("JsonLoad");
 
     glGenBuffers(1,&sdfBuffer);
@@ -166,31 +155,6 @@ void InitialiseProgram()
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, indirectBuffer);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
     CheckGLError("ssbo Buffer setup");
-
-    struct Vec3Padded
-    {
-        glm::vec3 color;
-        float pad;
-    };
-    std::vector<Vec3Padded> debugColors(scene.probes.size());
-    for (int i = 0; i < scene.probes.size(); i++)
-    {
-        // Simple color gradient based on probe index
-        float t = float(i) / float(scene.probes.size() - 1);
-        debugColors[i].color = glm::vec3(1.0f - t, t, 0.5f);
-        debugColors[i].pad = 0.0f;
-    }
-
-    // Upload debug data to GPU
-
-    glGenBuffers(1,&indirectBuffer);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, indirectBuffer);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(Vec3Padded) * scene.probes.size(), debugColors.data(),GL_DYNAMIC_DRAW);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, indirectBuffer);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-    CheckGLError("ssbo Buffer setup");
-
-
 
     rebakeLighting = true;
 
@@ -283,23 +247,7 @@ void MainLoop() {
         deltaTime = (double)((NOW - LAST) * 1000) / SDL_GetPerformanceFrequency();
         deltaTime /= 1000.0;
 
-        // if (rebakeLighting)
-        // {
-        //     glUseProgram(computeShader);
 
-        //     setInt(computeShader,"numProbes", scene.probes.size());
-        //     setInt(computeShader,"numSDFs", scene.sdfprims.size());
-        //     setInt(computeShader,"numLights", scene.Lights.size());
-        //     glUniform2i(glGetUniformLocation(computeShader, "Resolution"), ScreenWidth, ScreenHeight);
-
-        //     glDispatchCompute(scene.probes.size(), 1, 1);
-        //     std::cout <<scene.probes.size() << std::endl;
-        //     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
-        //     rebakeLighting = false;
-        //     std::cout << "Rebaked Lighting " << std::endl;
-        //     CheckGLError("Compute Shader Dispatch");
-        // }
-        
 
         
 

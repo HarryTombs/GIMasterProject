@@ -29,3 +29,4 @@ void setInt (GLuint program, const std::string& name, int value);
 void setFloat(GLuint program, const std::string& name, float value);
 void setMat4(GLuint program, const std::string& name, const glm::mat4 &value);
 void setVec3(GLuint program, const std::string& name, const glm::vec3 &value);
+void setVec2(GLuint program, const std::string& name, const glm::vec2 &value);

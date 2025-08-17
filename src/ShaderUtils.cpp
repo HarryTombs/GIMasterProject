@@ -2,8 +2,8 @@
 #include <SDL2/SDL.h>
 
 
-int ScreenHeight = 512;
-int ScreenWidth = 512;
+int ScreenHeight = 720;
+int ScreenWidth = 720;
 
 unsigned int cubeVAO = 0;
 unsigned int cubeVBO = 0;
@@ -268,8 +268,16 @@ void setMat4(GLuint program, const std::string& name, const glm::mat4 &value)
     glUniformMatrix4fv(location, 1, GL_FALSE, &value[0][0]);
 }
 
+
+
 void setVec3(GLuint program, const std::string& name, const glm::vec3 &value)
 {
     GLint location = glGetUniformLocation(program, name.c_str());
     glUniform3fv(location,1,&value[0]);
+}
+
+void setVec2(GLuint program, const std::string& name, const glm::vec2 &value)
+{
+    GLint location = glGetUniformLocation(program, name.c_str());
+    glUniform2fv(location,1,&value[0]);
 }
