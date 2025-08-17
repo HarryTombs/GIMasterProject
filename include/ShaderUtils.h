@@ -15,6 +15,8 @@ extern unsigned int cubeVBO;
 extern unsigned int quadVAO;
 extern unsigned int quadVBO;
 
+extern unsigned int frameCount;
+
 void CheckSDLError(const std::string& message);
 void CheckGLError(const std::string& message) ;
 

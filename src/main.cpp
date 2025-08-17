@@ -247,8 +247,7 @@ void MainLoop() {
         deltaTime = (double)((NOW - LAST) * 1000) / SDL_GetPerformanceFrequency();
         deltaTime /= 1000.0;
 
-
-
+        frameCount++; 
         
 
         defferedShadingGraph.mainLoop();

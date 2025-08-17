@@ -148,6 +148,13 @@ void Pass::loadViewProjMatricies()
     glm::mat4 projection = glm::perspective(glm::radians(useCamera->m_zoom), (float)ScreenWidth/ (float)ScreenHeight,0.01f,1000.0f);
     setMat4(shaderProgram, "view", view);
     setMat4(shaderProgram, "projection", projection);
+    float timeSec = SDL_GetTicks() / 1000.0f;
+    setFloat(shaderProgram,"time",timeSec);
+    glm::mat4 invView = glm::inverse(view);
+    glm::mat4 invProjection = glm::inverse(projection);
+    setMat4(shaderProgram, "invView", invView);
+    setMat4(shaderProgram, "invProjection", invProjection);
+    setVec2(shaderProgram, "texelSize",(glm::vec2(1.0)/glm::vec2(ScreenHeight,ScreenWidth)));
 }
 
 
@@ -157,11 +164,7 @@ void Pass::textureUniforms()
     for(int i = 0; i < Inputs.size(); i++)
     {
         setInt(shaderProgram,Inputs[i].name,i);
-        glm::mat4 invView = glm::inverse(useCamera->getView());
-        glm::mat4 invProjection = glm::inverse(glm::perspective(glm::radians(useCamera->m_zoom), (float)ScreenWidth/ (float)ScreenHeight,0.01f,1000.0f));
-        setMat4(shaderProgram, "invView", invView);
-        setMat4(shaderProgram, "invProjection", invProjection);
-        setVec2(shaderProgram, "texelSize",(glm::vec2(1.0)/glm::vec2(ScreenHeight,ScreenWidth)));
+        
     } 
 }
 

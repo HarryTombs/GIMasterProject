@@ -116,40 +116,28 @@ void Graph::executePasses()
         {
             p->frameBuffer.bind();
         }
+        
+        p->clear();
+        p->loadViewProjMatricies();
+        for(int i = 0; i < p->Inputs.size(); i++)
+        {
+            glActiveTexture(GL_TEXTURE0+i);
+            glBindTexture(GL_TEXTURE_2D,textures[p->Inputs[i].name].texID);
+        }
+        
         if(!p->isScreenQuad)
         {
-            p->clear();
-            p->loadViewProjMatricies();
-            for(int i = 0; i < p->Inputs.size(); i++)
-            {
-                glActiveTexture(GL_TEXTURE0+i);
-                glBindTexture(GL_TEXTURE_2D,textures[p->Inputs[i].name].texID);
-            }
             for (Model m : sceneModels)
             {
                 
                 setMat4(p->shaderProgram, "model", m.transMat);
                 m.Draw();
             }
-            // for (int i = 0;i < sceneProbes.size(); i++)
-            // {
-            //     glm::mat4 probemat(1.0f);
-            //     probemat = glm::translate(probemat,sceneProbes[i].Pos);
-            //     setMat4(p->shaderProgram, "probeModel", probemat);
-            //     std::cout << "uploaded probe Matrix" << i << std::endl;
-            // }
             glBlitFramebuffer(0, 0, ScreenWidth, ScreenHeight, 0, 0, ScreenWidth, ScreenHeight, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
         }
         if(p->isScreenQuad)
         {
-            p->clear();
-            glUseProgram(p->shaderProgram);
-            for(int i = 0; i < p->Inputs.size(); i++)
-            {
-                glActiveTexture(GL_TEXTURE0+i);
-                glBindTexture(GL_TEXTURE_2D,textures[p->Inputs[i].name].texID);
-            }
             glDisable(GL_DEPTH_TEST);
             renderQuad();
             glEnable(GL_DEPTH_TEST);

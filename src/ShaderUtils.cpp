@@ -5,11 +5,14 @@
 int ScreenHeight = 720;
 int ScreenWidth = 720;
 
+unsigned int frameCount = 0;
+
 unsigned int cubeVAO = 0;
 unsigned int cubeVBO = 0;
 
 unsigned int quadVAO = 0;
 unsigned int quadVBO = 0;
+
 
 void CheckSDLError(const std::string& message) 
 {

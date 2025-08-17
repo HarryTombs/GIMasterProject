@@ -23,8 +23,8 @@
                     {
                         "name": "inputUvTexture",
                         "existing": false,
-                        "width": 512,
-                        "height": 512,
+                        "width": 720,
+                        "height": 720,
                         "format":
                         {
                             "internalFormat": "GL_RGBA",

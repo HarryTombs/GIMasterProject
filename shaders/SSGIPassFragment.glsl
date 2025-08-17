@@ -10,6 +10,9 @@ uniform sampler2D DepthTexture;
 uniform mat4 invView;
 uniform mat4 invProjection;
 
+
+uniform float time;
+
 vec3 reconstructWorldPos(vec2 uv)
 {
     float Depth = texture(DepthTexture,uv).r;
@@ -31,17 +34,17 @@ void main()
 
 
     vec3 indirect = vec3(0.0);
-    int numSamples = 256;
+    int numSamples = 500;
 
     for (int i = 0; i < numSamples; i++)
     {
         vec2 rand = vec2(fract(sin(dot(uv, vec2(12.9898,78.233))) * 43758.5453 + float(i)));
-        float angle = rand.x * 6.2831;
+        float angle = rand.x * 6.2831 + time * 0.37;
         float radius = rand.y * 0.1;
         vec2 offsetUV = uv + radius * vec2(cos(angle), sin(angle));
 
         vec3 neighborPos = reconstructWorldPos(offsetUV);
-        vec3 nieghborCol = texture(LightTexture, offsetUV).rbg;
+        vec3 nieghborCol = texture(LightTexture, offsetUV).rgb;
 
         if (dot(neighborPos - pos, normal) > 0.0)
         {
