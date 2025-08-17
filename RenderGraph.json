@@ -145,6 +145,50 @@
                 ]
             },
             {
+                "PassName" : "StochasticNormalPass",
+                "FrameBuffer":"SNRMFBO",
+                "ScreenQuad":true,
+                "UseLights":false,
+                "Display":true,
+                "Shaders":
+                {
+                    "Vertex":"shaders/StochasticNormalsVertex.glsl",
+                    "Fragment":"shaders/StochasticNormalsFragment.glsl"
+                },
+                "Inputs":
+                [
+                    {
+                        "name": "LightTexture",
+                        "existing": true
+                    },
+                    {
+                        "name": "GNorm",
+                        "existing": true
+                    },
+                    {
+                        "name": "DepthTexture",
+                        "existing": true
+                    }
+                ],
+                "Outputs":
+                [
+                    {
+                        "name": "SNRMTexture",
+                        "existing": false,
+                        "width": 720,
+                        "height": 720,
+                        "format": 
+                        {
+                            "internalFormat": "GL_RGBA16F",
+                            "format": "GL_RGBA",
+                            "type": "GL_FLOAT"
+                        },
+                        "attachmentPoint": "GL_COLOR_ATTACHMENT0",
+                        "isImageTex": false
+                    }
+                ]
+            },
+            {
                 "PassName" : "SSGIPass",
                 "FrameBuffer":"SSGIFBO",
                 "ScreenQuad":true,
@@ -193,7 +237,7 @@
                 "FrameBuffer":"FilterFBO",
                 "ScreenQuad":true,
                 "UseLights":false,
-                "Display":true,
+                "Display":false,
                 "Shaders":
                 {
                     "Vertex":"shaders/BlurVertex.glsl",
