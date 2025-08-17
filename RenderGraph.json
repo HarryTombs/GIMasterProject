@@ -212,6 +212,10 @@
                     {
                         "name": "DepthTexture",
                         "existing": true
+                    },
+                    {
+                        "name": "LightTexture",
+                        "existing": true
                     }
                 ],
                 "Outputs":

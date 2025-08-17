@@ -6,11 +6,13 @@ layout (location=0)out vec3 BlurTexture;
 uniform sampler2D GNorm;
 uniform sampler2D SSGITexture;
 uniform sampler2D DepthTexture;
+uniform sampler2D LightTexture;
 
 uniform vec2 texelSize;
 
 void main() 
 {
+    vec3 lighting = texture(LightTexture, uv).xyz;
     float currentDepth = texture(DepthTexture, uv).r;
     vec3 currentNorm = normalize(texture(GNorm,uv).xyz);
     vec3 result = vec3(0.0);
@@ -43,5 +45,5 @@ void main()
     }
 
     vec3 SSGI = texture(SSGITexture,uv).xyz;
-    BlurTexture = result / totalWeight;
+    BlurTexture = lighting + result / totalWeight;
 }

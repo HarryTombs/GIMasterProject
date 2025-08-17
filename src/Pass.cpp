@@ -149,12 +149,13 @@ void Pass::loadViewProjMatricies()
     setMat4(shaderProgram, "view", view);
     setMat4(shaderProgram, "projection", projection);
     float timeSec = SDL_GetTicks() / 1000.0f;
-    setFloat(shaderProgram,"time",timeSec);
+    setInt(shaderProgram,"frame",frameCount);
     glm::mat4 invView = glm::inverse(view);
     glm::mat4 invProjection = glm::inverse(projection);
     setMat4(shaderProgram, "invView", invView);
     setMat4(shaderProgram, "invProjection", invProjection);
     setVec2(shaderProgram, "texelSize",(glm::vec2(1.0)/glm::vec2(ScreenHeight,ScreenWidth)));
+    setVec2(shaderProgram, "Resolution",glm::vec2(ScreenWidth,ScreenHeight));
 }
 
 
