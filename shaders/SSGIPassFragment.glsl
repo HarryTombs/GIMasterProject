@@ -16,7 +16,7 @@ uniform mat4 view;
 uniform int frame;
 uniform vec2 Resolution;
 
-int StepCount   = 32;
+int StepCount   = 64;
 float Thickness = 0.2;
 float MaxDist   = 10.0;
 float StepScale = 1.0;

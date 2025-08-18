@@ -183,7 +183,7 @@ void Graph::createTextures()
                 }
                 else
                 {
-                    newTex.create(texconf.name,ScreenWidth,ScreenHeight,newFmt,texconf.attachmentPoint);
+                    newTex.create(texconf.name,texconf.width,texconf.height,newFmt,texconf.attachmentPoint);
                     textures[texconf.name] = newTex;
                 }
 
@@ -206,7 +206,7 @@ void Graph::createTextures()
 
                 TextureObj newTex;
 
-                newTex.create(texconf.name,ScreenWidth,ScreenHeight,newFmt,texconf.attachmentPoint);
+                newTex.create(texconf.name,texconf.width,texconf.height,newFmt,texconf.attachmentPoint);
                 textures[texconf.name] = newTex;
 
                 CheckGLError("TextureCreation");
@@ -237,7 +237,7 @@ void Graph::resizeTextures()
 
                 TextureObj newTex;
 
-                newTex.create(texconf.name,ScreenWidth,ScreenHeight,newFmt,texconf.attachmentPoint);
+                newTex.create(texconf.name,texconf.width,texconf.height,newFmt,texconf.attachmentPoint);
                 textures[texconf.name] = newTex;
 
                 CheckGLError("TextureRecreation");

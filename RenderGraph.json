@@ -237,8 +237,44 @@
                 ]
             },
             {
-                "PassName" : "FilterPass",
-                "FrameBuffer":"FilterFBO",
+                "PassName" : "DownResPass",
+                "FrameBuffer":"DownRes",
+                "ScreenQuad":true,
+                "UseLights":false,
+                "Display":false,
+                "Shaders":
+                {
+                    "Vertex":"shaders/DownResVertex.glsl",
+                    "Fragment":"shaders/DownResFragment.glsl"
+                },
+                "Inputs":
+                [
+                    {
+                        "name": "SSGITexture",
+                        "existing": true
+                    }
+                ],
+                "Outputs":
+                [
+                    {
+                        "name": "DownResTexture",
+                        "existing": false,
+                        "width": 480,
+                        "height": 480,
+                        "format": 
+                        {
+                            "internalFormat": "GL_RGBA16F",
+                            "format": "GL_RGBA",
+                            "type": "GL_FLOAT"
+                        },
+                        "attachmentPoint": "GL_COLOR_ATTACHMENT0",
+                        "isImageTex": false
+                    }
+                ]
+            },
+            {
+                "PassName" : "BlurPass",
+                "FrameBuffer":"BlurFBO",
                 "ScreenQuad":true,
                 "UseLights":false,
                 "Display":true,
@@ -271,8 +307,8 @@
                     {
                         "name": "BlurTexture",
                         "existing": false,
-                        "width": 720,
-                        "height": 720,
+                        "width": 480,
+                        "height": 480,
                         "format": 
                         {
                             "internalFormat": "GL_RGBA16F",

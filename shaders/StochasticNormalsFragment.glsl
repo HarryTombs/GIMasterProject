@@ -7,11 +7,6 @@ uniform sampler2D GNorm;
 uniform sampler2D LightTexture;
 uniform sampler2D DepthTexture;
 
-uniform mat4 invView;
-uniform mat4 invProjection;
-uniform mat4 projection;
-uniform mat4 view;
-
 uniform int frame;
 uniform vec2 Resolution;
 
