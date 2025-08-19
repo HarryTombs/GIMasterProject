@@ -17,7 +17,7 @@ uniform int frame;
 uniform vec2 Resolution;
 
 int StepCount   = 64;
-float Thickness = 0.2;
+float Thickness = 0.05;
 float MaxDist   = 10.0;
 float StepScale = 1.0;
 
@@ -121,7 +121,7 @@ vec4 RayMarchSSGI(vec3 originVS, vec3 dirVS)
                     tBack = tm;
                 }
             }
-            retun vec4(bestUV, bestT, 1.0);
+            return vec4(bestUV, bestT, 1.0);
         }
         t += stepSize;
     }
@@ -147,5 +147,5 @@ void main()
     vec3 cubemap = vec3(0.0);
     vec3 sampleColour = texture(LightTexture, hitUV).rgb;
     // sampleColour *= hitMask;
-    SSGITexture =  sampleColour;
+    SSGITexture =  sampleColour * 2.0;
 }
