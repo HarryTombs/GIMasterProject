@@ -149,3 +149,10 @@ void main()
     // sampleColour *= hitMask;
     SSGITexture =  sampleColour * 2.0;
 }
+
+
+// Citation
+
+// Glsl code is adapted from Shubham Sachdevas
+// "Dynamic, Noise Free, Screen Space Diffuse Global Illumination"
+// available at https://gamehacker1999.github.io/posts/SSGI/

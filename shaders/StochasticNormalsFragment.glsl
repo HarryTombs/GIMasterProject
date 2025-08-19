@@ -92,3 +92,10 @@ void main()
     vec3 sN = makeStochasticNormal(uv);
     SNRMTexture = vec3(sN * 0.5 + 0.5);
 }
+
+
+// Citation
+
+// Glsl code is adapted from Shubham Sachdevas
+// "Dynamic, Noise Free, Screen Space Diffuse Global Illumination"
+// available at https://gamehacker1999.github.io/posts/SSGI/
