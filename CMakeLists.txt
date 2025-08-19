@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10.0)
 project(SDL_Proj VERSION 0.1.0 LANGUAGES C CXX)
 
-set(TargetName SDL_Proj)
+set(TargetName GIProj)
 
 add_executable(${TargetName})
 
@@ -12,7 +12,14 @@ include_directories(${CMAKE_SOURCE_DIR}/include)
 
 target_link_libraries(${TargetName} ${SDL2_LIBRARIES} )
 
+enable_testing()
+find_package(GTest REQUIRED)
 
+add_executable(GITests tests/GITests.cpp)
+target_include_directories(GITests PRIVATE include)
+
+target_link_libraries(GITests PRIVATE GTest::GTest GTest::Main pthread)
+add_test(NAME GITests COMMAND GITests)
 
 include_directories(include $ENV{HOME}/NGL/include)
 target_sources(${TargetName} PRIVATE ${PROJECT_SOURCE_DIR}/src/main.cpp
@@ -22,6 +29,7 @@ target_sources(${TargetName} PRIVATE ${PROJECT_SOURCE_DIR}/src/main.cpp
 			${PROJECT_SOURCE_DIR}/src/Scene.cpp
 			${PROJECT_SOURCE_DIR}/src/ShaderUtils.cpp
 			${PROJECT_SOURCE_DIR}/src/TextureUtils.cpp
+			${PROJECT_SOURCE_DIR}/src/stb_image.cpp
 			${PROJECT_SOURCE_DIR}/include/SDLWindow.h
 			${PROJECT_SOURCE_DIR}/include/ShaderUtils.h
 			${PROJECT_SOURCE_DIR}/include/TextureUtils.h
@@ -30,6 +38,7 @@ target_sources(${TargetName} PRIVATE ${PROJECT_SOURCE_DIR}/src/main.cpp
 			${PROJECT_SOURCE_DIR}/include/Pass.h
 			${PROJECT_SOURCE_DIR}/include/Graph.h
 			${PROJECT_SOURCE_DIR}/include/Scene.h
+			${PROJECT_SOURCE_DIR}/include/stb_image.h
 			${PROJECT_SOURCE_DIR}/include/Mesh.h)
 
 
