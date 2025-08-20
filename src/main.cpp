@@ -11,7 +11,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/string_cast.hpp>
 
-#include "stb_image.h"
+#include <stb_image.h>
 #include <filesystem>
 
 #include "SDLWindow.h"

@@ -8,6 +8,15 @@ add_executable(${TargetName})
 find_package(SDL2 REQUIRED)
 include_directories(${SDL2_INCLUDE_DIRS})
 
+include(FetchContent)
+FetchContent_Declare(
+    stb
+    GIT_REPOSITORY https://github.com/nothings/stb.git
+    GIT_TAG master
+)
+FetchContent_MakeAvailable(stb)
+target_include_directories(${TargetName} PRIVATE ${stb_SOURCE_DIR})
+
 include_directories(${CMAKE_SOURCE_DIR}/include)
 
 target_link_libraries(${TargetName} ${SDL2_LIBRARIES} )
@@ -21,7 +30,7 @@ target_include_directories(GITests PRIVATE include)
 target_link_libraries(GITests PRIVATE GTest::GTest GTest::Main pthread)
 add_test(NAME GITests COMMAND GITests)
 
-include_directories(include $ENV{HOME}/NGL/include)
+
 target_sources(${TargetName} PRIVATE ${PROJECT_SOURCE_DIR}/src/main.cpp
 			${PROJECT_SOURCE_DIR}/src/FrameBufferObject.cpp
 			${PROJECT_SOURCE_DIR}/src/Pass.cpp
@@ -59,9 +68,6 @@ find_package(assimp REQUIRED)
 target_link_libraries(${TargetName}  ${ASSIMP_LIBRARIES})
 
 
-target_include_directories(${TargetName} PRIVATE /home/harry/vcpkg/installed/x64-linux/include)
-
-# don't hard code this dumbass
 
 add_compile_definitions(ASSET_DIR="${CMAKE_CURRENT_SOURCE_DIR}/")
 
