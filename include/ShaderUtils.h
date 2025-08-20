@@ -17,16 +17,19 @@ extern unsigned int quadVBO;
 
 extern unsigned int frameCount;
 
+// error checking made easier
 void CheckSDLError(const std::string& message);
 void CheckGLError(const std::string& message) ;
 
 void renderQuad();
 void renderCube();
 
+// Shader creation functions
 std::string readFile(const std::string& path);
 GLuint loadComputeShader(const std::string& path);
 GLuint loadShaderProgram(const std::string& inVertPath, const std::string& inFragPath);
 
+// Uniform functions
 void setInt (GLuint program, const std::string& name, int value);
 void setFloat(GLuint program, const std::string& name, float value);
 void setMat4(GLuint program, const std::string& name, const glm::mat4 &value);

@@ -20,10 +20,13 @@ using namespace rapidjson;
 struct Graph
 {
     std::vector<std::unique_ptr<Pass>> passes;
+
+    // Unordered maps used for name referencing from Json
     std::unordered_map<std::string, TextureObj> textures;
     std::unordered_map<std::string, TextureFormat> formats;
     std::unordered_map<std::string, bool> useImages;
 
+    // Inherited from current scene
     Camera* currentCam = nullptr;
     std::vector<Model> sceneModels;
     std::vector<SpotLight> sceneLights;

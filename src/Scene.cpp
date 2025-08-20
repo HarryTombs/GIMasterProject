@@ -1,7 +1,9 @@
 #include "Scene.h"
 
+
 void Scene::layoutProbes()
 {
+    // probe layout for light probes
     for(float x = RoomMinX; x <= RoomMaxX; x += spacing)
     {
         for(float y = RoomMinY; y <= RoomMaxY; y += spacing)
@@ -21,6 +23,7 @@ void Scene::layoutProbes()
 
 void Scene::init()
 {
+    // Creating scene based on array properties
     layoutProbes();
     for(int i = 0; i < cubeSca.size(); i++)
     {

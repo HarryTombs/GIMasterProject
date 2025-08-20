@@ -26,21 +26,26 @@ public:
     Graph* graph = nullptr;
 
     std::string name;
-
+    
+    // Texconfigs store information from JSON to be created and stored in the graph class, prevents duplicate textures
     std::vector<TextureConfig> Inputs;
     std::vector<TextureConfig> Outputs;
-
+    
+    // attachment points defined for each pass
     std::vector<GLenum> InAttachments;
     std::vector<GLenum> OutAttachments;
 
+    // inherited from graph
     std::vector<Model> useModels;
     Camera* useCamera = nullptr;
     FrameBufferObject frameBuffer;
 
+    // boolean values inherited from JSON
     bool isScreenQuad;
     bool useLights;
     bool Display;
 
+    // shader program setuo for each given pass
     unsigned int shaderProgram;
 
     std::string vert;

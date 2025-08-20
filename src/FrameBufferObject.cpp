@@ -16,7 +16,7 @@ void TextureObj::create(std::string inName, int w, int h, TextureFormat& fmt, GL
     glGenTextures(1, &texID);
     glBindTexture(GL_TEXTURE_2D, texID);
     
-
+    // separate function for input image textures vs non input
     if (isImageTex)
     {
         int width, height, channels;
@@ -37,6 +37,7 @@ void TextureObj::create(std::string inName, int w, int h, TextureFormat& fmt, GL
         }
         stbi_image_free(data);
     }
+    // take from texture format to create
     else
     {
         glTexImage2D(GL_TEXTURE_2D, 0, fmt.internalFormat, w, h, 0, fmt.format, fmt.type, NULL);
@@ -57,12 +58,6 @@ void FrameBufferObject::create()
 void FrameBufferObject::bind()
 {
     glBindFramebuffer(GL_FRAMEBUFFER,fbo);
-}
-
-void FrameBufferObject::attachTexture(TextureObj tex)
-{
-    glFramebufferTexture2D(GL_FRAMEBUFFER, tex.attachmentPoint, GL_TEXTURE_2D, tex.texID, 0);
-    // Textures.push_back(tex);
 }
 
 GLuint FrameBufferObject::getID() 

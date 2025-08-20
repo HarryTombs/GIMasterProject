@@ -6,13 +6,18 @@
 
 void Graph::initGraph(const std::string& path,Scene scene)
 {
+    // Json reading and texture creation first thing
     readJson(path);
     createTextures();
+
+    // inherit from scene graph
 
     sceneModels = scene.Meshes;
     sceneLights = scene.Lights;
     sceneProbes = scene.probes;
     
+    // executing pass setup per pass
+
     for (const auto& p : passes)
     {
         
@@ -21,8 +26,6 @@ void Graph::initGraph(const std::string& path,Scene scene)
             p->frameBuffer.bind();
             p->attachOutputTextures(this);
             
-            // p->depthBufferSetup();
-
             GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
             if (status != GL_FRAMEBUFFER_COMPLETE) 
             {
@@ -32,6 +35,7 @@ void Graph::initGraph(const std::string& path,Scene scene)
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
             CheckGLError("FrameBuffer");
         }
+        // slight vairations in approach depending on if pass is based on the geometry or reading from textures
         if(p->isScreenQuad == true)
         {
             p->textureUniforms();
@@ -75,12 +79,14 @@ std::string readFileToString (const std::string& path)
 
 void Graph::readJson(const std::string& path)
 {
+    // Reading Json
     std::string fullpath = (std::string(ASSET_DIR) + "/" + path);
     std::string json  = readFileToString(fullpath);
 
     Document d;
     d.Parse(json.c_str());
 
+    // Error checking
     if (d.HasParseError())
     {
         std::cerr << "JSON parse error: " << d.GetParseError() << " at offset " << d.GetErrorOffset() << std::endl;
@@ -91,10 +97,13 @@ void Graph::readJson(const std::string& path)
     {
         const auto& graph = d["Graph"];
         
+        // getting initial details for passes then main json reading is done in pass creation
+
         if (graph.HasMember("Passes") && graph["Passes"].IsArray())
         {
             const auto& passesArray = graph["Passes"];
 
+            // creating a pass for each pass value
             for (const auto& passVal : passesArray.GetArray()) 
             {
                 std::unique_ptr<Pass> newPass = std::make_unique<Pass>(this);
@@ -108,15 +117,17 @@ void Graph::readJson(const std::string& path)
     
 }
 
+// Render loop execution 
 void Graph::executePasses()
 {
     for (const auto& p : passes)
     {
+        // If labeled as display writing to default frame buffer to show on screen 
         if (!p->Display)
         {
             p->frameBuffer.bind();
         }
-        
+        // Needed by or doesn't affect all passes
         p->clear();
         p->loadViewProjMatricies();
         for(int i = 0; i < p->Inputs.size(); i++)
@@ -125,6 +136,7 @@ void Graph::executePasses()
             glBindTexture(GL_TEXTURE_2D,textures[p->Inputs[i].name].texID);
         }
         
+        // Draw call for Geometry based passes
         if(!p->isScreenQuad)
         {
             for (Model m : sceneModels)
@@ -136,6 +148,7 @@ void Graph::executePasses()
             glBlitFramebuffer(0, 0, ScreenWidth, ScreenHeight, 0, 0, ScreenWidth, ScreenHeight, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
         }
+        // Draw call for screen quad based passes
         if(p->isScreenQuad)
         {
             glDisable(GL_DEPTH_TEST);
@@ -143,6 +156,7 @@ void Graph::executePasses()
             glEnable(GL_DEPTH_TEST);
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
         }
+        // needed for light calculation
         if(p->useLights)
         {
             for (unsigned int i = 0; i < sceneLights.size(); i++)
@@ -162,12 +176,16 @@ void Graph::executePasses()
 
 void Graph::createTextures()
 {
+    // after pass reads JSON create textures based on read vairables
     for (const auto& p : passes)
     {
+        // checks for all textures called by all passes
         for (TextureConfig texconf : p->Inputs)
         {
+            // checks if texture has already been created
             if (textures.find(texconf.name) == textures.end())
             {
+                // if not found new texture is created
                 TextureFormat newFmt;
 
                 newFmt.internalFormat = texconf.internalFormat;
@@ -175,6 +193,8 @@ void Graph::createTextures()
                 newFmt.type = texconf.type;
 
                 TextureObj newTex;
+
+                // only checking image tex for inputs as outputs would not have inputs
 
                 if(texconf.isImageTex)
                 {
@@ -187,8 +207,6 @@ void Graph::createTextures()
                     textures[texconf.name] = newTex;
                 }
 
-                
-
                 CheckGLError("TextureCreation");
 
                 std::cout << "Made texture: " << texconf.name <<  std::endl;
@@ -196,6 +214,7 @@ void Graph::createTextures()
         }
         for (TextureConfig texconf : p->Outputs)
         {
+            // name check if exists
             if (textures.find(texconf.name) == textures.end())
             {
                 TextureFormat newFmt;
@@ -221,6 +240,7 @@ void Graph::createTextures()
 
 void Graph::resizeTextures()
 {
+    // resize causes texture remake
     for (const auto& p : passes)
     {
         if(!p->isScreenQuad)
@@ -259,8 +279,6 @@ void Graph::resizeTextures()
         
     }
 }
-
-
 
 TextureObj Graph::getTexture(const std::string& name)
 {

@@ -84,9 +84,6 @@ private:
         
         CamRight = glm::normalize(glm::cross(CamFront,WorldUp));
         CamUp = glm::normalize(glm::cross(CamRight,CamFront));
-        // std::cout << "RIGHT: " << glm::to_string(CamRight) << std::endl;
-        // std::cout << "UP: " << glm::to_string(CamUp) << std::endl;
-        // std::cout << "FRONT: " << glm::to_string(CamFront) << std::endl;
     };
 
 

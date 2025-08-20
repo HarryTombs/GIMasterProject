@@ -28,7 +28,7 @@ struct SpotLight : BaseLight
     float cutoff = 0.95;
 };
 
-
+// SDFs to inherits properties from all given meshes in a scene padding used for SSBO compatibility
 struct SDFPrim
 {
     int type;           
@@ -44,11 +44,12 @@ struct SDFPrim
         
 };
 
+// Light probes laid throughout scene to gather luminence for DDGI/SDFGI
 struct Probe 
 {
     glm::vec3 Pos;
     float pad1;
-    glm::vec3 Col; // storing indirect light values
+    glm::vec3 Col; 
     float pad2;
 };
 
@@ -61,24 +62,26 @@ class Scene
     std::vector<SpotLight> Lights;
     std::vector<SDFPrim> sdfprims;
 
+    // current cam allows for active switching between cameras when live
     Camera currentCam;
 
-    // You could put all this in a json huh?
-
+    // scene information
     std::vector<glm::vec3> camPos = {glm::vec3(0.0f,0.0f,5.0f)};
 
+    // light Dir used for spotlight and enviroment light
     std::vector<glm::vec3> lightPos = {glm::vec3(-2.0f,0.5f,0.0), glm::vec3(3.0f,0.7f,4.0), glm::vec3(0.0f,1.0f,-4.0)};
     std::vector<glm::vec3> lightCol = {glm::vec3(1.0f,1.0f,1.0), glm::vec3(1.0f,1.0f,1.0), glm::vec3(1.0f,0.0f,1.0f)};
     std::vector<glm::vec3> lightDir = {glm::vec3(-1.0f,0.0f,0.0f),glm::vec3(0.5f,0.0f,1.0), glm::vec3(-0.5f,0.0f,-1.0f)};
 
+    // cubes available by default 
     std::vector<glm::vec3> cubePos = {glm::vec3(0.0f,-1.0f,0.0), glm::vec3(0.0f,3.0f,0.0), glm::vec3(0.0f,1.0f,-5.05f), glm::vec3(5.05f,1.0f,0.0f), glm::vec3(-5.05f,1.0f,0.0f), glm::vec3(2.0,0.0,2.0)};
     std::vector<glm::vec3> cubeSca = {glm::vec3(5.0f,0.1f,5.0f), glm::vec3(5.0f,0.1f,5.0f), glm::vec3(5.0f,2.5f,0.1f), glm::vec3(0.1f,2.5f,5.0f), glm::vec3(0.1f,2.5f,5.0f), glm::vec3(0.1,1.0,3.0)};
-
+    
+    // custom is describing any non primitive model, taking position and model path
     std::vector<glm::vec3> customPos = {glm::vec3(0.0f,0.0f,0.0)} ;
     std::vector<std::string> customPath = {"models/test2.obj"};
-
-    // end of sarcastic inclusion
-
+    
+    // setup for probes
     std::vector<Probe> probes;
 
     float RoomMinX = -5.5f;

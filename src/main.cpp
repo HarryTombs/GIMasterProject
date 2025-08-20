@@ -32,36 +32,19 @@ bool mouseDown = false;
 float glX;
 float glY;
 
-
-
-
-GLuint renderShader, computeShader; 
+GLuint renderShader; 
 
 unsigned int sdfBuffer;
 unsigned int probeBuffer;
 unsigned int lightBufffer;
 unsigned int indirectBuffer;
 
-bool rebakeLighting = false;
-
 Scene scene;
-
 Graph defferedShadingGraph;
-
-TextureObj inTexture;
-TextureFormat fmt = {GL_RGBA,GL_RGBA,GL_FLOAT};
-
-TextureObj computeTexture;
-TextureFormat comFmt = {};
 
 Uint64 NOW = SDL_GetPerformanceCounter();
 Uint64 LAST = 0;
 double deltaTime = 0;
-
-unsigned int texture;
-
-
-
 
 void GetOpenGLVersionInfo() 
 {
@@ -121,14 +104,22 @@ void InitialiseProgram()
 
     glEnable(GL_DEPTH_TEST);
 
+    // Scene graph initialisaion
+
     scene.init();
+
+    // forward rendering setup 
 
     renderShader = loadShaderProgram("shaders/vertex.glsl", "shaders/fragment.glsl");
     CheckGLError("Shaders");
 
+    // Render graph initialisation 
+
     defferedShadingGraph.currentCam = &scene.currentCam;
     defferedShadingGraph.initGraph("RenderGraph.json",scene);
     CheckGLError("JsonLoad");
+
+    // SSBOs included for showcasing things like probes and SDFs which aren't used in final image result
 
     glGenBuffers(1,&sdfBuffer);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, sdfBuffer);
@@ -155,8 +146,6 @@ void InitialiseProgram()
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
     CheckGLError("ssbo Buffer setup");
 
-    rebakeLighting = true;
-
 
 }
 
@@ -171,6 +160,7 @@ void Input() {
             std::cout << "Bye!" << std::endl;
             gQuit = true;
         }
+        // Resize event
 
         if (e.type == SDL_WINDOWEVENT && e.window.event == SDL_WINDOWEVENT_RESIZED)
         {
@@ -182,7 +172,7 @@ void Input() {
             glViewport(0,0,ScreenWidth,ScreenHeight);
         }
 
-        
+        // Mouse movement 
         if (e.type == SDL_MOUSEBUTTONDOWN) 
         {
 
@@ -245,10 +235,13 @@ void MainLoop() {
 
         deltaTime = (double)((NOW - LAST) * 1000) / SDL_GetPerformanceFrequency();
         deltaTime /= 1000.0;
+        
+        // Get frame count
 
         frameCount++; 
         
-
+        // loop for 
+        
         defferedShadingGraph.mainLoop();
 
         glDisable(GL_DEPTH_TEST);
@@ -260,10 +253,9 @@ void MainLoop() {
         );
 
         glEnable(GL_DEPTH_TEST);
-
-        // render cubes for lights
         CheckGLError("run graph");
-        
+
+        // forward rendering cubes for lights for clarity
 
         glUseProgram(renderShader);
 
@@ -282,7 +274,6 @@ void MainLoop() {
             glUseProgram(renderShader);
             renderCube();
         }
-
 
         SDL_GL_SwapWindow(GraphicsApplicationWindow);
     }

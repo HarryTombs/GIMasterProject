@@ -7,6 +7,7 @@
 
 GLenum getGLEnumFromString(const std::string& str);
 
+// Texture config struct for storing texture information without creating the textures on the passes
 struct TextureConfig
 {
     std::string name;

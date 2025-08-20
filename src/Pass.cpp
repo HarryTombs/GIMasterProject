@@ -6,15 +6,17 @@ Pass::Pass(Graph* parentGraph) : graph(parentGraph){}
 
 void Pass::init(const rapidjson::Value& passJson)
     {
+        // main JSON reading function defining whole individaul pass
         if(passJson.HasMember("PassName"))
         {
             name = passJson["PassName"].GetString();
         }
-
+        // JSON safety checks
         if (passJson.HasMember("Inputs") && passJson["Inputs"].IsArray()) 
         {
             for (const auto& input : passJson["Inputs"].GetArray()) 
             {
+                // create new texconfig according to JSON definition 
                 TextureConfig tex; 
                 tex.name = input["name"].GetString();
                 tex.existing = input["existing"].GetBool();
@@ -35,12 +37,9 @@ void Pass::init(const rapidjson::Value& passJson)
                     tex.format = getGLEnumFromString(fmt["format"].GetString());
                     tex.type = getGLEnumFromString(fmt["type"].GetString());
                 }
-                
 
-                // InAttachments.push_back(attachPoint);
                 Inputs.push_back(tex);
                 
-                // Optionally store more info like format/attachment
             }
         }
 
@@ -65,11 +64,11 @@ void Pass::init(const rapidjson::Value& passJson)
                 tex.format = getGLEnumFromString(fmt["format"].GetString());
                 tex.type = getGLEnumFromString(fmt["type"].GetString());
 
-                // OutAttachments.push_back(attachPoint);
                 Outputs.push_back(tex);
             }
         }
 
+        // Storing Shader information
         if (passJson.HasMember("Shaders") && passJson["Shaders"].IsObject())
         {
             const auto& shaders = passJson["Shaders"];
@@ -84,6 +83,7 @@ void Pass::init(const rapidjson::Value& passJson)
                 frag = inFrag;
             }
         }
+        // General Pass information
         if (passJson.HasMember("ScreenQuad") && passJson["ScreenQuad"].IsBool())
         {
             isScreenQuad = passJson["ScreenQuad"].GetBool();
@@ -103,32 +103,9 @@ void Pass::init(const rapidjson::Value& passJson)
         useCamera = graph->currentCam;
         useModels = graph->sceneModels;
 
-        // depthBufferSetup();
-        // drawBuffers();
         
     }
 
-void Pass::execute()
-{
-    frameBuffer.bind();
-    // clear();
-    // for(int i = 0; i < In.size(); i++)
-    // {
-    //     glActiveTexture(GL_TEXTURE0 + i);
-    //     glBindTexture(GL_TEXTURE_2D, newInTexobjs[i].texID);
-    // }
-
-    // if (!isScreenQuad)
-    // {
-    //     loadViewProjMatricies(useCamera);  
-    //     for (Model m : useModels)
-    //     {
-    //         loadModelMatricies(m.transMat);
-    //         m.Draw();
-
-    //     } 
-    // }
-}
 
 void Pass::createShaderProgram()
 {
@@ -138,12 +115,14 @@ void Pass::createShaderProgram()
 
 void Pass::loadViewProjMatricies()
 {
+    // make sure the camera exists
     if (!useCamera) {
         std::cerr << "useCamera is nullptr in loadViewProjMatricies()\n";
         return;
     }
     glUseProgram(shaderProgram);
 
+    // Load all needed uniforms 
     glm::mat4 view = useCamera->getView();
     glm::mat4 projection = glm::perspective(glm::radians(useCamera->m_zoom), (float)ScreenWidth/ (float)ScreenHeight,0.01f,1000.0f);
     setMat4(shaderProgram, "view", view);
@@ -161,6 +140,7 @@ void Pass::loadViewProjMatricies()
 
 void Pass::textureUniforms()
 {
+    // loading texture uniforms
     glUseProgram(shaderProgram);
     for(int i = 0; i < Inputs.size(); i++)
     {
@@ -169,18 +149,9 @@ void Pass::textureUniforms()
     } 
 }
 
-void Pass::depthBufferSetup()
-{
-    frameBuffer.bind();
-    unsigned int rboDepth;
-    // glGenRenderbuffers(1, &rboDepth);   
-    // glBindRenderbuffer(GL_RENDERBUFFER, rboDepth);
-    // glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, ScreenWidth , ScreenHeight);
-    // glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rboDepth);
-}
-
 void Pass::drawBuffers()
 {
+    // Draw buffers to Framebuffer
     std::vector<GLenum> useAttchments;
     for (int i = 0; i < OutAttachments.size();i++)
     {
@@ -193,14 +164,10 @@ void Pass::drawBuffers()
     std::cout << "Draw Buffers Complete " << useAttchments.size() << std::endl;
 }
 
-void Pass::bindTextures()
-{
-
-    
-}
 
 void Pass::attachOutputTextures(Graph* graph)
 {
+    // Finding texture attachment points and attaching them
     frameBuffer.bind();
     for (auto& tex : Outputs)
     {

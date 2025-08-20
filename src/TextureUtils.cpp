@@ -1,7 +1,7 @@
 #include "TextureUtils.h"
 #include <unordered_map>
 
-
+// GLenums used for reading from JSON don't work if json data is incorrect
 std::unordered_map<std::string, GLenum> glEnumMap = {
     {"GL_RGBA", GL_RGBA},
     {"GL_DEPTH_STENCIL", GL_DEPTH_STENCIL},
@@ -25,6 +25,7 @@ std::unordered_map<std::string, GLenum> glEnumMap = {
     {"GL_DEPTH_COMPONENT24", GL_DEPTH_COMPONENT24},
 };
 
+// Reading the GLenums properly
 GLenum getGLEnumFromString(const std::string& str) {
     auto it = glEnumMap.find(str);
     if (it != glEnumMap.end())
