@@ -47,8 +47,18 @@ target_sources(${TargetName} PRIVATE ${PROJECT_SOURCE_DIR}/src/main.cpp
 			${PROJECT_SOURCE_DIR}/include/Pass.h
 			${PROJECT_SOURCE_DIR}/include/Graph.h
 			${PROJECT_SOURCE_DIR}/include/Scene.h
-			${PROJECT_SOURCE_DIR}/include/Mesh.h)
+			${PROJECT_SOURCE_DIR}/include/Mesh.h
+			)
 
+target_sources(${TargetName} PRIVATE
+    ${PROJECT_SOURCE_DIR}/src/imgui.cpp
+    ${PROJECT_SOURCE_DIR}/src/imgui_draw.cpp
+    ${PROJECT_SOURCE_DIR}/src/imgui_tables.cpp
+    ${PROJECT_SOURCE_DIR}/src/imgui_widgets.cpp
+    ${PROJECT_SOURCE_DIR}/src/imgui_demo.cpp   # optional but handy
+    ${PROJECT_SOURCE_DIR}/src/imgui_impl_sdl2.cpp
+    ${PROJECT_SOURCE_DIR}/src/imgui_impl_opengl3.cpp
+)
 
 # Find and link GLEW
 find_package(GLEW REQUIRED)

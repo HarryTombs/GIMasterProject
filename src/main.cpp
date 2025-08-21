@@ -23,6 +23,10 @@
 #include "Graph.h"
 #include "FrameBufferObject.h"
 
+#include "imgui.h"
+#include "imgui_impl_sdl2.h"
+#include "imgui_impl_opengl3.h"
+
 
 SDL_Window* GraphicsApplicationWindow = nullptr;
 SDL_GLContext OpenGlConext = nullptr;
@@ -119,6 +123,18 @@ void InitialiseProgram()
     defferedShadingGraph.initGraph("RenderGraph.json",scene);
     CheckGLError("JsonLoad");
 
+    // ImGui init
+
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    ImGui::StyleColorsDark();
+
+    ImGui_ImplSDL2_InitForOpenGL(GraphicsApplicationWindow, OpenGlConext);
+    ImGui_ImplOpenGL3_Init("#version 150");
+    CheckGLError("ImGuiInit");
+    CheckSDLError("ImGuiInit");
+
     // SSBOs included for showcasing things like probes and SDFs which aren't used in final image result
 
     glGenBuffers(1,&sdfBuffer);
@@ -153,6 +169,11 @@ void Input() {
     SDL_Event e;
     while (SDL_PollEvent(&e) != 0) 
     {
+        ImGui_ImplSDL2_ProcessEvent(&e);
+
+        ImGuiIO& io = ImGui::GetIO();
+        if (io.WantCaptureMouse || io.WantCaptureKeyboard)
+            continue;
 
         // Quit event
         if (e.type ==  SDL_QUIT)
@@ -226,6 +247,14 @@ void Input() {
 void MainLoop() {
     while (!gQuit) 
     {
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplSDL2_NewFrame();
+        ImGui::NewFrame();
+
+        ImGui::Begin("Hello");
+        ImGui::Text("ImGui is working!");
+        ImGui::End();
+
         Input();
 
         // Get Delta time
@@ -239,8 +268,12 @@ void MainLoop() {
         // Get frame count
 
         frameCount++; 
+
+        ImGui::Render();
+
         
         // loop for 
+        
         
         defferedShadingGraph.mainLoop();
 
@@ -275,6 +308,10 @@ void MainLoop() {
             renderCube();
         }
 
+        glDisable(GL_DEPTH_TEST);
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        glEnable(GL_DEPTH_TEST);
+
         SDL_GL_SwapWindow(GraphicsApplicationWindow);
     }
 }
@@ -282,6 +319,9 @@ void MainLoop() {
 void CleanUp() 
 {
     glDeleteProgram(renderShader);
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplSDL2_Shutdown();
+    ImGui::DestroyContext();
     SDL_GL_DeleteContext(OpenGlConext);
     SDL_DestroyWindow(GraphicsApplicationWindow);
     SDL_Quit();
