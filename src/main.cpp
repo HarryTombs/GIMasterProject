@@ -249,11 +249,6 @@ void MainLoop() {
     {
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplSDL2_NewFrame();
-        ImGui::NewFrame();
-
-        ImGui::Begin("Hello");
-        ImGui::Text("ImGui is working!");
-        ImGui::End();
 
         Input();
 
@@ -269,13 +264,15 @@ void MainLoop() {
 
         frameCount++; 
 
-        ImGui::Render();
 
         
         // loop for 
         
         
         defferedShadingGraph.mainLoop();
+
+        ImGui::Render();
+
 
         glDisable(GL_DEPTH_TEST);
 

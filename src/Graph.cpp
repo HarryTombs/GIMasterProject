@@ -1,5 +1,6 @@
 #include "Graph.h"
 #include "Pass.h"
+#include "imgui.h"
 
 
 
@@ -41,11 +42,9 @@ void Graph::initGraph(const std::string& path,Scene scene)
             p->textureUniforms();
             setInt(p->shaderProgram,"numProbes", scene.probes.size());
             std::cout<<"Load uniforms pass: " << p->name << std::endl;
-            if (!p->Display)
-            {
-                p->frameBuffer.bind();
-                p->attachOutputTextures(this);
-            }
+
+            p->frameBuffer.bind();
+            p->attachOutputTextures(this);
             
 
             CheckGLError("ScreenQuad");
@@ -120,8 +119,12 @@ void Graph::readJson(const std::string& path)
 // Render loop execution 
 void Graph::executePasses()
 {
+    ImGui::NewFrame();
+
+    ImGui::Begin("Change Pass");
     for (const auto& p : passes)
     {
+        ImGui::Checkbox(p->name.c_str(), &p->Display);
         // If labeled as display writing to default frame buffer to show on screen 
         if (!p->Display)
         {
@@ -172,6 +175,7 @@ void Graph::executePasses()
             CheckGLError("Light creation");
         }
     }
+    ImGui::End();
 }
 
 void Graph::createTextures()

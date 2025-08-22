@@ -23,6 +23,7 @@ void Scene::layoutProbes()
 
 void Scene::init()
 {
+
     // Creating scene based on array properties
     layoutProbes();
     for(int i = 0; i < cubeSca.size(); i++)
