@@ -12,5 +12,6 @@ Libraries included
 - Cmake
 - rapidjson
 - stb_Image.h (Sometimes if you have it pre installed you need to comment out the #define in stb_image.cpp)
+- ImGui (included locally)
 
 stb_Image is fetched in cmake so make sure you're connected to the internet
